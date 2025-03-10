@@ -8,6 +8,7 @@ import { ClerkLoaded, useUser } from "@clerk/clerk-react";
 import AuthWrapper from "./components/auth/AuthWrapper";
 import Index from "./pages/Index";
 import BookingPage from "./pages/BookingPage";
+import ShipmentBookingPage from "./pages/ShipmentBookingPage";
 import TrackingPage from "./pages/TrackingPage";
 import CompliancePage from "./pages/CompliancePage";
 import DashboardPage from "./pages/DashboardPage";
@@ -43,6 +44,11 @@ const App = () => (
             <Route path="/book" element={<BookingPage />} />
             
             {/* Protected routes */}
+            <Route path="/shipment" element={
+              <ProtectedRoute>
+                <ShipmentBookingPage />
+              </ProtectedRoute>
+            } />
             <Route path="/tracking" element={
               <ProtectedRoute>
                 <TrackingPage />

@@ -5,7 +5,7 @@ import { AuthButtons } from "@/components/auth/AuthWrapper";
 import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../common/LanguageSwitcher";
-import { Menu, Users } from "lucide-react";
+import { Menu, Users, Package } from "lucide-react";
 import { useState } from "react";
 
 const NavBar = () => {
@@ -18,6 +18,7 @@ const NavBar = () => {
     { path: "/", label: t('nav.home') },
     { path: "/book", label: t('nav.book') },
     ...(isSignedIn ? [
+      { path: "/shipment", label: t('nav.shipment', 'Book Shipment'), icon: Package },
       { path: "/tracking", label: t('nav.tracking') },
       { path: "/compliance", label: t('nav.compliance') },
       { path: "/dashboard", label: t('nav.dashboard') },

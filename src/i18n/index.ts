@@ -1,15 +1,17 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-const resources = {
+export const resources = {
   en: {
     translation: {
       nav: {
         home: 'Home',
         book: 'Book Demo',
+        shipment: 'Book Shipment',
         tracking: 'Tracking',
         compliance: 'Compliance',
         dashboard: 'Dashboard',
+        collaborate: 'Collaborate'
       },
       common: {
         signIn: 'Sign In',
@@ -251,9 +253,11 @@ const resources = {
       nav: {
         home: 'Hem',
         book: 'Boka Demo',
+        shipment: 'Boka Frakt',
         tracking: 'Spårning',
         compliance: 'Efterlevnad',
         dashboard: 'Översikt',
+        collaborate: 'Samarbeta'
       },
       common: {
         signIn: 'Logga In',
@@ -495,9 +499,11 @@ const resources = {
       nav: {
         home: 'Etusivu',
         book: 'Varaa Demo',
+        shipment: 'Varaa Lähetys',
         tracking: 'Seuranta',
         compliance: 'Vaatimustenmukaisuus',
         dashboard: 'Hallintapaneeli',
+        collaborate: 'Yhteistyö'
       },
       common: {
         signIn: 'Kirjaudu Sisään',
@@ -571,9 +577,9 @@ const resources = {
         events: {
           pickedUp: 'Noudettu lähettäjältä',
           departed: 'Lähtenyt toimipaikasta',
-          arrivedSorting: 'Saapunut lajittelukeskukseen',
+          arrivedSorting: 'Anlänttä sorteringskeskukseen',
           departedFacility: 'Lähtenyt toimipaikasta',
-          arrivedDestination: 'Saapunut määränpään toimipaikkaan',
+          arrivedDestination: 'Anlänttä destinationsanläggning',
           outForDelivery: 'Jakelussa',
           delivered: 'Toimitettu'
         }
