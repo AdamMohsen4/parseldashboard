@@ -11,24 +11,17 @@ export const saveBookingToSupabase = async (
   estimatedDelivery: string
 ) => {
   try {
-    // Get the current authenticated user
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    
-    if (authError) {
-      console.error("Error getting authenticated user:", authError);
+    // Use the Clerk user ID that's passed in the request
+    if (!request.userId) {
+      console.error("User ID is missing from request, cannot save booking");
       return false;
     }
     
-    if (!authData.user) {
-      console.error("User not authenticated, cannot save booking");
-      return false;
-    }
-    
-    console.log("Authenticated user confirmed:", authData.user.id);
+    console.log("Using Clerk user ID for booking:", request.userId);
     
     // Log the full data we're trying to insert
     const bookingData = {
-      user_id: authData.user.id,
+      user_id: request.userId,
       tracking_code: trackingCode,
       carrier_name: request.carrier.name,
       carrier_price: request.carrier.price,
@@ -49,7 +42,7 @@ export const saveBookingToSupabase = async (
     
     console.log("Attempting to insert booking with data:", bookingData);
     
-    // Insert booking with the authenticated user ID
+    // Insert booking with the Clerk user ID
     const { data, error } = await supabase
       .from('booking')
       .insert(bookingData)

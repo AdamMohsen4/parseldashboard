@@ -6,7 +6,6 @@ import { saveShipment } from "./shipmentService";
 import { BookingRequest, BookingResponse } from "@/types/booking";
 import { calculateTotalPrice, calculateEstimatedDelivery, generateShipmentId, generateTrackingCode } from "./bookingUtils";
 import { saveBookingToSupabase } from "./bookingDb";
-import { supabase } from "@/integrations/supabase/client";
 
 export type { BookingRequest, BookingResponse };
 
@@ -14,27 +13,12 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
   try {
     console.log("Booking shipment with request:", request);
     
-    // Get current authenticated user directly from Supabase
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    
-    if (authError) {
-      console.error("Error getting authenticated user:", authError);
+    // Verify the userId exists in the request
+    if (!request.userId) {
+      console.error("Missing user ID in booking request");
       toast({
         title: "Authentication Error",
-        description: "There was a problem with your authentication. Please sign in again.",
-        variant: "destructive",
-      });
-      return {
-        success: false,
-        message: "Authentication error"
-      };
-    }
-    
-    if (!authData.user) {
-      console.error("User not authenticated, cannot book shipment");
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to book a shipment.",
+        description: "User ID is missing. Please sign in again.",
         variant: "destructive",
       });
       return {
@@ -43,13 +27,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       };
     }
     
-    console.log("Authenticated user found:", authData.user.id);
-    
-    // Make sure we use the authenticated user ID
-    const requestWithAuthUser = {
-      ...request,
-      userId: authData.user.id
-    };
+    console.log("Using Clerk authenticated user:", request.userId);
     
     // Generate IDs
     const shipmentId = generateShipmentId();
@@ -95,9 +73,9 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const estimatedDelivery = calculateEstimatedDelivery(request.deliverySpeed);
     
     // Step 3: Save the booking to Supabase
-    console.log("Attempting to save booking to Supabase with userId:", authData.user.id);
+    console.log("Attempting to save booking to Supabase with userId:", request.userId);
     const supabaseSaveSuccess = await saveBookingToSupabase(
-      requestWithAuthUser,
+      request,
       trackingCode,
       labelResult.labelUrl,
       pickupResult.pickupTime!,
@@ -115,7 +93,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       });
       
       const shipmentData = await saveShipment({
-        userId: authData.user.id,
+        userId: request.userId,
         trackingCode,
         carrier: request.carrier,
         weight: request.weight,
