@@ -37,10 +37,12 @@ const ShipmentList = () => {
         const mockData = await getLocalShipments(user.id);
         setShipments(mockData);
       } else if (bookings && bookings.length > 0) {
+        console.log("Loaded bookings from Supabase:", bookings);
+        
         // Map Supabase bookings to the Shipment format
         const mappedShipments = bookings.map(booking => ({
           id: booking.id.toString(),
-          userId: booking.user_id || '',
+          userId: booking.user_id,
           trackingCode: booking.tracking_code || '',
           carrier: {
             name: booking.carrier_name || 'E-Parsel Nordic',
