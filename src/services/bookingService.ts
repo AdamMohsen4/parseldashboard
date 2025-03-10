@@ -5,6 +5,8 @@
 import { toast } from "@/components/ui/use-toast";
 import { generateLabel } from "./labelService";
 import { schedulePickup } from "./pickupService";
+import { saveShipment, Shipment } from "./shipmentService";
+import { useUser } from "@clerk/clerk-react";
 
 export interface BookingRequest {
   // Package details
@@ -31,6 +33,9 @@ export interface BookingRequest {
   
   // Pickup slot (optional)
   pickupSlotId?: string;
+  
+  // User ID
+  userId: string;
 }
 
 export interface BookingResponse {
@@ -90,6 +95,31 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const complianceFee = request.includeCompliance ? 2 : 0;
     const totalPrice = request.carrier.price + complianceFee;
     
+    // Step 3: Save the shipment to our database
+    const shipmentData = await saveShipment({
+      userId: request.userId,
+      trackingCode,
+      carrier: request.carrier,
+      weight: request.weight,
+      dimensions: request.dimensions,
+      pickup: request.pickup,
+      delivery: request.delivery,
+      deliverySpeed: request.deliverySpeed,
+      includeCompliance: request.includeCompliance,
+      labelUrl: labelResult.labelUrl,
+      pickupTime: pickupResult.pickupTime,
+      totalPrice,
+      status: 'pending',
+      estimatedDelivery: calculateEstimatedDelivery(request.deliverySpeed)
+    });
+    
+    if (!shipmentData) {
+      return {
+        success: false,
+        message: "Failed to save shipment data"
+      };
+    }
+    
     // Return the combined result
     return {
       success: true,
@@ -113,3 +143,20 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     };
   }
 };
+
+// Helper function to calculate the estimated delivery date
+function calculateEstimatedDelivery(deliverySpeed: string): string {
+  const date = new Date();
+  
+  // Add days based on delivery speed
+  if (deliverySpeed === 'standard') {
+    date.setDate(date.getDate() + 3);
+  } else if (deliverySpeed === 'express') {
+    date.setDate(date.getDate() + 1);
+  } else {
+    date.setDate(date.getDate() + 5); // Default for economy or other options
+  }
+  
+  // Format the date
+  return date.toISOString().split('T')[0];
+}

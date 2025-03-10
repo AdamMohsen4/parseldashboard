@@ -6,32 +6,53 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import NavBar from "@/components/layout/NavBar";
 import { useTranslation } from "react-i18next";
+import { trackShipment, Shipment } from "@/services/shipmentService";
+import { toast } from "@/components/ui/use-toast";
 
 const TrackingPage = () => {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [isTracking, setIsTracking] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [shipment, setShipment] = useState<Shipment | null>(null);
   const { t } = useTranslation();
   
-  // Mock tracking data
-  const trackingData = {
-    id: "EP12345678",
-    status: t('tracking.status.inTransit'),
-    from: "Malmö, Sweden",
-    to: "Helsinki, Finland",
-    carrier: "E-Parsel",
-    estimatedDelivery: "March 18, 2023",
-    events: [
-      { date: "March 15, 2023 11:30", location: "Malmö", status: t('tracking.events.pickedUp') },
-      { date: "March 15, 2023 18:45", location: "Malmö", status: t('tracking.events.departed') },
-      { date: "March 16, 2023 09:15", location: "Stockholm", status: t('tracking.events.arrivedSorting') },
-      { date: "March 16, 2023 14:30", location: "Stockholm", status: t('tracking.events.departedFacility') },
-      { date: "March 17, 2023 07:45", location: "Helsinki", status: t('tracking.events.arrivedDestination') },
-    ]
-  };
-  
-  const handleTracking = (e: React.FormEvent) => {
+  const handleTracking = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!trackingNumber.trim()) {
+      toast({
+        title: "Tracking Error",
+        description: "Please enter a valid tracking number",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsLoading(true);
     setIsTracking(true);
+    
+    try {
+      const result = await trackShipment(trackingNumber);
+      
+      if (result) {
+        setShipment(result);
+      } else {
+        toast({
+          title: "Tracking Not Found",
+          description: "No shipment found with this tracking number. Please check and try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error tracking shipment:", error);
+      toast({
+        title: "Tracking Error",
+        description: "An error occurred while trying to track your shipment",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -52,20 +73,26 @@ const TrackingPage = () => {
                   onChange={(e) => setTrackingNumber(e.target.value)}
                   className="flex-1"
                 />
-                <Button type="submit">{t('tracking.track')}</Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Loading..." : t('tracking.track')}
+                </Button>
               </div>
             </form>
             
-            {isTracking && (
+            {isTracking && shipment && (
               <div className="mt-8 space-y-6 animate-fade-in">
                 <div className="bg-muted p-4 rounded-lg">
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="text-sm text-muted-foreground">{t('tracking.trackingNumber')}</p>
-                      <p className="font-bold">{trackingData.id}</p>
+                      <p className="font-bold">{shipment.trackingCode}</p>
                     </div>
                     <div className="bg-primary/10 text-primary px-3 py-1 rounded-full">
-                      {trackingData.status}
+                      {shipment.status === 'pending' && 'Pending'}
+                      {shipment.status === 'picked_up' && 'Picked Up'}
+                      {shipment.status === 'in_transit' && 'In Transit'}
+                      {shipment.status === 'delivered' && 'Delivered'}
+                      {shipment.status === 'exception' && 'Exception'}
                     </div>
                   </div>
                 </div>
@@ -73,19 +100,19 @@ const TrackingPage = () => {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">{t('tracking.from')}</p>
-                    <p>{trackingData.from}</p>
+                    <p>{shipment.pickup}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">{t('tracking.to')}</p>
-                    <p>{trackingData.to}</p>
+                    <p>{shipment.delivery}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">{t('tracking.carrier')}</p>
-                    <p>{trackingData.carrier}</p>
+                    <p>{shipment.carrier.name}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">{t('tracking.estimatedDelivery')}</p>
-                    <p>{trackingData.estimatedDelivery}</p>
+                    <p>{shipment.estimatedDelivery || 'Not available'}</p>
                   </div>
                 </div>
                 
@@ -96,13 +123,14 @@ const TrackingPage = () => {
                   <div className="relative pl-6 space-y-6">
                     <div className="absolute top-0 bottom-0 left-2 w-0.5 bg-muted"></div>
                     
-                    {trackingData.events.map((event, index) => (
+                    {shipment.events.map((event, index) => (
                       <div key={index} className="relative">
                         <div className="absolute -left-6 mt-1.5 w-4 h-4 rounded-full bg-primary"></div>
                         <div>
-                          <p className="text-sm text-muted-foreground">{event.date}</p>
+                          <p className="text-sm text-muted-foreground">{new Date(event.date).toLocaleString()}</p>
                           <p className="font-medium">{event.status}</p>
                           <p className="text-sm">{event.location}</p>
+                          {event.description && <p className="text-xs text-muted-foreground mt-1">{event.description}</p>}
                         </div>
                       </div>
                     ))}
@@ -117,6 +145,12 @@ const TrackingPage = () => {
                     </p>
                   </div>
                 </div>
+              </div>
+            )}
+            
+            {isTracking && !shipment && !isLoading && (
+              <div className="mt-8 p-4 bg-muted rounded-lg">
+                <p className="text-center">No shipment found with tracking number: {trackingNumber}</p>
               </div>
             )}
           </CardContent>

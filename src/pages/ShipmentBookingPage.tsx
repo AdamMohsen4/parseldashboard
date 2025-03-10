@@ -13,7 +13,7 @@ import { useUser } from "@clerk/clerk-react";
 import { bookShipment } from "@/services/bookingService";
 
 const ShipmentBookingPage = () => {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   const [weight, setWeight] = useState("");
   const [length, setLength] = useState("");
   const [width, setWidth] = useState("");
@@ -39,7 +39,7 @@ const ShipmentBookingPage = () => {
   };
 
   const handleBookNow = async () => {
-    if (!isSignedIn) {
+    if (!isSignedIn || !user) {
       // Trigger Clerk sign-in dialog
       document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click();
       return;
@@ -56,6 +56,7 @@ const ShipmentBookingPage = () => {
         carrier: { name: carrier.name, price: carrier.price },
         deliverySpeed,
         includeCompliance: compliance,
+        userId: user.id
       });
       
       if (result.success) {
