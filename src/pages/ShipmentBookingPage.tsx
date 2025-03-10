@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { Link } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
 import { bookShipment } from "@/services/bookingService";
+import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
 
 const ShipmentBookingPage = () => {
   const { isSignedIn, user } = useUser();
@@ -179,22 +181,24 @@ const ShipmentBookingPage = () => {
                     
                     <div>
                       <Label htmlFor="pickup">Pickup Address</Label>
-                      <Input 
-                        id="pickup" 
-                        placeholder="e.g. Malmö, SE" 
+                      <GooglePlacesAutocomplete
+                        id="pickup"
+                        placeholder="Enter pickup address"
                         value={pickup}
                         onChange={(e) => setPickup(e.target.value)}
+                        onPlaceSelect={(address) => setPickup(address)}
                         required
                       />
                     </div>
                     
                     <div>
                       <Label htmlFor="delivery">Delivery Address</Label>
-                      <Input 
-                        id="delivery" 
-                        placeholder="e.g. Helsinki, FI" 
+                      <GooglePlacesAutocomplete
+                        id="delivery"
+                        placeholder="Enter delivery address"
                         value={delivery}
                         onChange={(e) => setDelivery(e.target.value)}
+                        onPlaceSelect={(address) => setDelivery(address)}
                         required
                       />
                     </div>
