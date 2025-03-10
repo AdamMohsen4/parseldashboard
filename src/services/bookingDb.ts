@@ -62,9 +62,11 @@ export const saveBookingToSupabase = async (
   }
 };
 
-// New function to fetch bookings with optional limit
+// Function to fetch bookings from Supabase
 export const fetchBookingsFromSupabase = async (userId: string, limit?: number) => {
   try {
+    console.log(`Fetching bookings for user: ${userId}, with limit: ${limit || 'no limit'}`);
+    
     let query = supabase
       .from('booking')
       .select('*')
@@ -82,6 +84,7 @@ export const fetchBookingsFromSupabase = async (userId: string, limit?: number) 
       return [];
     }
     
+    console.log(`Successfully fetched ${data?.length || 0} bookings from Supabase`);
     return data || [];
   } catch (error) {
     console.error("Error fetching bookings:", error);
