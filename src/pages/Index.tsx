@@ -4,9 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Link } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
+import { useTranslation } from "react-i18next";
 
 const Index = () => {
   const { isSignedIn } = useUser();
+  const { t } = useTranslation();
   
   return (
     <div className="min-h-screen bg-background">
@@ -18,23 +20,22 @@ const Index = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-                Simplified Logistics for <span className="text-primary">Small Businesses</span>
+                {t('home.hero.title')}
               </h1>
               <p className="text-lg text-muted-foreground">
-                Book, track, and manage your shipments from a single platform at a fixed rate of €10 per parcel.
-                Faster than phone calls, simpler than enterprise software.
+                {t('home.hero.description')}
               </p>
               <div className="pt-4 flex flex-wrap gap-4">
                 <Button size="lg" asChild>
-                  <Link to="/book">Book a Shipment</Link>
+                  <Link to="/book">{t('home.hero.bookButton')}</Link>
                 </Button>
                 {isSignedIn ? (
                   <Button size="lg" variant="outline" asChild>
-                    <Link to="/dashboard">View Dashboard</Link>
+                    <Link to="/dashboard">{t('home.hero.viewDashboard')}</Link>
                   </Button>
                 ) : (
                   <Button size="lg" variant="outline" onClick={() => document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click()}>
-                    Sign In
+                    {t('common.signIn')}
                   </Button>
                 )}
               </div>
@@ -54,43 +55,40 @@ const Index = () => {
       <section className="py-20 bg-secondary/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Why Choose E-Parsel?</h2>
+            <h2 className="text-3xl font-bold mb-4">{t('home.features.title')}</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              We simplify logistics for small and medium enterprises across the Nordic region.
+              {t('home.features.description')}
             </p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
             <Card>
               <CardHeader>
-                <CardTitle>Fixed €10 Rate</CardTitle>
-                <CardDescription>Transparent pricing with no hidden fees</CardDescription>
+                <CardTitle>{t('home.features.fixedRate.title')}</CardTitle>
+                <CardDescription>{t('home.features.fixedRate.subtitle')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Book shipments to any Nordic destination for a flat €10 rate per parcel. 
-                Save up to 30% compared to direct carrier pricing.</p>
+                <p>{t('home.features.fixedRate.description')}</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader>
-                <CardTitle>Real-time Tracking</CardTitle>
-                <CardDescription>Monitor your shipments 24/7</CardDescription>
+                <CardTitle>{t('home.features.tracking.title')}</CardTitle>
+                <CardDescription>{t('home.features.tracking.subtitle')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Get live updates on your shipment status with real-time map tracking and 
-                automated SMS/email notifications.</p>
+                <p>{t('home.features.tracking.description')}</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader>
-                <CardTitle>Unified Dashboard</CardTitle>
-                <CardDescription>Connect with your 3PL provider</CardDescription>
+                <CardTitle>{t('home.features.dashboard.title')}</CardTitle>
+                <CardDescription>{t('home.features.dashboard.subtitle')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Access shipment history, analytics, and document management in one place. 
-                Seamlessly communicate with your logistics provider.</p>
+                <p>{t('home.features.dashboard.description')}</p>
               </CardContent>
             </Card>
           </div>
@@ -100,12 +98,12 @@ const Index = () => {
       {/* CTA section */}
       <section className="py-20 px-4">
         <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl font-bold mb-6">Ready to Simplify Your Shipping?</h2>
+          <h2 className="text-3xl font-bold mb-6">{t('home.cta.title')}</h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Join hundreds of SMEs across the Nordic region who trust E-Parsel for their shipping needs.
+            {t('home.cta.description')}
           </p>
           <Button size="lg" asChild>
-            <Link to="/book">Book Your First Shipment</Link>
+            <Link to="/book">{t('home.cta.button')}</Link>
           </Button>
         </div>
       </section>
@@ -116,40 +114,40 @@ const Index = () => {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <h3 className="font-bold text-lg mb-4">E-Parsel</h3>
-              <p className="text-muted-foreground">Simplified logistics solutions for SMEs.</p>
+              <p className="text-muted-foreground">{t('footer.description')}</p>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Services</h4>
+              <h4 className="font-bold mb-4">{t('footer.services')}</h4>
               <ul className="space-y-2">
-                <li><Link to="/book" className="text-muted-foreground hover:text-primary">Book Shipment</Link></li>
+                <li><Link to="/book" className="text-muted-foreground hover:text-primary">{t('nav.book')}</Link></li>
                 {isSignedIn && (
                   <>
-                    <li><Link to="/tracking" className="text-muted-foreground hover:text-primary">Tracking</Link></li>
-                    <li><Link to="/compliance" className="text-muted-foreground hover:text-primary">Compliance</Link></li>
-                    <li><Link to="/dashboard" className="text-muted-foreground hover:text-primary">Dashboard</Link></li>
+                    <li><Link to="/tracking" className="text-muted-foreground hover:text-primary">{t('nav.tracking')}</Link></li>
+                    <li><Link to="/compliance" className="text-muted-foreground hover:text-primary">{t('nav.compliance')}</Link></li>
+                    <li><Link to="/dashboard" className="text-muted-foreground hover:text-primary">{t('nav.dashboard')}</Link></li>
                   </>
                 )}
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Company</h4>
+              <h4 className="font-bold mb-4">{t('footer.company')}</h4>
               <ul className="space-y-2">
-                <li><Link to="/about" className="text-muted-foreground hover:text-primary">About Us</Link></li>
-                <li><Link to="/contact" className="text-muted-foreground hover:text-primary">Contact</Link></li>
-                <li><Link to="/terms" className="text-muted-foreground hover:text-primary">Terms of Service</Link></li>
+                <li><Link to="/about" className="text-muted-foreground hover:text-primary">{t('footer.about')}</Link></li>
+                <li><Link to="/contact" className="text-muted-foreground hover:text-primary">{t('footer.contact')}</Link></li>
+                <li><Link to="/terms" className="text-muted-foreground hover:text-primary">{t('footer.terms')}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Contact</h4>
+              <h4 className="font-bold mb-4">{t('footer.contact')}</h4>
               <address className="not-italic text-muted-foreground">
-                <p>Email: info@e-parsel.com</p>
-                <p>Phone: +46 123 456 789</p>
-                <p>Address: Malmö, Sweden</p>
+                <p>{t('footer.contactInfo.email')} info@e-parsel.com</p>
+                <p>{t('footer.contactInfo.phone')} +46 123 456 789</p>
+                <p>{t('footer.contactInfo.address')} Malmö, Sweden</p>
               </address>
             </div>
           </div>
           <div className="border-t border-border mt-12 pt-6 text-center text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} E-Parsel. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} E-Parsel. {t('footer.rights')}</p>
           </div>
         </div>
       </footer>

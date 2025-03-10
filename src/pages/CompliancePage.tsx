@@ -1,9 +1,13 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
+import { useTranslation } from "react-i18next";
 
 const CompliancePage = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-background">
       <NavBar />
@@ -11,33 +15,33 @@ const CompliancePage = () => {
       <div className="container mx-auto px-4 py-8">
         <Card className="max-w-4xl mx-auto">
           <CardHeader>
-            <CardTitle>Compliance Package</CardTitle>
+            <CardTitle>{t('compliance.title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <p className="text-muted-foreground">
-              Our Compliance Package ensures your shipments meet all regulatory requirements for cross-border shipping within the Nordic region. This service includes all necessary documentation, customs clearance assistance, and ensures adherence to local regulations.
+              {t('compliance.description')}
             </p>
 
             <Separator />
 
             <div>
-              <h3 className="text-xl font-semibold mb-4">What's Included</h3>
+              <h3 className="text-xl font-semibold mb-4">{t('compliance.included')}</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="border border-border rounded-lg p-4">
-                  <h4 className="font-medium mb-2">Documentation Preparation</h4>
-                  <p className="text-sm text-muted-foreground">All required customs and shipping documents prepared on your behalf</p>
+                  <h4 className="font-medium mb-2">{t('compliance.documentation.title')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('compliance.documentation.description')}</p>
                 </div>
                 <div className="border border-border rounded-lg p-4">
-                  <h4 className="font-medium mb-2">Customs Clearance</h4>
-                  <p className="text-sm text-muted-foreground">Expedited customs processing and clearance assistance</p>
+                  <h4 className="font-medium mb-2">{t('compliance.customs.title')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('compliance.customs.description')}</p>
                 </div>
                 <div className="border border-border rounded-lg p-4">
-                  <h4 className="font-medium mb-2">Tax & Duty Calculation</h4>
-                  <p className="text-sm text-muted-foreground">Accurate calculation of applicable taxes and duties</p>
+                  <h4 className="font-medium mb-2">{t('compliance.tax.title')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('compliance.tax.description')}</p>
                 </div>
                 <div className="border border-border rounded-lg p-4">
-                  <h4 className="font-medium mb-2">Regulatory Compliance</h4>
-                  <p className="text-sm text-muted-foreground">Verification that shipments meet all relevant regulations</p>
+                  <h4 className="font-medium mb-2">{t('compliance.regulatory.title')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('compliance.regulatory.description')}</p>
                 </div>
               </div>
             </div>
@@ -45,16 +49,16 @@ const CompliancePage = () => {
             <Separator />
 
             <div>
-              <h3 className="text-xl font-semibold mb-4">Pricing</h3>
+              <h3 className="text-xl font-semibold mb-4">{t('compliance.pricing')}</h3>
               <div className="bg-muted p-4 rounded-lg">
                 <div className="flex justify-between items-center">
                   <div>
-                    <h4 className="font-medium">Compliance Package</h4>
-                    <p className="text-sm text-muted-foreground">Added to any shipment</p>
+                    <h4 className="font-medium">{t('compliance.package')}</h4>
+                    <p className="text-sm text-muted-foreground">{t('compliance.addedTo')}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-xl font-bold">€2.00</p>
-                    <p className="text-sm text-muted-foreground">per package</p>
+                    <p className="text-sm text-muted-foreground">{t('compliance.perPackage')}</p>
                   </div>
                 </div>
               </div>
@@ -63,26 +67,26 @@ const CompliancePage = () => {
             <Separator />
 
             <div>
-              <h3 className="text-xl font-semibold mb-4">Frequently Asked Questions</h3>
+              <h3 className="text-xl font-semibold mb-4">{t('compliance.faq')}</h3>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-medium">When do I need the Compliance Package?</h4>
-                  <p className="text-sm text-muted-foreground">It's recommended for all cross-border shipments, especially for commercial goods, but is optional for personal items of low value.</p>
+                  <h4 className="font-medium">{t('compliance.whenNeeded.question')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('compliance.whenNeeded.answer')}</p>
                 </div>
                 <div>
-                  <h4 className="font-medium">Does this guarantee my package won't have customs issues?</h4>
-                  <p className="text-sm text-muted-foreground">While it significantly reduces the risk of delays and issues, final decisions rest with customs authorities.</p>
+                  <h4 className="font-medium">{t('compliance.guarantee.question')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('compliance.guarantee.answer')}</p>
                 </div>
                 <div>
-                  <h4 className="font-medium">How do I add this to my shipment?</h4>
-                  <p className="text-sm text-muted-foreground">Simply select the Compliance Package option during the booking process.</p>
+                  <h4 className="font-medium">{t('compliance.howToAdd.question')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('compliance.howToAdd.answer')}</p>
                 </div>
               </div>
             </div>
 
             <div className="flex justify-center pt-4">
               <Link to="/dashboard" className="text-primary hover:underline">
-                View Compliance Status in Dashboard
+                {t('compliance.viewStatus')}
               </Link>
             </div>
           </CardContent>
