@@ -3,60 +3,91 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/AuthWrapper";
 import { useUser } from "@clerk/clerk-react";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "../common/LanguageSwitcher";
+import { Menu } from "lucide-react";
+import { useState } from "react";
 
 const NavBar = () => {
   const { isSignedIn } = useUser();
   const location = useLocation();
+  const { t } = useTranslation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const navItems = [
+    { path: "/", label: t('nav.home') },
+    { path: "/book", label: t('nav.book') },
+    ...(isSignedIn ? [
+      { path: "/tracking", label: t('nav.tracking') },
+      { path: "/compliance", label: t('nav.compliance') },
+      { path: "/dashboard", label: t('nav.dashboard') },
+    ] : []),
+  ];
 
   return (
-    <header className="border-b border-border">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center">
-          <Link to="/">
-            <h1 className="text-2xl font-bold text-primary">E-Parsel</h1>
-          </Link>
-          <span className="ml-2 text-sm bg-accent/10 text-accent px-2 py-0.5 rounded-full">SME Portal</span>
-        </div>
-        
-        <nav className="hidden md:flex space-x-6">
-          <Link 
-            to="/" 
-            className={`${location.pathname === '/' ? 'text-primary font-medium' : 'text-foreground'} hover:text-primary transition-colors`}
-          >
-            Home
-          </Link>
-          <Link 
-            to="/book" 
-            className={`${location.pathname === '/book' ? 'text-primary font-medium' : 'text-foreground'} hover:text-primary transition-colors`}
-          >
-            Book Shipment
-          </Link>
+    <header className="border-b border-border sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <Link to="/">
+              <h1 className="text-2xl font-bold text-primary">E-Parsel</h1>
+            </Link>
+            <span className="ml-2 text-sm bg-accent/10 text-accent px-2 py-0.5 rounded-full">SME Portal</span>
+          </div>
           
-          {isSignedIn && (
-            <>
-              <Link 
-                to="/tracking" 
-                className={`${location.pathname === '/tracking' ? 'text-primary font-medium' : 'text-foreground'} hover:text-primary transition-colors`}
+          {/* Mobile menu button */}
+          <button 
+            className="md:hidden p-2"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+
+          {/* Desktop navigation */}
+          <nav className="hidden md:flex items-center space-x-6">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`${
+                  location.pathname === item.path
+                    ? "text-primary font-medium"
+                    : "text-foreground"
+                } hover:text-primary transition-colors`}
               >
-                Tracking
+                {item.label}
               </Link>
-              <Link 
-                to="/compliance" 
-                className={`${location.pathname === '/compliance' ? 'text-primary font-medium' : 'text-foreground'} hover:text-primary transition-colors`}
+            ))}
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <AuthButtons />
+            </div>
+          </nav>
+        </div>
+
+        {/* Mobile navigation */}
+        {isMenuOpen && (
+          <nav className="md:hidden py-4 space-y-2">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`${
+                  location.pathname === item.path
+                    ? "text-primary font-medium"
+                    : "text-foreground"
+                } block py-2 hover:text-primary transition-colors`}
+                onClick={() => setIsMenuOpen(false)}
               >
-                Compliance
+                {item.label}
               </Link>
-              <Link 
-                to="/dashboard" 
-                className={`${location.pathname === '/dashboard' ? 'text-primary font-medium' : 'text-foreground'} hover:text-primary transition-colors`}
-              >
-                Dashboard
-              </Link>
-            </>
-          )}
-        </nav>
-        
-        <AuthButtons />
+            ))}
+            <div className="flex items-center gap-2 pt-4">
+              <LanguageSwitcher />
+              <AuthButtons />
+            </div>
+          </nav>
+        )}
       </div>
     </header>
   );
