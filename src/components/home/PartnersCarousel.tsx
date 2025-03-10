@@ -13,7 +13,7 @@ interface Partner {
 
 // Sample partners data
 const partners: Partner[] = [
-  { id: 1, name: 'TechBox', logo: 'Hardware', industry: 'Technology' },
+  { id: 1, name: 'TechBox', industry: 'Technology' },
   { id: 2, name: 'GreenLogistics', industry: 'Logistics' },
   { id: 3, name: 'SwedishHome', industry: 'Retail' },
   { id: 4, name: 'MalmöFashion', industry: 'Fashion' },
