@@ -1,4 +1,3 @@
-
 ## How can I edit this code?
 
 There are several ways of editing your application.
@@ -39,19 +38,6 @@ npm run dev
 - Select the "Codespaces" tab.
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## GitHub Pages Deployment
-
-This project is configured for GitHub Pages deployment. The `vite.config.ts` file includes the proper base path setting.
-
-To deploy the application to GitHub Pages:
-
-```sh
-# Build the application
-npm run build
-
-# Deploy to GitHub Pages (you can use gh-pages package or GitHub Actions)
-```
 
 ## What technologies are used for this project?
 
