@@ -73,7 +73,8 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       toast({
         title: "Database Save Warning",
         description: "Could not save to primary database, using backup storage instead.",
-        variant: "warning",
+        // Changed from "warning" to "destructive" as that's a valid variant
+        variant: "destructive",
       });
       
       const shipmentData = await saveShipment({
