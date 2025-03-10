@@ -31,19 +31,26 @@ export const saveBookingToSupabase = async (
       estimated_delivery: estimatedDelivery
     });
     
-    // Check if the user is authenticated
-    const { data: { user } } = await supabase.auth.getUser();
+    // Get the current authenticated user
+    const { data: authData, error: authError } = await supabase.auth.getUser();
     
-    if (!user) {
+    if (authError) {
+      console.error("Error getting authenticated user:", authError);
+      return false;
+    }
+    
+    if (!authData.user) {
       console.error("User not authenticated, cannot save booking");
       return false;
     }
+    
+    console.log("Authenticated user confirmed:", authData.user.id);
     
     // Insert booking with the authenticated user ID
     const { data, error } = await supabase
       .from('booking')
       .insert({
-        user_id: user.id,
+        user_id: authData.user.id,
         tracking_code: trackingCode,
         carrier_name: request.carrier.name,
         carrier_price: request.carrier.price,

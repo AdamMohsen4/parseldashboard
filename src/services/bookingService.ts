@@ -14,10 +14,14 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
   try {
     console.log("Booking shipment with request:", request);
     
-    // Get current authenticated user
-    const { data: { user } } = await supabase.auth.getUser();
+    // Get current authenticated user directly from Supabase
+    const { data: authData, error: authError } = await supabase.auth.getUser();
     
-    if (!user) {
+    if (authError) {
+      console.error("Error getting authenticated user:", authError);
+    }
+    
+    if (!authData.user) {
       console.error("User not authenticated, cannot book shipment");
       toast({
         title: "Authentication Required",
@@ -30,10 +34,12 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       };
     }
     
+    console.log("Authenticated user found:", authData.user.id);
+    
     // Make sure we use the authenticated user ID
     const requestWithAuthUser = {
       ...request,
-      userId: user.id
+      userId: authData.user.id
     };
     
     // Generate IDs
@@ -80,7 +86,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const estimatedDelivery = calculateEstimatedDelivery(request.deliverySpeed);
     
     // Step 3: Save the booking to Supabase
-    console.log("Attempting to save booking to Supabase with userId:", user.id);
+    console.log("Attempting to save booking to Supabase with userId:", authData.user.id);
     const supabaseSaveSuccess = await saveBookingToSupabase(
       requestWithAuthUser,
       trackingCode,
@@ -100,7 +106,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       });
       
       const shipmentData = await saveShipment({
-        userId: user.id,
+        userId: authData.user.id,
         trackingCode,
         carrier: request.carrier,
         weight: request.weight,
