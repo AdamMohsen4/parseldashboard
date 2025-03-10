@@ -102,7 +102,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     // Step 3a: Save the shipment to Supabase
     try {
       const { data, error } = await supabase
-        .from('Booking')
+        .from('booking')
         .insert({
           user_id: request.userId,
           tracking_code: trackingCode,

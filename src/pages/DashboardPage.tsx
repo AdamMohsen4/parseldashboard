@@ -28,21 +28,21 @@ const DashboardPage = () => {
     try {
       // Get active shipments (pending, picked_up, in_transit)
       const { data: activeData, error: activeError } = await supabase
-        .from('Booking')
+        .from('booking')
         .select('id')
         .eq('user_id', user.id)
         .in('status', ['pending', 'picked_up', 'in_transit']);
       
       // Get completed shipments
       const { data: completedData, error: completedError } = await supabase
-        .from('Booking')
+        .from('booking')
         .select('id')
         .eq('user_id', user.id)
         .eq('status', 'delivered');
       
       // Get sum of total spent
       const { data: spentData, error: spentError } = await supabase
-        .from('Booking')
+        .from('booking')
         .select('total_price')
         .eq('user_id', user.id);
       

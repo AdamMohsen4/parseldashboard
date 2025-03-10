@@ -27,7 +27,7 @@ const ShipmentList = () => {
     try {
       // First try to get shipments from Supabase
       const { data: bookings, error } = await supabase
-        .from('Booking')
+        .from('booking')
         .select('*')
         .eq('user_id', user.id);
       
@@ -40,7 +40,7 @@ const ShipmentList = () => {
         // Map Supabase bookings to the Shipment format
         const mappedShipments = bookings.map(booking => ({
           id: booking.id.toString(),
-          userId: booking.user_id,
+          userId: booking.user_id || '',
           trackingCode: booking.tracking_code || '',
           carrier: {
             name: booking.carrier_name || 'E-Parsel Nordic',
