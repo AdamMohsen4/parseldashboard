@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
@@ -6,13 +5,14 @@ import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Package, Shield, LineChart, CheckCircle, Truck, Map } from "lucide-react";
-
 const Index = () => {
-  const { isSignedIn } = useUser();
-  const { t } = useTranslation();
-  
-  return (
-    <div className="min-h-screen bg-background">
+  const {
+    isSignedIn
+  } = useUser();
+  const {
+    t
+  } = useTranslation();
+  return <div className="min-h-screen bg-background">
       <NavBar />
 
       {/* Hero section */}
@@ -32,34 +32,21 @@ const Index = () => {
               </p>
               <div className="pt-6 flex flex-wrap gap-4">
                 <Button size="lg" className="group animate-slide-in-right" asChild>
-                  <Link to="/book">
+                  <Link to="/book" className="mx-0">
                     {t('home.hero.bookButton')}
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
-                {isSignedIn ? (
-                  <Button size="lg" variant="outline" className="animate-slide-in-right [animation-delay:100ms]" asChild>
+                {isSignedIn ? <Button size="lg" variant="outline" className="animate-slide-in-right [animation-delay:100ms]" asChild>
                     <Link to="/dashboard">{t('home.hero.viewDashboard')}</Link>
-                  </Button>
-                ) : (
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="animate-slide-in-right [animation-delay:100ms]"
-                    onClick={() => document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click()}
-                  >
+                  </Button> : <Button size="lg" variant="outline" className="animate-slide-in-right [animation-delay:100ms]" onClick={() => document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click()}>
                     {t('common.signIn')}
-                  </Button>
-                )}
+                  </Button>}
               </div>
             </div>
             <div className="relative rounded-lg overflow-hidden shadow-2xl animate-fade-in">
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent" />
-              <img 
-                src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&q=80" 
-                alt="E-Parcel Warehouse Workers" 
-                className="w-full h-auto rounded-lg transform transition-transform hover:scale-105 duration-700"
-              />
+              <img alt="E-Parcel Warehouse Workers" className="w-full h-auto rounded-lg transform transition-transform hover:scale-105 duration-700" src="/lovable-uploads/7326fca2-a314-40a0-8acb-41c65a241827.jpg" />
             </div>
           </div>
         </div>
@@ -113,7 +100,7 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="group hover:shadow-xl transition-all duration-300 border-t-4 border-primary animate-fade-in [animation-delay:100ms]">
+            <Card className="group hover:shadow-xl transition-all duration-300 border-t-4 border-primary animate-fade-in [animation-delay:100ms] px-0">
               <CardHeader>
                 <Package className="h-10 w-10 text-primary mb-4" />
                 <CardTitle>{t('home.features.fixedRate.title')}</CardTitle>
@@ -180,13 +167,11 @@ const Index = () => {
               <h4 className="font-bold mb-4">{t('footer.services')}</h4>
               <ul className="space-y-2">
                 <li><Link to="/book" className="text-muted-foreground hover:text-primary">{t('nav.book')}</Link></li>
-                {isSignedIn && (
-                  <>
+                {isSignedIn && <>
                     <li><Link to="/tracking" className="text-muted-foreground hover:text-primary">{t('nav.tracking')}</Link></li>
                     <li><Link to="/compliance" className="text-muted-foreground hover:text-primary">{t('nav.compliance')}</Link></li>
                     <li><Link to="/dashboard" className="text-muted-foreground hover:text-primary">{t('nav.dashboard')}</Link></li>
-                  </>
-                )}
+                  </>}
               </ul>
             </div>
             <div>
@@ -211,8 +196,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
