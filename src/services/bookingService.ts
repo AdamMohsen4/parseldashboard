@@ -1,12 +1,7 @@
-
-// Centralized booking service that handles the entire booking process
-// Integrates label generation and pickup scheduling
-
 import { toast } from "@/components/ui/use-toast";
 import { generateLabel } from "./labelService";
 import { schedulePickup } from "./pickupService";
-import { saveShipment, Shipment } from "./shipmentService";
-import { useUser } from "@clerk/clerk-react";
+import { saveShipment } from "./shipmentService";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface BookingRequest {
