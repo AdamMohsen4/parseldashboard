@@ -11,6 +11,7 @@ import BookingPage from "./pages/BookingPage";
 import TrackingPage from "./pages/TrackingPage";
 import CompliancePage from "./pages/CompliancePage";
 import DashboardPage from "./pages/DashboardPage";
+import CollaboratePage from "./pages/CollaboratePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,11 @@ const App = () => (
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/collaborate" element={
+              <ProtectedRoute>
+                <CollaboratePage />
               </ProtectedRoute>
             } />
             

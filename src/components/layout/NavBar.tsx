@@ -5,7 +5,7 @@ import { AuthButtons } from "@/components/auth/AuthWrapper";
 import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../common/LanguageSwitcher";
-import { Menu } from "lucide-react";
+import { Menu, Users } from "lucide-react";
 import { useState } from "react";
 
 const NavBar = () => {
@@ -21,6 +21,7 @@ const NavBar = () => {
       { path: "/tracking", label: t('nav.tracking') },
       { path: "/compliance", label: t('nav.compliance') },
       { path: "/dashboard", label: t('nav.dashboard') },
+      { path: "/collaborate", label: t('nav.collaborate', 'Collaborate'), icon: Users },
     ] : []),
   ];
 
@@ -53,8 +54,9 @@ const NavBar = () => {
                   location.pathname === item.path
                     ? "text-primary font-medium"
                     : "text-foreground"
-                } hover:text-primary transition-colors`}
+                } hover:text-primary transition-colors flex items-center gap-1`}
               >
+                {item.icon && <item.icon className="h-4 w-4" />}
                 {item.label}
               </Link>
             ))}
@@ -76,9 +78,10 @@ const NavBar = () => {
                   location.pathname === item.path
                     ? "text-primary font-medium"
                     : "text-foreground"
-                } block py-2 hover:text-primary transition-colors`}
+                } block py-2 hover:text-primary transition-colors flex items-center gap-1`}
                 onClick={() => setIsMenuOpen(false)}
               >
+                {item.icon && <item.icon className="h-4 w-4" />}
                 {item.label}
               </Link>
             ))}
