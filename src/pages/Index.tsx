@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, Package, Shield, LineChart } from "lucide-react";
+import { ArrowRight, Package, Shield, LineChart, CheckCircle, Truck, Map } from "lucide-react";
 
 const Index = () => {
   const { isSignedIn } = useUser();
@@ -17,10 +17,13 @@ const Index = () => {
 
       {/* Hero section */}
       <section className="py-24 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 -z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 -z-10" />
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 animate-fade-in">
+              <div className="inline-block bg-primary/10 px-4 py-2 rounded-full text-primary font-medium text-sm mb-2">
+                {t('home.hero.badge')}
+              </div>
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
                 {t('home.hero.title')}
               </h1>
@@ -28,21 +31,21 @@ const Index = () => {
                 {t('home.hero.description')}
               </p>
               <div className="pt-6 flex flex-wrap gap-4">
-                <Button size="lg" className="group animate-slide-right" asChild>
+                <Button size="lg" className="group animate-slide-in-right" asChild>
                   <Link to="/book">
                     {t('home.hero.bookButton')}
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
                 {isSignedIn ? (
-                  <Button size="lg" variant="outline" className="animate-slide-right" asChild>
+                  <Button size="lg" variant="outline" className="animate-slide-in-right [animation-delay:100ms]" asChild>
                     <Link to="/dashboard">{t('home.hero.viewDashboard')}</Link>
                   </Button>
                 ) : (
                   <Button 
                     size="lg" 
                     variant="outline" 
-                    className="animate-slide-right"
+                    className="animate-slide-in-right [animation-delay:100ms]"
                     onClick={() => document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click()}
                   >
                     {t('common.signIn')}
@@ -53,8 +56,8 @@ const Index = () => {
             <div className="relative rounded-lg overflow-hidden shadow-2xl animate-fade-in">
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent" />
               <img 
-                src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?auto=format&fit=crop&q=80" 
-                alt="Logistics" 
+                src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80" 
+                alt="E-Parcel Modern Logistics" 
                 className="w-full h-auto rounded-lg transform transition-transform hover:scale-105 duration-700"
               />
             </div>
@@ -62,11 +65,46 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Benefits section - NEW */}
+      <section className="py-16 bg-secondary/10">
+        <div className="container mx-auto max-w-6xl px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="flex items-center space-x-4 animate-fade-in [animation-delay:100ms]">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <CheckCircle className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium">{t('home.benefits.reliable.title')}</h3>
+                <p className="text-muted-foreground">{t('home.benefits.reliable.description')}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4 animate-fade-in [animation-delay:200ms]">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Truck className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium">{t('home.benefits.fast.title')}</h3>
+                <p className="text-muted-foreground">{t('home.benefits.fast.description')}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4 animate-fade-in [animation-delay:300ms]">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Map className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium">{t('home.benefits.coverage.title')}</h3>
+                <p className="text-muted-foreground">{t('home.benefits.coverage.description')}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features section */}
-      <section className="py-24 bg-secondary/30">
+      <section className="py-24 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
               {t('home.features.title')}
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -75,7 +113,7 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="group hover:shadow-xl transition-all duration-300 animate-slide-up">
+            <Card className="group hover:shadow-xl transition-all duration-300 border-t-4 border-primary animate-fade-in [animation-delay:100ms]">
               <CardHeader>
                 <Package className="h-10 w-10 text-primary mb-4" />
                 <CardTitle>{t('home.features.fixedRate.title')}</CardTitle>
@@ -86,7 +124,7 @@ const Index = () => {
               </CardContent>
             </Card>
             
-            <Card className="group hover:shadow-xl transition-all duration-300 animate-slide-up [animation-delay:200ms]">
+            <Card className="group hover:shadow-xl transition-all duration-300 border-t-4 border-primary animate-fade-in [animation-delay:200ms]">
               <CardHeader>
                 <Shield className="h-10 w-10 text-primary mb-4" />
                 <CardTitle>{t('home.features.tracking.title')}</CardTitle>
@@ -97,7 +135,7 @@ const Index = () => {
               </CardContent>
             </Card>
             
-            <Card className="group hover:shadow-xl transition-all duration-300 animate-slide-up [animation-delay:400ms]">
+            <Card className="group hover:shadow-xl transition-all duration-300 border-t-4 border-primary animate-fade-in [animation-delay:300ms]">
               <CardHeader>
                 <LineChart className="h-10 w-10 text-primary mb-4" />
                 <CardTitle>{t('home.features.dashboard.title')}</CardTitle>
@@ -115,16 +153,18 @@ const Index = () => {
       <section className="py-24 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
         <div className="container mx-auto max-w-4xl text-center relative z-10">
-          <h2 className="text-4xl font-bold mb-6 animate-fade-in">{t('home.cta.title')}</h2>
-          <p className="text-xl text-muted-foreground mb-8 animate-fade-in [animation-delay:200ms]">
-            {t('home.cta.description')}
-          </p>
-          <Button size="lg" className="group animate-fade-in [animation-delay:400ms]" asChild>
-            <Link to="/book">
-              {t('home.cta.button')}
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </Button>
+          <Card className="p-8 shadow-lg animate-fade-in border-none bg-gradient-to-r from-background/90 to-background/70 backdrop-blur-sm">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">{t('home.cta.title')}</h2>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              {t('home.cta.description')}
+            </p>
+            <Button size="lg" className="group animate-scale-in" asChild>
+              <Link to="/book">
+                {t('home.cta.button')}
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
+          </Card>
         </div>
       </section>
 

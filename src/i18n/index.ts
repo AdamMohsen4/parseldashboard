@@ -1,4 +1,3 @@
-
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
@@ -18,10 +17,25 @@ const resources = {
       },
       home: {
         hero: {
+          badge: 'Nordic SME Logistics',
           title: 'Simplified Logistics for Small Businesses',
           description: 'Book, track, and manage your shipments from a single platform at a fixed rate of €10 per parcel. Faster than phone calls, simpler than enterprise software.',
           bookButton: 'Book a Shipment',
           viewDashboard: 'View Dashboard',
+        },
+        benefits: {
+          reliable: {
+            title: 'Reliable Service',
+            description: '99.8% on-time delivery across the Nordic region'
+          },
+          fast: {
+            title: 'Fast Delivery',
+            description: 'Next-day delivery available for urban areas'
+          },
+          coverage: {
+            title: 'Nordic Coverage',
+            description: 'Seamless shipping across all Nordic countries'
+          }
         },
         features: {
           title: 'Why Choose E-Parsel?',
@@ -47,6 +61,34 @@ const resources = {
           description: 'Join hundreds of SMEs across the Nordic region who trust E-Parsel for their shipping needs.',
           button: 'Book Your First Shipment',
         },
+      },
+      tracking: {
+        title: 'Track Your Shipment',
+        placeholder: 'Enter tracking number (e.g., EP12345678)',
+        track: 'Track',
+        trackingNumber: 'Tracking Number',
+        from: 'From',
+        to: 'To',
+        carrier: 'Carrier',
+        estimatedDelivery: 'Estimated Delivery',
+        trackingHistory: 'Tracking History',
+        needHelp: 'Need Help?',
+        helpText: 'If you have any questions about your shipment, please contact our customer service at support@e-parsel.com or call +46 123 456 789.',
+        status: {
+          inTransit: 'In Transit',
+          delivered: 'Delivered',
+          pending: 'Pending',
+          exception: 'Exception'
+        },
+        events: {
+          pickedUp: 'Picked up from sender',
+          departed: 'Departed facility',
+          arrivedSorting: 'Arrived at sorting center',
+          departedFacility: 'Departed facility',
+          arrivedDestination: 'Arrived at destination facility',
+          outForDelivery: 'Out for delivery',
+          delivered: 'Delivered'
+        }
       },
       booking: {
         title: 'Book a Shipment',
@@ -78,19 +120,6 @@ const resources = {
         total: 'Total:',
         confirmBooking: 'Confirm Booking',
         signInToBook: 'Sign In to Book',
-      },
-      tracking: {
-        title: 'Track Your Shipment',
-        placeholder: 'Enter tracking number (e.g., PN12345678)',
-        track: 'Track',
-        trackingNumber: 'Tracking Number',
-        from: 'From',
-        to: 'To',
-        carrier: 'Carrier',
-        estimatedDelivery: 'Estimated Delivery',
-        trackingHistory: 'Tracking History',
-        needHelp: 'Need Help?',
-        helpText: 'If you have any questions about your shipment, please contact our customer service at support@parcelnordic.com or call +46 123 456 789.',
       },
       compliance: {
         title: 'Compliance Package',
@@ -232,10 +261,25 @@ const resources = {
       },
       home: {
         hero: {
+          badge: 'Nordisk SMF-Logistik',
           title: 'Förenklad Logistik för Småföretag',
           description: 'Boka, spåra och hantera dina försändelser från en enda plattform till en fast avgift på 10 € per paket. Snabbare än telefonsamtal, enklare än företagsmjukvara.',
           bookButton: 'Boka en Försändelse',
           viewDashboard: 'Visa Översikt',
+        },
+        benefits: {
+          reliable: {
+            title: 'Pålitlig Service',
+            description: '99,8% leverans i tid över hela Norden'
+          },
+          fast: {
+            title: 'Snabb Leverans',
+            description: 'Leverans nästa dag tillgänglig för stadsområden'
+          },
+          coverage: {
+            title: 'Nordisk Täckning',
+            description: 'Sömlös frakt över alla nordiska länder'
+          }
         },
         features: {
           title: 'Varför Välja E-Parsel?',
@@ -261,6 +305,34 @@ const resources = {
           description: 'Gå med hundratals små och medelstora företag i Norden som litar på E-Parsel för sina fraktbehov.',
           button: 'Boka Din Första Försändelse',
         },
+      },
+      tracking: {
+        title: 'Spåra Din Försändelse',
+        placeholder: 'Ange spårningsnummer (t.ex. EP12345678)',
+        track: 'Spåra',
+        trackingNumber: 'Spårningsnummer',
+        from: 'Från',
+        to: 'Till',
+        carrier: 'Transportör',
+        estimatedDelivery: 'Beräknad Leverans',
+        trackingHistory: 'Spårningshistorik',
+        needHelp: 'Behöver du Hjälp?',
+        helpText: 'Om du har några frågor om din försändelse, kontakta vår kundtjänst på support@e-parsel.com eller ring +46 123 456 789.',
+        status: {
+          inTransit: 'Under Transport',
+          delivered: 'Levererad',
+          pending: 'Väntar',
+          exception: 'Problem'
+        },
+        events: {
+          pickedUp: 'Hämtad från avsändare',
+          departed: 'Lämnat anläggning',
+          arrivedSorting: 'Anlänt till sorteringscentral',
+          departedFacility: 'Lämnat anläggning',
+          arrivedDestination: 'Anlänt till destinationsanläggning',
+          outForDelivery: 'Ute för leverans',
+          delivered: 'Levererad'
+        }
       },
       booking: {
         title: 'Boka en Försändelse',
@@ -292,19 +364,6 @@ const resources = {
         total: 'Totalt:',
         confirmBooking: 'Bekräfta Bokning',
         signInToBook: 'Logga In för att Boka',
-      },
-      tracking: {
-        title: 'Spåra Din Försändelse',
-        placeholder: 'Ange spårningsnummer (t.ex. PN12345678)',
-        track: 'Spåra',
-        trackingNumber: 'Spårningsnummer',
-        from: 'Från',
-        to: 'Till',
-        carrier: 'Transportör',
-        estimatedDelivery: 'Beräknad Leverans',
-        trackingHistory: 'Spårningshistorik',
-        needHelp: 'Behöver du Hjälp?',
-        helpText: 'Om du har några frågor om din försändelse, kontakta vår kundtjänst på support@parcelnordic.com eller ring +46 123 456 789.',
       },
       compliance: {
         title: 'Efterlevnadspaket',
@@ -446,10 +505,25 @@ const resources = {
       },
       home: {
         hero: {
+          badge: 'Pohjoismainen PK-Logistiikka',
           title: 'Yksinkertaistettua Logistiikkaa Pienyrityksille',
           description: 'Varaa, seuraa ja hallinnoi lähetyksiäsi yhdeltä alustalta kiinteään 10 € hintaan per paketti. Nopeampaa kuin puhelut, yksinkertaisempaa kuin yritysohjelmat.',
           bookButton: 'Varaa Lähetys',
           viewDashboard: 'Näytä Hallintapaneeli',
+        },
+        benefits: {
+          reliable: {
+            title: 'Luotettava Palvelu',
+            description: '99,8% toimituksista ajallaan Pohjoismaissa'
+          },
+          fast: {
+            title: 'Nopea Toimitus',
+            description: 'Seuraavan päivän toimitus saatavilla kaupunkialueilla'
+          },
+          coverage: {
+            title: 'Pohjoismainen Kattavuus',
+            description: 'Saumaton toimitus kaikissa Pohjoismaissa'
+          }
         },
         features: {
           title: 'Miksi Valita E-Parsel?',
@@ -475,6 +549,34 @@ const resources = {
           description: 'Liity satoihin pohjoismaisiin pk-yrityksiin, jotka luottavat E-Parsel-palveluun lähetystarpeissaan.',
           button: 'Varaa Ensimmäinen Lähetyksesi',
         },
+      },
+      tracking: {
+        title: 'Seuraa Lähetystäsi',
+        placeholder: 'Syötä seurantanumero (esim. EP12345678)',
+        track: 'Seuraa',
+        trackingNumber: 'Seurantanumero',
+        from: 'Lähettäjä',
+        to: 'Vastaanottaja',
+        carrier: 'Kuljetusyritys',
+        estimatedDelivery: 'Arvioitu Toimitus',
+        trackingHistory: 'Seurantahistoria',
+        needHelp: 'Tarvitsetko Apua?',
+        helpText: 'Jos sinulla on kysyttävää lähetyksestäsi, ota yhteyttä asiakaspalveluumme osoitteessa support@e-parsel.com tai soita +46 123 456 789.',
+        status: {
+          inTransit: 'Kuljetuksessa',
+          delivered: 'Toimitettu',
+          pending: 'Odottaa',
+          exception: 'Poikkeus'
+        },
+        events: {
+          pickedUp: 'Noudettu lähettäjältä',
+          departed: 'Lähtenyt toimipaikasta',
+          arrivedSorting: 'Saapunut lajittelukeskukseen',
+          departedFacility: 'Lähtenyt toimipaikasta',
+          arrivedDestination: 'Saapunut määränpään toimipaikkaan',
+          outForDelivery: 'Jakelussa',
+          delivered: 'Toimitettu'
+        }
       },
       booking: {
         title: 'Varaa Lähetys',
@@ -506,19 +608,6 @@ const resources = {
         total: 'Yhteensä:',
         confirmBooking: 'Vahvista Varaus',
         signInToBook: 'Kirjaudu Sisään Varataksesi',
-      },
-      tracking: {
-        title: 'Seuraa Lähetystäsi',
-        placeholder: 'Syötä seurantanumero (esim. PN12345678)',
-        track: 'Seuraa',
-        trackingNumber: 'Seurantanumero',
-        from: 'Lähettäjä',
-        to: 'Vastaanottaja',
-        carrier: 'Kuljetusyritys',
-        estimatedDelivery: 'Arvioitu Toimitus',
-        trackingHistory: 'Seurantahistoria',
-        needHelp: 'Tarvitsetko Apua?',
-        helpText: 'Jos sinulla on kysyttävää lähetyksestäsi, ota yhteyttä asiakaspalveluumme osoitteessa support@parcelnordic.com tai soita +46 123 456 789.',
       },
       compliance: {
         title: 'Vaatimustenmukaisuuspaketti',
@@ -632,10 +721,10 @@ const resources = {
       footer: {
         description: 'Yksinkertaistettuja logistiikkaratkaisuja pk-yrityksille.',
         services: 'Palvelut',
-        company: 'Yritys',
-        about: 'Tietoa Meistä',
-        contact: 'Yhteystiedot',
-        terms: 'Käyttöehdot',
+        company: 'Företag',
+        about: 'Om Oss',
+        contact: 'Kontakt',
+        terms: 'Användarvillkor',
         contactInfo: {
           email: 'Sähköposti:',
           phone: 'Puhelin:',
