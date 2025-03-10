@@ -6,12 +6,35 @@ import { saveShipment } from "./shipmentService";
 import { BookingRequest, BookingResponse } from "@/types/booking";
 import { calculateTotalPrice, calculateEstimatedDelivery, generateShipmentId, generateTrackingCode } from "./bookingUtils";
 import { saveBookingToSupabase } from "./bookingDb";
+import { supabase } from "@/integrations/supabase/client";
 
 export type { BookingRequest, BookingResponse };
 
 export const bookShipment = async (request: BookingRequest): Promise<BookingResponse> => {
   try {
     console.log("Booking shipment with request:", request);
+    
+    // Get current authenticated user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.error("User not authenticated, cannot book shipment");
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to book a shipment.",
+        variant: "destructive",
+      });
+      return {
+        success: false,
+        message: "Authentication required"
+      };
+    }
+    
+    // Make sure we use the authenticated user ID
+    const requestWithAuthUser = {
+      ...request,
+      userId: user.id
+    };
     
     // Generate IDs
     const shipmentId = generateShipmentId();
@@ -57,9 +80,9 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const estimatedDelivery = calculateEstimatedDelivery(request.deliverySpeed);
     
     // Step 3: Save the booking to Supabase
-    console.log("Attempting to save booking to Supabase with userId:", request.userId);
+    console.log("Attempting to save booking to Supabase with userId:", user.id);
     const supabaseSaveSuccess = await saveBookingToSupabase(
-      request,
+      requestWithAuthUser,
       trackingCode,
       labelResult.labelUrl,
       pickupResult.pickupTime!,
@@ -73,12 +96,11 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       toast({
         title: "Database Save Warning",
         description: "Could not save to primary database, using backup storage instead.",
-        // Changed from "warning" to "destructive" as that's a valid variant
         variant: "destructive",
       });
       
       const shipmentData = await saveShipment({
-        userId: request.userId,
+        userId: user.id,
         trackingCode,
         carrier: request.carrier,
         weight: request.weight,
