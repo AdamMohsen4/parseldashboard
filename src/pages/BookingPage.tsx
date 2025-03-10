@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
+import { Link } from "react-router-dom";
 
 const BookingPage = () => {
   const [weight, setWeight] = useState("");
@@ -19,7 +19,6 @@ const BookingPage = () => {
   const [deliverySpeed, setDeliverySpeed] = useState("standard");
   const [compliance, setCompliance] = useState(false);
   
-  // Mock carrier data
   const carrierOptions = [
     { id: 1, name: "PostNord", price: 10, eta: "2 days", icon: "📦" },
     { id: 2, name: "DHL", price: 12, eta: "1 day", icon: "🚚" },
@@ -44,7 +43,6 @@ const BookingPage = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Booking Form */}
           <div className="md:w-2/5">
             <Card>
               <CardHeader>
@@ -166,7 +164,12 @@ const BookingPage = () => {
                         checked={compliance}
                         onChange={(e) => setCompliance(e.target.checked)}
                       />
-                      <Label htmlFor="compliance">Add Compliance Package (+€2)</Label>
+                      <Label htmlFor="compliance">
+                        Add Compliance Package (+€2)
+                        <Link to="/compliance" className="ml-1 text-primary text-sm underline">
+                          Learn more
+                        </Link>
+                      </Label>
                     </div>
                   </div>
                   
@@ -176,7 +179,6 @@ const BookingPage = () => {
             </Card>
           </div>
           
-          {/* Rate Table */}
           <div className="md:w-3/5">
             <Card>
               <CardHeader>
