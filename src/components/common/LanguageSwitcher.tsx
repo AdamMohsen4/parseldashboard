@@ -1,24 +1,50 @@
 
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Languages } from "lucide-react";
 
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
 
-  const toggleLanguage = () => {
-    const newLang = i18n.language === 'en' ? 'sv' : 'en';
-    i18n.changeLanguage(newLang);
+  const changeLanguage = (language: string) => {
+    i18n.changeLanguage(language);
+  };
+
+  const getLanguageName = (code: string) => {
+    switch (code) {
+      case 'en': return 'English';
+      case 'sv': return 'Svenska';
+      case 'fi': return 'Suomi';
+      default: return code.toUpperCase();
+    }
   };
 
   return (
-    <Button 
-      variant="outline" 
-      size="sm" 
-      onClick={toggleLanguage}
-      className="px-2"
-    >
-      {i18n.language === 'en' ? 'SV' : 'EN'}
-    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="px-2 flex items-center gap-1">
+          <Languages className="h-4 w-4" />
+          <span>{i18n.language.toUpperCase()}</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => changeLanguage('en')}>
+          {getLanguageName('en')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => changeLanguage('sv')}>
+          {getLanguageName('sv')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => changeLanguage('fi')}>
+          {getLanguageName('fi')}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
