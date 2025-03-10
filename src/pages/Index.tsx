@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
@@ -6,6 +5,7 @@ import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Package, Shield, LineChart, CheckCircle, Truck, Map } from "lucide-react";
+import PartnersCarousel from "@/components/home/PartnersCarousel";
 
 const Index = () => {
   const { isSignedIn } = useUser();
@@ -158,6 +158,11 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Partners Carousel section */}
+      <section className="py-16">
+        <PartnersCarousel speed={45} />
+      </section>
+
       {/* Footer */}
       <footer className="bg-muted py-12">
         <div className="container mx-auto px-4">
@@ -203,3 +208,4 @@ const Index = () => {
 };
 
 export default Index;
+
