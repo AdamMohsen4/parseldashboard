@@ -11,13 +11,24 @@ export const saveBookingToSupabase = async (
   estimatedDelivery: string
 ) => {
   try {
-    console.log("Saving booking to Supabase:", { 
-      request, 
-      trackingCode,
+    console.log("Saving booking to Supabase with payload:", { 
       user_id: request.userId,
-      dimensions: request.dimensions,
-      pickup: request.pickup,
-      delivery: request.delivery
+      tracking_code: trackingCode,
+      carrier_name: request.carrier.name,
+      carrier_price: request.carrier.price,
+      weight: request.weight,
+      dimension_length: request.dimensions.length,
+      dimension_width: request.dimensions.width,
+      dimension_height: request.dimensions.height,
+      pickup_address: request.pickup,
+      delivery_address: request.delivery,
+      delivery_speed: request.deliverySpeed,
+      include_compliance: request.includeCompliance,
+      label_url: labelUrl,
+      pickup_time: pickupTime,
+      total_price: totalPrice,
+      status: 'pending',
+      estimated_delivery: estimatedDelivery
     });
     
     // Insert booking with the user ID as a string
@@ -50,7 +61,7 @@ export const saveBookingToSupabase = async (
       return false;
     }
     
-    console.log("Successfully saved booking to Supabase:", data);
+    console.log("Successfully saved booking to Supabase with response:", data);
     return true;
   } catch (error) {
     console.error("Supabase insertion error:", error);

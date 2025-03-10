@@ -25,11 +25,14 @@ const ShipmentList = () => {
     
     setIsLoading(true);
     try {
-      // First try to get shipments from Supabase
+      console.log("Loading shipments for user:", user.id);
+      
+      // Get bookings from Supabase
       const { data: bookings, error } = await supabase
         .from('booking')
-        .select('*')
-        .eq('user_id', user.id);
+        .select('*');
+      
+      console.log("Supabase query result:", { bookings, error });
       
       if (error) {
         console.error("Error loading bookings from Supabase:", error);
@@ -68,6 +71,7 @@ const ShipmentList = () => {
         }));
         setShipments(mappedShipments);
       } else {
+        console.log("No bookings found in Supabase, falling back to mock data");
         // If no Supabase bookings, fall back to mock data
         const mockData = await getLocalShipments(user.id);
         setShipments(mockData);

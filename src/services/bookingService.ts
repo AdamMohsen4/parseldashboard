@@ -11,7 +11,7 @@ export type { BookingRequest, BookingResponse };
 
 export const bookShipment = async (request: BookingRequest): Promise<BookingResponse> => {
   try {
-    console.log("Booking shipment:", request);
+    console.log("Booking shipment with request:", request);
     
     // Generate IDs
     const shipmentId = generateShipmentId();
@@ -57,7 +57,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const estimatedDelivery = calculateEstimatedDelivery(request.deliverySpeed);
     
     // Step 3: Save the booking to Supabase
-    console.log("Saving booking to Supabase with userId:", request.userId);
+    console.log("Attempting to save booking to Supabase with userId:", request.userId);
     const supabaseSaveSuccess = await saveBookingToSupabase(
       request,
       trackingCode,
@@ -70,6 +70,12 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     // If Supabase save fails, fall back to local storage
     if (!supabaseSaveSuccess) {
       console.error("Supabase save failed, falling back to local storage");
+      toast({
+        title: "Database Save Warning",
+        description: "Could not save to primary database, using backup storage instead.",
+        variant: "warning",
+      });
+      
       const shipmentData = await saveShipment({
         userId: request.userId,
         trackingCode,
@@ -95,6 +101,10 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       }
     } else {
       console.log("Successfully saved booking to Supabase");
+      toast({
+        title: "Booking Saved",
+        description: "Your shipment has been successfully recorded in our database.",
+      });
     }
     
     // Return the combined result
