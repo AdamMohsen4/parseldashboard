@@ -13,22 +13,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
   try {
     console.log("Booking shipment with request:", request);
     
-    // Verify the userId exists in the request
-    if (!request.userId) {
-      console.error("Missing user ID in booking request");
-      toast({
-        title: "Authentication Error",
-        description: "User ID is missing. Please sign in again.",
-        variant: "destructive",
-      });
-      return {
-        success: false,
-        message: "Authentication required"
-      };
-    }
-    
-    console.log("Using Clerk authenticated user:", request.userId);
-    
     // Generate IDs
     const shipmentId = generateShipmentId();
     const trackingCode = generateTrackingCode();
@@ -89,6 +73,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       toast({
         title: "Database Save Warning",
         description: "Could not save to primary database, using backup storage instead.",
+        // Changed from "warning" to "destructive" as that's a valid variant
         variant: "destructive",
       });
       
