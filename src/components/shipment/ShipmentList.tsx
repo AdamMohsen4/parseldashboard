@@ -6,10 +6,15 @@ import { Shipment } from "@/services/shipmentService";
 import { useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
-import { Loader2, Package, RefreshCw } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Loader2, Package, RefreshCw, ArrowRight } from "lucide-react";
+import { fetchBookingsFromSupabase } from "@/services/bookingDb";
 
-const ShipmentList = () => {
+interface ShipmentListProps {
+  limit?: number;
+  showViewAll?: boolean;
+}
+
+const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { user, isSignedIn } = useUser();
@@ -18,30 +23,20 @@ const ShipmentList = () => {
     if (isSignedIn && user) {
       loadShipments();
     }
-  }, [isSignedIn, user]);
+  }, [isSignedIn, user, limit]);
 
   const loadShipments = async () => {
     if (!user) return;
     
     setIsLoading(true);
     try {
-      console.log("Loading shipments for user:", user.id);
+      console.log("Loading shipments for user:", user.id, "with limit:", limit);
       
-      // Get bookings from Supabase
-      const { data: bookings, error } = await supabase
-        .from('booking')
-        .select('*');
+      // Use the fetchBookingsFromSupabase function with the optional limit
+      const bookings = await fetchBookingsFromSupabase(user.id, limit);
+      console.log("Loaded bookings:", bookings);
       
-      console.log("Supabase query result:", { bookings, error });
-      
-      if (error) {
-        console.error("Error loading bookings from Supabase:", error);
-        // Fall back to the mock data if there's an error
-        const mockData = await getLocalShipments(user.id);
-        setShipments(mockData);
-      } else if (bookings && bookings.length > 0) {
-        console.log("Loaded bookings from Supabase:", bookings);
-        
+      if (bookings && bookings.length > 0) {
         // Map Supabase bookings to the Shipment format
         const mappedShipments = bookings.map(booking => ({
           id: booking.id.toString(),
@@ -71,9 +66,9 @@ const ShipmentList = () => {
         }));
         setShipments(mappedShipments);
       } else {
-        console.log("No bookings found in Supabase, falling back to mock data");
+        console.log("No bookings found, falling back to mock data");
         // If no Supabase bookings, fall back to mock data
-        const mockData = await getLocalShipments(user.id);
+        const mockData = await getLocalShipments(user.id, limit);
         setShipments(mockData);
       }
     } catch (error) {
@@ -89,10 +84,11 @@ const ShipmentList = () => {
   };
 
   // Function to get shipments from localStorage (as a fallback)
-  const getLocalShipments = async (userId: string) => {
+  const getLocalShipments = async (userId: string, limit?: number) => {
     try {
       const data = await import('@/services/shipmentService').then(m => m.getShipments(userId));
-      return data;
+      // Apply limit if provided
+      return limit ? data.slice(0, limit) : data;
     } catch (error) {
       console.error("Error fetching local shipments:", error);
       return [];
@@ -193,6 +189,16 @@ const ShipmentList = () => {
                 </div>
               </div>
             ))}
+            
+            {showViewAll && shipments.length > 0 && (
+              <div className="pt-4">
+                <Button variant="link" className="p-0 h-auto text-primary" asChild>
+                  <Link to="/tracking" className="flex items-center">
+                    View all shipments <ArrowRight className="ml-1 h-3 w-3" />
+                  </Link>
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </CardContent>
