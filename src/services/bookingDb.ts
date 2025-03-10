@@ -11,7 +11,14 @@ export const saveBookingToSupabase = async (
   estimatedDelivery: string
 ) => {
   try {
-    console.log("Saving booking to Supabase:", { request, trackingCode });
+    console.log("Saving booking to Supabase:", { 
+      request, 
+      trackingCode,
+      user_id: request.userId,
+      dimensions: request.dimensions,
+      pickup: request.pickup,
+      delivery: request.delivery
+    });
     
     // Insert booking with the user ID as a string
     const { data, error } = await supabase

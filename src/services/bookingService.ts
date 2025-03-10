@@ -56,7 +56,8 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const totalPrice = calculateTotalPrice(request.carrier.price, request.includeCompliance);
     const estimatedDelivery = calculateEstimatedDelivery(request.deliverySpeed);
     
-    // Step 3: Save the booking
+    // Step 3: Save the booking to Supabase
+    console.log("Saving booking to Supabase with userId:", request.userId);
     const supabaseSaveSuccess = await saveBookingToSupabase(
       request,
       trackingCode,
@@ -68,6 +69,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     
     // If Supabase save fails, fall back to local storage
     if (!supabaseSaveSuccess) {
+      console.error("Supabase save failed, falling back to local storage");
       const shipmentData = await saveShipment({
         userId: request.userId,
         trackingCode,
@@ -91,6 +93,8 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
           message: "Failed to save shipment data"
         };
       }
+    } else {
+      console.log("Successfully saved booking to Supabase");
     }
     
     // Return the combined result

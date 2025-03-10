@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,12 +13,12 @@ import { bookShipment } from "@/services/bookingService";
 
 const ShipmentBookingPage = () => {
   const { isSignedIn, user } = useUser();
-  const [weight, setWeight] = useState("");
-  const [length, setLength] = useState("");
-  const [width, setWidth] = useState("");
-  const [height, setHeight] = useState("");
-  const [pickup, setPickup] = useState("");
-  const [delivery, setDelivery] = useState("");
+  const [weight, setWeight] = useState("5");
+  const [length, setLength] = useState("20");
+  const [width, setWidth] = useState("15");
+  const [height, setHeight] = useState("10");
+  const [pickup, setPickup] = useState("Stockholm, SE");
+  const [delivery, setDelivery] = useState("Helsinki, FI");
   const [deliverySpeed, setDeliverySpeed] = useState("standard");
   const [compliance, setCompliance] = useState(false);
   const [showBookingConfirmation, setShowBookingConfirmation] = useState(false);
@@ -48,6 +47,8 @@ const ShipmentBookingPage = () => {
     setIsBooking(true);
     
     try {
+      console.log("Creating booking with user ID:", user.id);
+      
       const result = await bookShipment({
         weight,
         dimensions: { length, width, height },
@@ -82,6 +83,26 @@ const ShipmentBookingPage = () => {
     } finally {
       setIsBooking(false);
     }
+  };
+
+  const createTestBooking = () => {
+    if (!isSignedIn || !user) {
+      toast({
+        title: "Sign In Required",
+        description: "Please sign in to create a test booking.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setWeight("5");
+    setLength("20");
+    setWidth("15");
+    setHeight("10");
+    setPickup("Stockholm, SE");
+    setDelivery("Helsinki, FI");
+    setShowBookingConfirmation(true);
+    handleBookNow();
   };
 
   return (
@@ -212,7 +233,19 @@ const ShipmentBookingPage = () => {
                     </div>
                   </div>
                   
-                  <Button type="submit" className="w-full">Calculate Rate</Button>
+                  <div className="flex flex-col space-y-2">
+                    <Button type="submit" className="w-full">Calculate Rate</Button>
+                    {process.env.NODE_ENV === 'development' && (
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="w-full" 
+                        onClick={createTestBooking}
+                      >
+                        Create Test Booking
+                      </Button>
+                    )}
+                  </div>
                 </form>
               </CardContent>
             </Card>
