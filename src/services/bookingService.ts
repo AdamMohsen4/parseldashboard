@@ -7,6 +7,7 @@ import { generateLabel } from "./labelService";
 import { schedulePickup } from "./pickupService";
 import { saveShipment, Shipment } from "./shipmentService";
 import { useUser } from "@clerk/clerk-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface BookingRequest {
   // Package details
@@ -95,29 +96,88 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const complianceFee = request.includeCompliance ? 2 : 0;
     const totalPrice = request.carrier.price + complianceFee;
     
-    // Step 3: Save the shipment to our database
-    const shipmentData = await saveShipment({
-      userId: request.userId,
-      trackingCode,
-      carrier: request.carrier,
-      weight: request.weight,
-      dimensions: request.dimensions,
-      pickup: request.pickup,
-      delivery: request.delivery,
-      deliverySpeed: request.deliverySpeed,
-      includeCompliance: request.includeCompliance,
-      labelUrl: labelResult.labelUrl,
-      pickupTime: pickupResult.pickupTime,
-      totalPrice,
-      status: 'pending',
-      estimatedDelivery: calculateEstimatedDelivery(request.deliverySpeed)
-    });
+    // Calculate estimated delivery date
+    const estimatedDelivery = calculateEstimatedDelivery(request.deliverySpeed);
     
-    if (!shipmentData) {
-      return {
-        success: false,
-        message: "Failed to save shipment data"
-      };
+    // Step 3a: Save the shipment to Supabase
+    try {
+      const { data, error } = await supabase
+        .from('Booking')
+        .insert({
+          user_id: request.userId,
+          tracking_code: trackingCode,
+          carrier_name: request.carrier.name,
+          carrier_price: request.carrier.price,
+          weight: request.weight,
+          dimension_length: request.dimensions.length,
+          dimension_width: request.dimensions.width,
+          dimension_height: request.dimensions.height,
+          pickup_address: request.pickup,
+          delivery_address: request.delivery,
+          delivery_speed: request.deliverySpeed,
+          include_compliance: request.includeCompliance,
+          label_url: labelResult.labelUrl,
+          pickup_time: pickupResult.pickupTime,
+          total_price: totalPrice,
+          status: 'pending',
+          estimated_delivery: estimatedDelivery
+        })
+        .select()
+        .single();
+        
+      if (error) {
+        console.error("Error saving to Supabase:", error);
+        // If Supabase save fails, fall back to local storage
+        const shipmentData = await saveShipment({
+          userId: request.userId,
+          trackingCode,
+          carrier: request.carrier,
+          weight: request.weight,
+          dimensions: request.dimensions,
+          pickup: request.pickup,
+          delivery: request.delivery,
+          deliverySpeed: request.deliverySpeed,
+          includeCompliance: request.includeCompliance,
+          labelUrl: labelResult.labelUrl,
+          pickupTime: pickupResult.pickupTime,
+          totalPrice,
+          status: 'pending',
+          estimatedDelivery
+        });
+        
+        if (!shipmentData) {
+          return {
+            success: false,
+            message: "Failed to save shipment data"
+          };
+        }
+      }
+    } catch (supabaseError) {
+      console.error("Supabase insertion error:", supabaseError);
+      // Fall back to local storage
+      const shipmentData = await saveShipment({
+        userId: request.userId,
+        trackingCode,
+        carrier: request.carrier,
+        weight: request.weight,
+        dimensions: request.dimensions,
+        pickup: request.pickup,
+        delivery: request.delivery,
+        deliverySpeed: request.deliverySpeed,
+        includeCompliance: request.includeCompliance,
+        labelUrl: labelResult.labelUrl,
+        pickupTime: pickupResult.pickupTime,
+        totalPrice,
+        status: 'pending',
+        estimatedDelivery
+      });
+      
+      if (!shipmentData) {
+        return {
+          success: false,
+          message: "Failed to save shipment data"
+        };
+      }
     }
     
     // Return the combined result

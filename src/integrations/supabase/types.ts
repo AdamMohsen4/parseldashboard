@@ -9,7 +9,87 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      booking: {
+        Row: {
+          carrier_name: string | null
+          carrier_price: number | null
+          created_at: string
+          delivery_address: string | null
+          delivery_speed: string | null
+          dimension_height: string | null
+          dimension_length: string | null
+          dimension_width: string | null
+          estimated_delivery: string | null
+          id: number
+          include_compliance: boolean | null
+          label_url: string | null
+          pickup_address: string | null
+          pickup_time: string | null
+          status: string | null
+          total_price: number | null
+          tracking_code: string | null
+          user_id: string | null
+          weight: string | null
+        }
+        Insert: {
+          carrier_name?: string | null
+          carrier_price?: number | null
+          created_at?: string
+          delivery_address?: string | null
+          delivery_speed?: string | null
+          dimension_height?: string | null
+          dimension_length?: string | null
+          dimension_width?: string | null
+          estimated_delivery?: string | null
+          id?: number
+          include_compliance?: boolean | null
+          label_url?: string | null
+          pickup_address?: string | null
+          pickup_time?: string | null
+          status?: string | null
+          total_price?: number | null
+          tracking_code?: string | null
+          user_id?: string | null
+          weight?: string | null
+        }
+        Update: {
+          carrier_name?: string | null
+          carrier_price?: number | null
+          created_at?: string
+          delivery_address?: string | null
+          delivery_speed?: string | null
+          dimension_height?: string | null
+          dimension_length?: string | null
+          dimension_width?: string | null
+          estimated_delivery?: string | null
+          id?: number
+          include_compliance?: boolean | null
+          label_url?: string | null
+          pickup_address?: string | null
+          pickup_time?: string | null
+          status?: string | null
+          total_price?: number | null
+          tracking_code?: string | null
+          user_id?: string | null
+          weight?: string | null
+        }
+        Relationships: []
+      }
+      Booking: {
+        Row: {
+          created_at: string
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

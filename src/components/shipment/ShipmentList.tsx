@@ -2,11 +2,12 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getShipments, Shipment, updateShipmentStatus } from "@/services/shipmentService";
+import { Shipment } from "@/services/shipmentService";
 import { useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { Loader2, Package, RefreshCw } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const ShipmentList = () => {
   const [shipments, setShipments] = useState<Shipment[]>([]);
@@ -24,8 +25,51 @@ const ShipmentList = () => {
     
     setIsLoading(true);
     try {
-      const data = await getShipments(user.id);
-      setShipments(data);
+      // First try to get shipments from Supabase
+      const { data: bookings, error } = await supabase
+        .from('Booking')
+        .select('*')
+        .eq('user_id', user.id);
+      
+      if (error) {
+        console.error("Error loading bookings from Supabase:", error);
+        // Fall back to the mock data if there's an error
+        const mockData = await getLocalShipments(user.id);
+        setShipments(mockData);
+      } else if (bookings && bookings.length > 0) {
+        // Map Supabase bookings to the Shipment format
+        const mappedShipments = bookings.map(booking => ({
+          id: booking.id.toString(),
+          userId: booking.user_id,
+          trackingCode: booking.tracking_code || '',
+          carrier: {
+            name: booking.carrier_name || 'E-Parsel Nordic',
+            price: Number(booking.carrier_price) || 10
+          },
+          weight: booking.weight || '',
+          dimensions: {
+            length: booking.dimension_length || '',
+            width: booking.dimension_width || '',
+            height: booking.dimension_height || ''
+          },
+          pickup: booking.pickup_address || '',
+          delivery: booking.delivery_address || '',
+          deliverySpeed: booking.delivery_speed || 'standard',
+          includeCompliance: booking.include_compliance || false,
+          status: booking.status as any || 'pending',
+          createdAt: booking.created_at,
+          labelUrl: booking.label_url,
+          pickupTime: booking.pickup_time,
+          totalPrice: Number(booking.total_price) || 10,
+          estimatedDelivery: booking.estimated_delivery ? new Date(booking.estimated_delivery).toISOString().split('T')[0] : undefined,
+          events: []
+        }));
+        setShipments(mappedShipments);
+      } else {
+        // If no Supabase bookings, fall back to mock data
+        const mockData = await getLocalShipments(user.id);
+        setShipments(mockData);
+      }
     } catch (error) {
       console.error("Error loading shipments:", error);
       toast({
@@ -35,6 +79,17 @@ const ShipmentList = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Function to get shipments from localStorage (as a fallback)
+  const getLocalShipments = async (userId: string) => {
+    try {
+      const data = await import('@/services/shipmentService').then(m => m.getShipments(userId));
+      return data;
+    } catch (error) {
+      console.error("Error fetching local shipments:", error);
+      return [];
     }
   };
 
