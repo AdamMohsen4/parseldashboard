@@ -13,7 +13,7 @@ export const saveBookingToSupabase = async (
   try {
     console.log("Saving booking to Supabase:", { request, trackingCode });
     
-    // Convert Clerk user ID to string to avoid UUID format issues
+    // Insert booking with the user ID as a string
     const { data, error } = await supabase
       .from('booking')
       .insert({
