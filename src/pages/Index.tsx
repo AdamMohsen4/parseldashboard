@@ -56,8 +56,8 @@ const Index = () => {
             <div className="relative rounded-lg overflow-hidden shadow-2xl animate-fade-in">
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent" />
               <img 
-                src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80" 
-                alt="E-Parcel Modern Logistics" 
+                src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&q=80" 
+                alt="E-Parcel Warehouse Workers" 
                 className="w-full h-auto rounded-lg transform transition-transform hover:scale-105 duration-700"
               />
             </div>
