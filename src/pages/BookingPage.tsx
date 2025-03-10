@@ -10,6 +10,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
+import { bookShipment } from "@/services/bookingService";
 
 const BookingPage = () => {
   const { isSignedIn } = useUser();
@@ -22,6 +23,8 @@ const BookingPage = () => {
   const [deliverySpeed, setDeliverySpeed] = useState("standard");
   const [compliance, setCompliance] = useState(false);
   const [showBookingConfirmation, setShowBookingConfirmation] = useState(false);
+  const [isBooking, setIsBooking] = useState(false);
+  const [bookingResult, setBookingResult] = useState<any>(null);
   
   // Fixed price carrier
   const carrier = { id: 1, name: "E-Parsel Nordic", price: 10, eta: "3 days", icon: "📦" };
@@ -35,15 +38,48 @@ const BookingPage = () => {
     });
   };
 
-  const handleBookNow = () => {
-    if (isSignedIn) {
-      toast({
-        title: "Shipment Booked",
-        description: "Your shipment has been booked with E-Parsel Nordic!",
-      });
-    } else {
+  const handleBookNow = async () => {
+    if (!isSignedIn) {
       // Trigger Clerk sign-in dialog
       document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click();
+      return;
+    }
+
+    setIsBooking(true);
+    
+    try {
+      const result = await bookShipment({
+        weight,
+        dimensions: { length, width, height },
+        pickup,
+        delivery,
+        carrier: { name: carrier.name, price: carrier.price },
+        deliverySpeed,
+        includeCompliance: compliance,
+      });
+      
+      if (result.success) {
+        setBookingResult(result);
+        toast({
+          title: "Shipment Booked",
+          description: `Your shipment has been booked with tracking code: ${result.trackingCode}`,
+        });
+      } else {
+        toast({
+          title: "Booking Failed",
+          description: result.message || "There was a problem with your booking.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error in booking flow:", error);
+      toast({
+        title: "Booking Error",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBooking(false);
     }
   };
 
@@ -200,7 +236,9 @@ const BookingPage = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold">€{carrier.price}{compliance ? " + €2" : ""}</p>
-                      <Button size="sm" onClick={handleBookNow}>Book Now</Button>
+                      <Button size="sm" onClick={handleBookNow} disabled={isBooking}>
+                        {isBooking ? "Processing..." : "Book Now"}
+                      </Button>
                     </div>
                   </div>
                   
@@ -221,9 +259,28 @@ const BookingPage = () => {
                       </p>
                       <div className="flex justify-between items-center">
                         <p className="font-semibold">Total: €{compliance ? "12" : "10"}</p>
-                        <Button onClick={handleBookNow}>
-                          {isSignedIn ? "Confirm Booking" : "Sign In to Book"}
+                        <Button onClick={handleBookNow} disabled={isBooking}>
+                          {isBooking ? "Processing..." : isSignedIn ? "Confirm Booking" : "Sign In to Book"}
                         </Button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Booking result */}
+                  {bookingResult && (
+                    <div className="mt-8 bg-green-50 p-4 rounded-lg border border-green-500">
+                      <h4 className="font-medium mb-2 text-green-700">Booking Confirmed!</h4>
+                      <div className="space-y-2 text-sm">
+                        <p><strong>Tracking Code:</strong> {bookingResult.trackingCode}</p>
+                        <p><strong>Pickup Time:</strong> {bookingResult.pickupTime}</p>
+                        <p><strong>Total Price:</strong> €{bookingResult.totalPrice}</p>
+                        <div className="pt-3">
+                          <Button size="sm" variant="outline" asChild>
+                            <a href={bookingResult.labelUrl} target="_blank" rel="noopener noreferrer">
+                              Download Label
+                            </a>
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   )}
