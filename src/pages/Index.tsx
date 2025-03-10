@@ -48,7 +48,7 @@ const Index = () => {
               <img 
                 alt="E-Parcel Logistics Facility Aerial View" 
                 className="w-full h-auto rounded-lg transform transition-transform hover:scale-105 duration-700" 
-                src="/lovable-uploads/40bf477a-ad0b-486e-9a0d-83c1aff0401a.png" 
+                src="uploads/40bf477a-ad0b-486e-9a0d-83c1aff0401a.png" 
               />
             </div>
           </div>
