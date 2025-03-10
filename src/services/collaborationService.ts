@@ -48,23 +48,9 @@ export const createCollaboration = async (
   formData: CollaborationFormData
 ): Promise<boolean> => {
   try {
-    // Set auth headers explicitly
-    const { error } = await supabase.auth.setSession({
-      access_token: userId,
-      refresh_token: userId
-    });
-    
-    if (error) {
-      console.error("Error setting Supabase session:", error);
-      toast({
-        title: "Authentication Error",
-        description: "Could not authenticate with the database. Please try again.",
-        variant: "destructive",
-      });
-      return false;
-    }
-    
-    const { error: insertError } = await supabase
+    // Instead of trying to set a session with the user ID,
+    // we'll directly insert the data with the user ID
+    const { error } = await supabase
       .from('collaborations')
       .insert({
         user_id: userId,
@@ -78,8 +64,8 @@ export const createCollaboration = async (
         contact_phone: formData.contactPhone
       });
     
-    if (insertError) {
-      console.error("Error creating collaboration:", insertError);
+    if (error) {
+      console.error("Error creating collaboration:", error);
       toast({
         title: "Error",
         description: "Failed to create collaboration listing. Please try again.",
