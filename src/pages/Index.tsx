@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
@@ -5,13 +6,11 @@ import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Package, Shield, LineChart, CheckCircle, Truck, Map } from "lucide-react";
+
 const Index = () => {
-  const {
-    isSignedIn
-  } = useUser();
-  const {
-    t
-  } = useTranslation();
+  const { isSignedIn } = useUser();
+  const { t } = useTranslation();
+  
   return <div className="min-h-screen bg-background">
       <NavBar />
 
@@ -46,7 +45,11 @@ const Index = () => {
             </div>
             <div className="relative rounded-lg overflow-hidden shadow-2xl animate-fade-in">
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent" />
-              <img alt="E-Parcel Warehouse Workers" className="w-full h-auto rounded-lg transform transition-transform hover:scale-105 duration-700" src="/lovable-uploads/7326fca2-a314-40a0-8acb-41c65a241827.jpg" />
+              <img 
+                alt="E-Parcel Logistics Facility Aerial View" 
+                className="w-full h-auto rounded-lg transform transition-transform hover:scale-105 duration-700" 
+                src="/lovable-uploads/40bf477a-ad0b-486e-9a0d-83c1aff0401a.png" 
+              />
             </div>
           </div>
         </div>
@@ -198,4 +201,5 @@ const Index = () => {
       </footer>
     </div>;
 };
+
 export default Index;
