@@ -6,7 +6,7 @@ const resources = {
     translation: {
       nav: {
         home: 'Home',
-        book: 'Book Shipment',
+        book: 'Book Demo',
         tracking: 'Tracking',
         compliance: 'Compliance',
         dashboard: 'Dashboard',
@@ -20,7 +20,7 @@ const resources = {
           badge: 'Nordic SME Logistics',
           title: 'Simplified Logistics for Small Businesses',
           description: 'Book, track, and manage your shipments from a single platform at a fixed rate of €10 per parcel. Faster than phone calls, simpler than enterprise software.',
-          bookButton: 'Book a Shipment',
+          bookButton: 'Book a Demo',
           viewDashboard: 'View Dashboard',
         },
         benefits: {
@@ -59,7 +59,7 @@ const resources = {
         cta: {
           title: 'Ready to Simplify Your Shipping?',
           description: 'Join hundreds of SMEs across the Nordic region who trust E-Parsel for their shipping needs.',
-          button: 'Book Your First Shipment',
+          button: 'Book Your Demo',
         },
       },
       tracking: {
@@ -250,7 +250,7 @@ const resources = {
     translation: {
       nav: {
         home: 'Hem',
-        book: 'Boka Frakt',
+        book: 'Boka Demo',
         tracking: 'Spårning',
         compliance: 'Efterlevnad',
         dashboard: 'Översikt',
@@ -264,7 +264,7 @@ const resources = {
           badge: 'Nordisk SMF-Logistik',
           title: 'Förenklad Logistik för Småföretag',
           description: 'Boka, spåra och hantera dina försändelser från en enda plattform till en fast avgift på 10 € per paket. Snabbare än telefonsamtal, enklare än företagsmjukvara.',
-          bookButton: 'Boka en Försändelse',
+          bookButton: 'Boka en Demo',
           viewDashboard: 'Visa Översikt',
         },
         benefits: {
@@ -303,7 +303,7 @@ const resources = {
         cta: {
           title: 'Redo att Förenkla din Frakt?',
           description: 'Gå med hundratals små och medelstora företag i Norden som litar på E-Parsel för sina fraktbehov.',
-          button: 'Boka Din Första Försändelse',
+          button: 'Boka Din Demo',
         },
       },
       tracking: {
@@ -494,7 +494,7 @@ const resources = {
     translation: {
       nav: {
         home: 'Etusivu',
-        book: 'Varaa Lähetys',
+        book: 'Varaa Demo',
         tracking: 'Seuranta',
         compliance: 'Vaatimustenmukaisuus',
         dashboard: 'Hallintapaneeli',
@@ -508,7 +508,7 @@ const resources = {
           badge: 'Pohjoismainen PK-Logistiikka',
           title: 'Yksinkertaistettua Logistiikkaa Pienyrityksille',
           description: 'Varaa, seuraa ja hallinnoi lähetyksiäsi yhdeltä alustalta kiinteään 10 € hintaan per paketti. Nopeampaa kuin puhelut, yksinkertaisempaa kuin yritysohjelmat.',
-          bookButton: 'Varaa Lähetys',
+          bookButton: 'Varaa Demo',
           viewDashboard: 'Näytä Hallintapaneeli',
         },
         benefits: {
@@ -643,7 +643,7 @@ const resources = {
           answer: 'Vaikka se merkittävästi vähentää viivästysten ja ongelmien riskiä, lopulliset päätökset ovat tulliviranomaisten käsissä.',
         },
         howToAdd: {
-          question: 'Miten lisään tämän lähetykseeni?',
+          question: 'Miten lisään tämän lähetykseni?',
           answer: 'Valitse yksinkertaisesti Vaatimustenmukaisuuspaketti-vaihtoehto varaamisprosessin aikana.',
         },
         viewStatus: 'Näytä Vaatimustenmukaisuuden Tila Hallintapaneelissa',
