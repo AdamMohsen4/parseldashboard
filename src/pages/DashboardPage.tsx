@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, LineChart, ResponsiveContainer, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line } from "recharts";
@@ -7,15 +7,9 @@ import { Separator } from "@/components/ui/separator";
 import { UploadCloud, FileText, FileSpreadsheet, Package, TrendingUp, Clock, Calendar, ChevronRight } from "lucide-react";
 import NavBar from "@/components/layout/NavBar";
 import { Link } from "react-router-dom";
-import FileUploadDialog from "@/components/dashboard/FileUploadDialog";
-import DocumentList from "@/components/dashboard/DocumentList";
-import { DocumentFile, getDocuments } from "@/services/documentService";
 
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
-  const [documents, setDocuments] = useState<DocumentFile[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   const deliveryData = [
     { name: "Jan", onTime: 92, delayed: 8 },
@@ -43,34 +37,8 @@ const DashboardPage = () => {
     { id: "EP-78949", date: "2023-06-11", from: "Oslo", to: "Copenhagen", status: "Delivered", documents: ["invoice.pdf"] },
   ];
 
-  useEffect(() => {
-    if (activeTab === "documents") {
-      loadDocuments();
-    }
-  }, [activeTab]);
-
-  const loadDocuments = () => {
-    setIsLoading(true);
-    try {
-      const docs = getDocuments();
-      setDocuments(docs);
-    } catch (error) {
-      console.error("Error fetching documents:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const openUploadDialog = () => {
-    setIsUploadDialogOpen(true);
-  };
-
-  const closeUploadDialog = () => {
-    setIsUploadDialogOpen(false);
-  };
-
-  const handleUploadComplete = () => {
-    loadDocuments();
+  const uploadFile = () => {
+    console.log("File upload initiated");
   };
 
   return (
@@ -87,7 +55,7 @@ const DashboardPage = () => {
             <Button asChild>
               <Link to="/book">New Shipment</Link>
             </Button>
-            <Button variant="outline" onClick={openUploadDialog}>
+            <Button variant="outline" onClick={uploadFile}>
               <UploadCloud className="mr-2 h-4 w-4" />
               Upload File
             </Button>
@@ -276,16 +244,13 @@ const DashboardPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  <div 
-                    className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors"
-                    onClick={openUploadDialog}
-                  >
+                  <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
                     <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
                     <h3 className="mt-2 text-lg font-semibold">Upload Documents</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       Drag and drop files here or click to browse
                     </p>
-                    <Button onClick={(e) => { e.stopPropagation(); openUploadDialog(); }}>Select Files</Button>
+                    <Button onClick={uploadFile}>Select Files</Button>
                     <p className="mt-2 text-xs text-muted-foreground">
                       Supported formats: PDF, CSV, Excel, JPG
                     </p>
@@ -295,13 +260,40 @@ const DashboardPage = () => {
 
                   <div>
                     <h3 className="text-lg font-semibold mb-4">Recent Documents</h3>
-                    {isLoading ? (
-                      <p className="text-center py-4 text-muted-foreground">Loading documents...</p>
-                    ) : documents.length === 0 ? (
-                      <p className="text-center py-4 text-muted-foreground">No documents found. Upload some documents to get started.</p>
-                    ) : (
-                      <DocumentList documents={documents} onDelete={loadDocuments} />
-                    )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center p-4 border border-border rounded-lg">
+                        <FileText className="h-10 w-10 text-red-500 mr-4" />
+                        <div>
+                          <p className="font-medium">Invoice-EP-78945.pdf</p>
+                          <p className="text-xs text-muted-foreground">Uploaded: 2023-06-15</p>
+                        </div>
+                        <Button variant="ghost" size="sm" className="ml-auto">View</Button>
+                      </div>
+                      <div className="flex items-center p-4 border border-border rounded-lg">
+                        <FileText className="h-10 w-10 text-red-500 mr-4" />
+                        <div>
+                          <p className="font-medium">CustomsForm-EP-78945.pdf</p>
+                          <p className="text-xs text-muted-foreground">Uploaded: 2023-06-15</p>
+                        </div>
+                        <Button variant="ghost" size="sm" className="ml-auto">View</Button>
+                      </div>
+                      <div className="flex items-center p-4 border border-border rounded-lg">
+                        <FileSpreadsheet className="h-10 w-10 text-green-500 mr-4" />
+                        <div>
+                          <p className="font-medium">ShipmentData-Jun2023.csv</p>
+                          <p className="text-xs text-muted-foreground">Uploaded: 2023-06-01</p>
+                        </div>
+                        <Button variant="ghost" size="sm" className="ml-auto">View</Button>
+                      </div>
+                      <div className="flex items-center p-4 border border-border rounded-lg">
+                        <FileText className="h-10 w-10 text-red-500 mr-4" />
+                        <div>
+                          <p className="font-medium">Invoice-EP-78946.pdf</p>
+                          <p className="text-xs text-muted-foreground">Uploaded: 2023-06-14</p>
+                        </div>
+                        <Button variant="ghost" size="sm" className="ml-auto">View</Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -410,12 +402,6 @@ const DashboardPage = () => {
           </TabsContent>
         </Tabs>
       </div>
-      
-      <FileUploadDialog 
-        isOpen={isUploadDialogOpen}
-        onClose={closeUploadDialog}
-        onUploadComplete={handleUploadComplete}
-      />
     </div>
   );
 };
