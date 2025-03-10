@@ -10,7 +10,7 @@ const Index = () => {
       <header className="border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-primary">ParcelNordic</h1>
+            <h1 className="text-2xl font-bold text-primary">E-Parsel</h1>
             <span className="ml-2 text-sm bg-accent/10 text-accent px-2 py-0.5 rounded-full">SME Portal</span>
           </div>
           <nav className="hidden md:flex space-x-6">
@@ -18,6 +18,7 @@ const Index = () => {
             <Link to="/book" className="text-foreground hover:text-primary transition-colors">Book Shipment</Link>
             <Link to="/tracking" className="text-foreground hover:text-primary transition-colors">Tracking</Link>
             <Link to="/compliance" className="text-foreground hover:text-primary transition-colors">Compliance</Link>
+            <Link to="/dashboard" className="text-foreground hover:text-primary transition-colors">Dashboard</Link>
           </nav>
           <div>
             <Button variant="outline" className="mr-2">Login</Button>
@@ -43,7 +44,7 @@ const Index = () => {
                   <Link to="/book">Book a Shipment</Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                  <Link to="/tracking">Track a Package</Link>
+                  <Link to="/dashboard">View Dashboard</Link>
                 </Button>
               </div>
             </div>
@@ -62,7 +63,7 @@ const Index = () => {
       <section className="py-20 bg-secondary/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Why Choose ParcelNordic?</h2>
+            <h2 className="text-3xl font-bold mb-4">Why Choose E-Parsel?</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               We simplify logistics for small and medium enterprises across the Nordic region.
             </p>
@@ -93,12 +94,12 @@ const Index = () => {
             
             <Card>
               <CardHeader>
-                <CardTitle>EU Compliance</CardTitle>
-                <CardDescription>Stay compliant with regulations</CardDescription>
+                <CardTitle>Unified Dashboard</CardTitle>
+                <CardDescription>Connect with your 3PL provider</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Add compliance features for just €2 extra per shipment. Carbon tracking, 
-                ELD integration, and CSRD reporting.</p>
+                <p>Access shipment history, analytics, and document management in one place. 
+                Seamlessly communicate with your logistics provider.</p>
               </CardContent>
             </Card>
           </div>
@@ -110,7 +111,7 @@ const Index = () => {
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to Simplify Your Shipping?</h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Join hundreds of SMEs across the Nordic region who trust ParcelNordic for their shipping needs.
+            Join hundreds of SMEs across the Nordic region who trust E-Parsel for their shipping needs.
           </p>
           <Button size="lg" asChild>
             <Link to="/book">Book Your First Shipment</Link>
@@ -123,7 +124,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h3 className="font-bold text-lg mb-4">ParcelNordic</h3>
+              <h3 className="font-bold text-lg mb-4">E-Parsel</h3>
               <p className="text-muted-foreground">Simplified logistics solutions for SMEs.</p>
             </div>
             <div>
@@ -132,6 +133,7 @@ const Index = () => {
                 <li><Link to="/book" className="text-muted-foreground hover:text-primary">Book Shipment</Link></li>
                 <li><Link to="/tracking" className="text-muted-foreground hover:text-primary">Tracking</Link></li>
                 <li><Link to="/compliance" className="text-muted-foreground hover:text-primary">Compliance</Link></li>
+                <li><Link to="/dashboard" className="text-muted-foreground hover:text-primary">Dashboard</Link></li>
               </ul>
             </div>
             <div>
@@ -145,14 +147,14 @@ const Index = () => {
             <div>
               <h4 className="font-bold mb-4">Contact</h4>
               <address className="not-italic text-muted-foreground">
-                <p>Email: info@parcelnordic.com</p>
+                <p>Email: info@e-parsel.com</p>
                 <p>Phone: +46 123 456 789</p>
                 <p>Address: Malmö, Sweden</p>
               </address>
             </div>
           </div>
           <div className="border-t border-border mt-12 pt-6 text-center text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} ParcelNordic. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} E-Parsel. All rights reserved.</p>
           </div>
         </div>
       </footer>

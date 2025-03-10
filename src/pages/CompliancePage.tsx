@@ -1,13 +1,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Link } from "react-router-dom";
 
 const CompliancePage = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border">
         <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-primary">ParcelNordic</h1>
+          <h1 className="text-2xl font-bold text-primary">E-Parsel</h1>
         </div>
       </header>
 
@@ -81,6 +82,12 @@ const CompliancePage = () => {
                   <p className="text-sm text-muted-foreground">Simply select the Compliance Package option during the booking process.</p>
                 </div>
               </div>
+            </div>
+
+            <div className="flex justify-center pt-4">
+              <Link to="/dashboard" className="text-primary hover:underline">
+                View Compliance Status in Dashboard
+              </Link>
             </div>
           </CardContent>
         </Card>
