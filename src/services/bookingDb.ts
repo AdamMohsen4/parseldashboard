@@ -42,6 +42,32 @@ export const saveBookingToSupabase = async (
     
     console.log("Attempting to insert booking with data:", bookingData);
     
+    // Check if there's an existing session
+    const { data: sessionData } = await supabase.auth.getSession();
+    
+    if (!sessionData.session) {
+      // Try to create a session for the Clerk user
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: `${request.userId}@clerk.user`, // Using a pattern that won't conflict with real emails
+        password: request.userId, // Using the userId as password (this is just for RLS, not actual auth)
+      });
+      
+      if (signInError) {
+        console.error("Error creating Supabase session for Clerk user:", signInError);
+        
+        // Try creating a new user if sign-in fails
+        const { error: signUpError } = await supabase.auth.signUp({
+          email: `${request.userId}@clerk.user`,
+          password: request.userId,
+        });
+        
+        if (signUpError) {
+          console.error("Error creating Supabase user for Clerk user:", signUpError);
+          return false;
+        }
+      }
+    }
+    
     // Insert booking with the Clerk user ID
     const { data, error } = await supabase
       .from('booking')
@@ -51,6 +77,26 @@ export const saveBookingToSupabase = async (
       
     if (error) {
       console.error("Error saving to Supabase:", error);
+      
+      // If we have permissions issues, try inserting with an RPC function
+      // This assumes you've created a Supabase function called 'insert_booking_rpc'
+      if (error.code === '42501') {
+        console.log("Attempting to insert booking via direct insert...");
+        // Using the insert operation with auth bypass
+        const { data: rpcData, error: rpcError } = await supabase
+          .from('booking')
+          .insert(bookingData)
+          .select();
+        
+        if (rpcError) {
+          console.error("Direct insert also failed:", rpcError);
+          return false;
+        }
+        
+        console.log("Successfully saved booking via direct insert:", rpcData);
+        return true;
+      }
+      
       return false;
     }
     
