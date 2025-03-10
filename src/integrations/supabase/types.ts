@@ -75,6 +75,87 @@ export type Database = {
         }
         Relationships: []
       }
+      collaborations: {
+        Row: {
+          business_name: string
+          contact_email: string
+          contact_phone: string
+          created_at: string
+          destination: string
+          frequency: string
+          id: string
+          next_shipment_date: string
+          notes: string | null
+          user_id: string
+          volume: string
+        }
+        Insert: {
+          business_name: string
+          contact_email: string
+          contact_phone: string
+          created_at?: string
+          destination: string
+          frequency: string
+          id?: string
+          next_shipment_date: string
+          notes?: string | null
+          user_id: string
+          volume: string
+        }
+        Update: {
+          business_name?: string
+          contact_email?: string
+          contact_phone?: string
+          created_at?: string
+          destination?: string
+          frequency?: string
+          id?: string
+          next_shipment_date?: string
+          notes?: string | null
+          user_id?: string
+          volume?: string
+        }
+        Relationships: []
+      }
+      demo_requests: {
+        Row: {
+          company: string | null
+          created_at: string
+          demo_type: string | null
+          email: string
+          id: string
+          message: string | null
+          name: string
+          phone: string | null
+          preferred_date: string | null
+          status: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          demo_type?: string | null
+          email: string
+          id?: string
+          message?: string | null
+          name: string
+          phone?: string | null
+          preferred_date?: string | null
+          status?: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          demo_type?: string | null
+          email?: string
+          id?: string
+          message?: string | null
+          name?: string
+          phone?: string | null
+          preferred_date?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
