@@ -1,16 +1,12 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
+import NavBar from "@/components/layout/NavBar";
 
 const CompliancePage = () => {
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border">
-        <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-primary">E-Parsel</h1>
-        </div>
-      </header>
+      <NavBar />
 
       <div className="container mx-auto px-4 py-8">
         <Card className="max-w-4xl mx-auto">

@@ -2,30 +2,15 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import NavBar from "@/components/layout/NavBar";
+import { useUser } from "@clerk/clerk-react";
 
 const Index = () => {
+  const { isSignedIn } = useUser();
+  
   return (
     <div className="min-h-screen bg-background">
-      {/* Header with navigation */}
-      <header className="border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-primary">E-Parsel</h1>
-            <span className="ml-2 text-sm bg-accent/10 text-accent px-2 py-0.5 rounded-full">SME Portal</span>
-          </div>
-          <nav className="hidden md:flex space-x-6">
-            <Link to="/" className="text-foreground hover:text-primary transition-colors">Home</Link>
-            <Link to="/book" className="text-foreground hover:text-primary transition-colors">Book Shipment</Link>
-            <Link to="/tracking" className="text-foreground hover:text-primary transition-colors">Tracking</Link>
-            <Link to="/compliance" className="text-foreground hover:text-primary transition-colors">Compliance</Link>
-            <Link to="/dashboard" className="text-foreground hover:text-primary transition-colors">Dashboard</Link>
-          </nav>
-          <div>
-            <Button variant="outline" className="mr-2">Login</Button>
-            <Button>Sign Up</Button>
-          </div>
-        </div>
-      </header>
+      <NavBar />
 
       {/* Hero section */}
       <section className="py-20 px-4">
@@ -43,9 +28,15 @@ const Index = () => {
                 <Button size="lg" asChild>
                   <Link to="/book">Book a Shipment</Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <Link to="/dashboard">View Dashboard</Link>
-                </Button>
+                {isSignedIn ? (
+                  <Button size="lg" variant="outline" asChild>
+                    <Link to="/dashboard">View Dashboard</Link>
+                  </Button>
+                ) : (
+                  <Button size="lg" variant="outline" onClick={() => document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click()}>
+                    Sign In
+                  </Button>
+                )}
               </div>
             </div>
             <div className="relative rounded-lg overflow-hidden shadow-xl">
@@ -131,9 +122,13 @@ const Index = () => {
               <h4 className="font-bold mb-4">Services</h4>
               <ul className="space-y-2">
                 <li><Link to="/book" className="text-muted-foreground hover:text-primary">Book Shipment</Link></li>
-                <li><Link to="/tracking" className="text-muted-foreground hover:text-primary">Tracking</Link></li>
-                <li><Link to="/compliance" className="text-muted-foreground hover:text-primary">Compliance</Link></li>
-                <li><Link to="/dashboard" className="text-muted-foreground hover:text-primary">Dashboard</Link></li>
+                {isSignedIn && (
+                  <>
+                    <li><Link to="/tracking" className="text-muted-foreground hover:text-primary">Tracking</Link></li>
+                    <li><Link to="/compliance" className="text-muted-foreground hover:text-primary">Compliance</Link></li>
+                    <li><Link to="/dashboard" className="text-muted-foreground hover:text-primary">Dashboard</Link></li>
+                  </>
+                )}
               </ul>
             </div>
             <div>

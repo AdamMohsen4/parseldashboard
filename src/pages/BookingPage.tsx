@@ -1,15 +1,18 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
+import NavBar from "@/components/layout/NavBar";
+import { useUser } from "@clerk/clerk-react";
 
 const BookingPage = () => {
+  const { isSignedIn } = useUser();
   const [weight, setWeight] = useState("");
   const [length, setLength] = useState("");
   const [width, setWidth] = useState("");
@@ -18,28 +21,35 @@ const BookingPage = () => {
   const [delivery, setDelivery] = useState("");
   const [deliverySpeed, setDeliverySpeed] = useState("standard");
   const [compliance, setCompliance] = useState(false);
+  const [showBookingConfirmation, setShowBookingConfirmation] = useState(false);
   
-  const carrierOptions = [
-    { id: 1, name: "PostNord", price: 10, eta: "2 days", icon: "📦" },
-    { id: 2, name: "DHL", price: 12, eta: "1 day", icon: "🚚" },
-    { id: 3, name: "Bring", price: 11, eta: "3 days", icon: "📬" },
-  ];
+  // Fixed price carrier
+  const carrier = { id: 1, name: "E-Parsel Nordic", price: 10, eta: "3 days", icon: "📦" };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setShowBookingConfirmation(true);
     toast({
       title: "Booking Submitted",
       description: "Your shipment has been booked successfully!",
     });
   };
 
+  const handleBookNow = () => {
+    if (isSignedIn) {
+      toast({
+        title: "Shipment Booked",
+        description: "Your shipment has been booked with E-Parsel Nordic!",
+      });
+    } else {
+      // Trigger Clerk sign-in dialog
+      document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border">
-        <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-primary">ParcelNordic</h1>
-        </div>
-      </header>
+      <NavBar />
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row gap-8">
@@ -143,16 +153,8 @@ const BookingPage = () => {
                       className="space-y-2"
                     >
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="express" id="express" />
-                        <Label htmlFor="express">Express (1 day)</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
                         <RadioGroupItem value="standard" id="standard" />
                         <Label htmlFor="standard">Standard (3 days)</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="economy" id="economy" />
-                        <Label htmlFor="economy">Economy (5 days)</Label>
                       </div>
                     </RadioGroup>
                     
@@ -173,7 +175,7 @@ const BookingPage = () => {
                     </div>
                   </div>
                   
-                  <Button type="submit" className="w-full">Calculate Rates</Button>
+                  <Button type="submit" className="w-full">Calculate Rate</Button>
                 </form>
               </CardContent>
             </Card>
@@ -182,36 +184,49 @@ const BookingPage = () => {
           <div className="md:w-3/5">
             <Card>
               <CardHeader>
-                <CardTitle>Available Rates</CardTitle>
+                <CardTitle>Fixed Rate Shipping</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {carrierOptions.map((carrier) => (
-                    <div 
-                      key={carrier.id} 
-                      className="border border-border rounded-lg p-4 flex justify-between items-center hover:border-primary cursor-pointer"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <div className="text-2xl">{carrier.icon}</div>
-                        <div>
-                          <h4 className="font-medium">{carrier.name}</h4>
-                          <p className="text-sm text-muted-foreground">Estimated delivery: {carrier.eta}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold">€{carrier.price}</p>
-                        <Button size="sm">Book Now</Button>
+                  <div 
+                    className="border border-primary rounded-lg p-4 flex justify-between items-center"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="text-2xl">{carrier.icon}</div>
+                      <div>
+                        <h4 className="font-medium">{carrier.name}</h4>
+                        <p className="text-sm text-muted-foreground">Estimated delivery: {carrier.eta}</p>
                       </div>
                     </div>
-                  ))}
-                </div>
-                
-                <div className="mt-8 bg-muted p-4 rounded-lg">
-                  <h4 className="font-medium mb-2">About our rates</h4>
-                  <p className="text-sm text-muted-foreground">
-                    All shipments include tracking and insurance up to €500. Additional insurance 
-                    can be purchased during checkout. Rates shown include all taxes and fees.
-                  </p>
+                    <div className="text-right">
+                      <p className="text-lg font-bold">€{carrier.price}{compliance ? " + €2" : ""}</p>
+                      <Button size="sm" onClick={handleBookNow}>Book Now</Button>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-8 bg-muted p-4 rounded-lg">
+                    <h4 className="font-medium mb-2">About our rates</h4>
+                    <p className="text-sm text-muted-foreground">
+                      All shipments include tracking and insurance up to €500. Additional insurance 
+                      can be purchased during checkout. Rates shown include all taxes and fees.
+                    </p>
+                  </div>
+                  
+                  {/* Booking confirmation */}
+                  {showBookingConfirmation && (
+                    <div className="mt-8 bg-primary/10 p-4 rounded-lg border border-primary">
+                      <h4 className="font-medium mb-2 text-primary">Shipment Ready to Book</h4>
+                      <p className="text-sm mb-4">
+                        Your shipment from {pickup} to {delivery} is ready to be booked with E-Parsel Nordic.
+                      </p>
+                      <div className="flex justify-between items-center">
+                        <p className="font-semibold">Total: €{compliance ? "12" : "10"}</p>
+                        <Button onClick={handleBookNow}>
+                          {isSignedIn ? "Confirm Booking" : "Sign In to Book"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

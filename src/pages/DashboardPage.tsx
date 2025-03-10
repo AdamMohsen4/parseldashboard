@@ -5,6 +5,8 @@ import { BarChart, LineChart, ResponsiveContainer, Bar, XAxis, YAxis, CartesianG
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { UploadCloud, FileText, FileSpreadsheet, Package, TrendingUp, Clock, Calendar, ChevronRight } from "lucide-react";
+import NavBar from "@/components/layout/NavBar";
+import { Link } from "react-router-dom";
 
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -41,12 +43,7 @@ const DashboardPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-primary">E-Parsel</h1>
-          <Button variant="outline" size="sm">Back to Home</Button>
-        </div>
-      </header>
+      <NavBar />
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -55,7 +52,9 @@ const DashboardPage = () => {
             <p className="text-muted-foreground">Manage your shipments and view analytics</p>
           </div>
           <div className="flex gap-2 mt-4 md:mt-0">
-            <Button>New Shipment</Button>
+            <Button asChild>
+              <Link to="/book">New Shipment</Link>
+            </Button>
             <Button variant="outline" onClick={uploadFile}>
               <UploadCloud className="mr-2 h-4 w-4" />
               Upload File
@@ -408,4 +407,3 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
-
