@@ -19,6 +19,15 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     
     if (authError) {
       console.error("Error getting authenticated user:", authError);
+      toast({
+        title: "Authentication Error",
+        description: "There was a problem with your authentication. Please sign in again.",
+        variant: "destructive",
+      });
+      return {
+        success: false,
+        message: "Authentication error"
+      };
     }
     
     if (!authData.user) {

@@ -11,8 +11,24 @@ export const saveBookingToSupabase = async (
   estimatedDelivery: string
 ) => {
   try {
-    console.log("Saving booking to Supabase with payload:", { 
-      user_id: request.userId,
+    // Get the current authenticated user
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    
+    if (authError) {
+      console.error("Error getting authenticated user:", authError);
+      return false;
+    }
+    
+    if (!authData.user) {
+      console.error("User not authenticated, cannot save booking");
+      return false;
+    }
+    
+    console.log("Authenticated user confirmed:", authData.user.id);
+    
+    // Log the full data we're trying to insert
+    const bookingData = {
+      user_id: authData.user.id,
       tracking_code: trackingCode,
       carrier_name: request.carrier.name,
       carrier_price: request.carrier.price,
@@ -29,45 +45,14 @@ export const saveBookingToSupabase = async (
       total_price: totalPrice,
       status: 'pending',
       estimated_delivery: estimatedDelivery
-    });
+    };
     
-    // Get the current authenticated user
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    
-    if (authError) {
-      console.error("Error getting authenticated user:", authError);
-      return false;
-    }
-    
-    if (!authData.user) {
-      console.error("User not authenticated, cannot save booking");
-      return false;
-    }
-    
-    console.log("Authenticated user confirmed:", authData.user.id);
+    console.log("Attempting to insert booking with data:", bookingData);
     
     // Insert booking with the authenticated user ID
     const { data, error } = await supabase
       .from('booking')
-      .insert({
-        user_id: authData.user.id,
-        tracking_code: trackingCode,
-        carrier_name: request.carrier.name,
-        carrier_price: request.carrier.price,
-        weight: request.weight,
-        dimension_length: request.dimensions.length,
-        dimension_width: request.dimensions.width,
-        dimension_height: request.dimensions.height,
-        pickup_address: request.pickup,
-        delivery_address: request.delivery,
-        delivery_speed: request.deliverySpeed,
-        include_compliance: request.includeCompliance,
-        label_url: labelUrl,
-        pickup_time: pickupTime,
-        total_price: totalPrice,
-        status: 'pending',
-        estimated_delivery: estimatedDelivery
-      })
+      .insert(bookingData)
       .select()
       .maybeSingle();
       
