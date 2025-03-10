@@ -1,16 +1,14 @@
-
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, LineChart, ResponsiveContainer, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { UploadCloud, FilePdf, FileSpreadsheet, Package, TrendingUp, Clock, Calendar, ChevronRight } from "lucide-react";
+import { UploadCloud, FileText, FileSpreadsheet, Package, TrendingUp, Clock, Calendar, ChevronRight } from "lucide-react";
 
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Mock data for charts
   const deliveryData = [
     { name: "Jan", onTime: 92, delayed: 8 },
     { name: "Feb", onTime: 88, delayed: 12 },
@@ -29,7 +27,6 @@ const DashboardPage = () => {
     { name: "Jun", volume: 189 },
   ];
 
-  // Mock shipment history
   const shipments = [
     { id: "EP-78945", date: "2023-06-15", from: "Malmö", to: "Helsinki", status: "Delivered", documents: ["invoice.pdf", "customs.pdf"] },
     { id: "EP-78946", date: "2023-06-14", from: "Stockholm", to: "Oslo", status: "In Transit", documents: ["invoice.pdf"] },
@@ -39,7 +36,6 @@ const DashboardPage = () => {
   ];
 
   const uploadFile = () => {
-    // In a real implementation, this would open a file picker
     console.log("File upload initiated");
   };
 
@@ -76,7 +72,6 @@ const DashboardPage = () => {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Card>
                 <CardHeader className="pb-2">
@@ -139,7 +134,6 @@ const DashboardPage = () => {
               </Card>
             </div>
 
-            {/* Recent Shipments */}
             <Card>
               <CardHeader>
                 <CardTitle>Recent Shipments</CardTitle>
@@ -173,7 +167,6 @@ const DashboardPage = () => {
               </CardContent>
             </Card>
 
-            {/* Delivery Performance Chart */}
             <Card>
               <CardHeader>
                 <CardTitle>Delivery Performance</CardTitle>
@@ -270,7 +263,7 @@ const DashboardPage = () => {
                     <h3 className="text-lg font-semibold mb-4">Recent Documents</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex items-center p-4 border border-border rounded-lg">
-                        <FilePdf className="h-10 w-10 text-red-500 mr-4" />
+                        <FileText className="h-10 w-10 text-red-500 mr-4" />
                         <div>
                           <p className="font-medium">Invoice-EP-78945.pdf</p>
                           <p className="text-xs text-muted-foreground">Uploaded: 2023-06-15</p>
@@ -278,7 +271,7 @@ const DashboardPage = () => {
                         <Button variant="ghost" size="sm" className="ml-auto">View</Button>
                       </div>
                       <div className="flex items-center p-4 border border-border rounded-lg">
-                        <FilePdf className="h-10 w-10 text-red-500 mr-4" />
+                        <FileText className="h-10 w-10 text-red-500 mr-4" />
                         <div>
                           <p className="font-medium">CustomsForm-EP-78945.pdf</p>
                           <p className="text-xs text-muted-foreground">Uploaded: 2023-06-15</p>
@@ -294,7 +287,7 @@ const DashboardPage = () => {
                         <Button variant="ghost" size="sm" className="ml-auto">View</Button>
                       </div>
                       <div className="flex items-center p-4 border border-border rounded-lg">
-                        <FilePdf className="h-10 w-10 text-red-500 mr-4" />
+                        <FileText className="h-10 w-10 text-red-500 mr-4" />
                         <div>
                           <p className="font-medium">Invoice-EP-78946.pdf</p>
                           <p className="text-xs text-muted-foreground">Uploaded: 2023-06-14</p>
@@ -415,3 +408,4 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
+
