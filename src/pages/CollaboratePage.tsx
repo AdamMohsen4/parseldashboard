@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useUser } from "@clerk/clerk-react";
 import NavBar from "@/components/layout/NavBar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,21 +9,100 @@ import { Label } from "@/components/ui/label";
 import { Users, MapPin, Package, Mail, MessageSquare } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import CollaborationList from "@/components/collaboration/CollaborationList";
-import { mockCollaborations } from "@/components/collaboration/mockData";
+import { fetchCollaborations, createCollaboration } from "@/services/collaborationService";
+import { Collaboration } from "@/components/collaboration/types";
+import { toast } from "@/components/ui/use-toast";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 
 const CollaboratePage = () => {
   const { t } = useTranslation();
+  const { user } = useUser();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredCollaborations, setFilteredCollaborations] = useState(mockCollaborations);
+  const [filteredCollaborations, setFilteredCollaborations] = useState<Collaboration[]>([]);
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    destination: "",
+    volume: "",
+    frequency: "",
+    nextShipmentDate: "",
+    notes: "",
+    contactEmail: user?.primaryEmailAddress?.emailAddress || "",
+    contactPhone: ""
+  });
+
+  // Fetch collaborations using React Query
+  const { data: collaborations = [], isLoading } = useQuery({
+    queryKey: ['collaborations'],
+    queryFn: fetchCollaborations
+  });
+
+  // Update filtered collaborations when data changes
+  useEffect(() => {
+    setFilteredCollaborations(collaborations);
+  }, [collaborations]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const filtered = mockCollaborations.filter(
+    const filtered = collaborations.filter(
       (collab) =>
         collab.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         collab.destination.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredCollaborations(filtered);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "You must be logged in to create a collaboration listing.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate form
+    const requiredFields = ['destination', 'volume', 'frequency', 'nextShipmentDate', 'contactEmail', 'contactPhone'];
+    const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
+    
+    if (missingFields.length > 0) {
+      toast({
+        title: "Missing Information",
+        description: `Please fill in all required fields: ${missingFields.join(', ')}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const success = await createCollaboration(user.id, {
+      businessName: user.organizationMemberships?.[0]?.organization.name || user.fullName || 'Anonymous Business',
+      ...formData
+    });
+
+    if (success) {
+      // Reset form
+      setFormData({
+        destination: "",
+        volume: "",
+        frequency: "",
+        nextShipmentDate: "",
+        notes: "",
+        contactEmail: user.primaryEmailAddress?.emailAddress || "",
+        contactPhone: ""
+      });
+      
+      // Refresh data
+      queryClient.invalidateQueries({ queryKey: ['collaborations'] });
+    }
   };
 
   return (
@@ -112,29 +192,75 @@ const CollaboratePage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
-            <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="destination">{t('collaborate.form.destination', 'Destination')}</Label>
-                <Input id="destination" placeholder="City, Country" />
+                <Input 
+                  id="destination" 
+                  placeholder="City, Country" 
+                  value={formData.destination}
+                  onChange={handleInputChange}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="volume">{t('collaborate.form.volume', 'Approximate Volume')}</Label>
-                <Input id="volume" placeholder="e.g., 5 kg or 0.5 cubic meters" />
+                <Input 
+                  id="volume" 
+                  placeholder="e.g., 5 kg or 0.5 cubic meters" 
+                  value={formData.volume}
+                  onChange={handleInputChange}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="frequency">{t('collaborate.form.frequency', 'Shipping Frequency')}</Label>
-                <Input id="frequency" placeholder="e.g., Weekly, Monthly" />
+                <Input 
+                  id="frequency" 
+                  placeholder="e.g., Weekly, Monthly" 
+                  value={formData.frequency}
+                  onChange={handleInputChange}
+                />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="date">{t('collaborate.form.date', 'Next Shipping Date')}</Label>
-                <Input id="date" type="date" />
+                <Label htmlFor="nextShipmentDate">{t('collaborate.form.date', 'Next Shipping Date')}</Label>
+                <Input 
+                  id="nextShipmentDate" 
+                  type="date" 
+                  value={formData.nextShipmentDate}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="contactEmail">{t('collaborate.form.email', 'Contact Email')}</Label>
+                <Input 
+                  id="contactEmail" 
+                  type="email" 
+                  placeholder="your@email.com" 
+                  value={formData.contactEmail}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="contactPhone">{t('collaborate.form.phone', 'Contact Phone')}</Label>
+                <Input 
+                  id="contactPhone" 
+                  placeholder="+1 (123) 456-7890" 
+                  value={formData.contactPhone}
+                  onChange={handleInputChange}
+                />
               </div>
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="notes">{t('collaborate.form.notes', 'Additional Notes')}</Label>
-                <Input id="notes" placeholder="Any specific requirements or information" />
+                <Input 
+                  id="notes" 
+                  placeholder="Any specific requirements or information" 
+                  value={formData.notes}
+                  onChange={handleInputChange}
+                />
               </div>
               <div className="md:col-span-2">
-                <Button className="w-full">{t('collaborate.form.submit', 'Create Collaboration Listing')}</Button>
+                <Button type="submit" className="w-full">
+                  {t('collaborate.form.submit', 'Create Collaboration Listing')}
+                </Button>
               </div>
             </form>
           </CardContent>
@@ -145,7 +271,13 @@ const CollaboratePage = () => {
           {t('collaborate.availableCollaborations', 'Available Collaboration Opportunities')}
         </h2>
         
-        <CollaborationList collaborations={filteredCollaborations} />
+        {isLoading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-lg">Loading collaborations...</p>
+          </div>
+        ) : (
+          <CollaborationList collaborations={filteredCollaborations} />
+        )}
       </div>
     </div>
   );
