@@ -19,36 +19,6 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Protected route component
-const ProtectedRoute = ({ children, requireAdmin = false }: { children: React.ReactNode, requireAdmin?: boolean }) => {
-  const { isSignedIn, isLoaded, user } = useUser();
-  
-  // Log authentication state for debugging
-  if (isLoaded) {
-    console.log("Protected route:", { 
-      isSignedIn, 
-      userRole: user?.publicMetadata?.role || "none",
-      requireAdmin
-    });
-  }
-  
-  if (!isLoaded) {
-    return <div>Loading...</div>;
-  }
-  
-  if (!isSignedIn) {
-    return <Navigate to="/" />;
-  }
-  
-  // Check if admin role is required and user has it
-  if (requireAdmin && user?.publicMetadata?.role !== "admin") {
-    console.log("Admin required but user has role:", user?.publicMetadata?.role);
-    return <Navigate to="/dashboard" />;
-  }
-  
-  return <>{children}</>;
-};
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -62,39 +32,39 @@ const App = () => (
             
             {/* Protected routes */}
             <Route path="/shipment" element={
-              <ProtectedRoute>
+              <AuthWrapper requireAuth>
                 <ShipmentBookingPage />
-              </ProtectedRoute>
+              </AuthWrapper>
             } />
             <Route path="/3pl" element={
-              <ProtectedRoute>
+              <AuthWrapper requireAuth>
                 <ThreePLServicePage />
-              </ProtectedRoute>
+              </AuthWrapper>
             } />
             <Route path="/tracking" element={
-              <ProtectedRoute>
+              <AuthWrapper requireAuth>
                 <TrackingPage />
-              </ProtectedRoute>
+              </AuthWrapper>
             } />
             <Route path="/compliance" element={
-              <ProtectedRoute>
+              <AuthWrapper requireAuth>
                 <CompliancePage />
-              </ProtectedRoute>
+              </AuthWrapper>
             } />
             <Route path="/dashboard" element={
-              <ProtectedRoute>
+              <AuthWrapper requireAuth>
                 <DashboardPage />
-              </ProtectedRoute>
+              </AuthWrapper>
             } />
             <Route path="/admin-dashboard" element={
-              <ProtectedRoute requireAdmin={true}>
+              <AuthWrapper requireAuth requireAdmin>
                 <AdminDashboardPage />
-              </ProtectedRoute>
+              </AuthWrapper>
             } />
             <Route path="/collaborate" element={
-              <ProtectedRoute>
+              <AuthWrapper requireAuth>
                 <CollaboratePage />
-              </ProtectedRoute>
+              </AuthWrapper>
             } />
             
             {/* Catch-all route */}

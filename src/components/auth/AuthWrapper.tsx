@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -17,6 +18,24 @@ const AuthWrapper = ({ children, requireAuth = false, requireAdmin = false }: Au
   
   // Check if user has admin role
   const isAdmin = isSignedIn && user?.publicMetadata?.role === "admin";
+
+  // Set auth header for Supabase when user is authenticated
+  useEffect(() => {
+    if (isSignedIn && user) {
+      // Get the JWT token from Clerk
+      user.getToken({ template: "supabase" }).then((token) => {
+        // Set the auth token in Supabase
+        supabase.auth.setSession({ 
+          access_token: token as string, 
+          refresh_token: ''
+        });
+        console.log("Supabase auth token set from Clerk");
+      });
+    } else {
+      // Clear the Supabase session when not signed in
+      supabase.auth.signOut();
+    }
+  }, [isSignedIn, user]);
 
   // Log auth status for debugging
   useEffect(() => {
