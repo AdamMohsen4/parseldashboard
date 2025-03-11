@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/AuthWrapper";
 import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 import { 
   Menu, 
   Users, 
