@@ -28,7 +28,6 @@ const NavBar = () => {
       name: t('nav.categories.general', 'General'),
       items: [
         { path: "/", label: t('nav.home'), icon: null },
-        { path: "/book", label: t('nav.book'), icon: null },
       ]
     },
     ...(isSignedIn ? [
@@ -37,13 +36,14 @@ const NavBar = () => {
         items: [
           { path: "/shipment", label: t('nav.shipment', 'Ship Package'), icon: Package },
           { path: "/tracking", label: t('nav.tracking'), icon: Truck },
+          { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
         ]
       },
       {
         name: t('nav.categories.services', 'Services'),
         items: [
           { path: "/3pl", label: t('nav.3pl', '3PL Services'), icon: Warehouse },
-          { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
+          { path: "/book", label: t('nav.book'), icon: null },
         ]
       },
       {
