@@ -1,4 +1,6 @@
 
+export type CustomerType = "business" | "private" | "ecommerce";
+
 export interface BookingRequest {
   // Package details
   weight: string;
@@ -27,6 +29,11 @@ export interface BookingRequest {
   
   // User ID
   userId: string;
+  
+  // Customer type data
+  customerType?: CustomerType;
+  businessName?: string;
+  vatNumber?: string;
 }
 
 export interface BookingResponse {

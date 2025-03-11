@@ -36,6 +36,21 @@ const App = () => (
                 <ShipmentBookingPage />
               </AuthWrapper>
             } />
+            <Route path="/shipment/business" element={
+              <AuthWrapper requireAuth>
+                <ShipmentBookingPage customerType="business" />
+              </AuthWrapper>
+            } />
+            <Route path="/shipment/private" element={
+              <AuthWrapper requireAuth>
+                <ShipmentBookingPage customerType="private" />
+              </AuthWrapper>
+            } />
+            <Route path="/shipment/ecommerce" element={
+              <AuthWrapper requireAuth>
+                <ShipmentBookingPage customerType="ecommerce" />
+              </AuthWrapper>
+            } />
             <Route path="/3pl" element={
               <AuthWrapper requireAuth>
                 <ThreePLServicePage />

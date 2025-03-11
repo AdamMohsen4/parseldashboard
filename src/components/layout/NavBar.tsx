@@ -5,7 +5,21 @@ import { AuthButtons } from "@/components/auth/AuthWrapper";
 import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../common/LanguageSwitcher";
-import { Menu, Users, Package, Warehouse, ChevronDown, Truck, FileCheck, LayoutDashboard, Phone, Shield } from "lucide-react";
+import { 
+  Menu, 
+  Users, 
+  Package, 
+  Warehouse, 
+  ChevronDown, 
+  Truck, 
+  FileCheck, 
+  LayoutDashboard, 
+  Phone, 
+  Shield,
+  User,
+  Briefcase,
+  ShoppingCart
+} from "lucide-react";
 import { useState } from "react";
 import { 
   DropdownMenu, 
@@ -37,9 +51,17 @@ const NavBar = () => {
       {
         name: t('nav.categories.shipping', 'Shipping'),
         items: [
-          { path: "/shipment", label: t('nav.shipment', 'Ship Package'), icon: Package },
+          { 
+            path: "/shipment", 
+            label: t('nav.shipment', 'Ship Package'), 
+            icon: Package,
+            subItems: [
+              { path: "/shipment/business", label: t('nav.shipment.business', 'Business'), icon: Briefcase },
+              { path: "/shipment/private", label: t('nav.shipment.private', 'Private Customer'), icon: User },
+              { path: "/shipment/ecommerce", label: t('nav.shipment.ecommerce', 'E-commerce Business'), icon: ShoppingCart },
+            ]
+          },
           { path: "/tracking", label: t('nav.tracking'), icon: Truck },
-
         ]
       },
       {
@@ -48,7 +70,6 @@ const NavBar = () => {
           { path: "/3pl", label: t('nav.3pl', '3PL Services'), icon: Warehouse },
           { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
           { path: "/book", label: t('nav.book'), icon: Phone },
-        
         ]
       },
       {
@@ -124,17 +145,46 @@ const NavBar = () => {
                     <DropdownMenuLabel>{category.name}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {category.items.map((item) => (
-                      <DropdownMenuItem key={item.path} asChild>
-                        <Link
-                          to={item.path}
-                          className={`${
-                            location.pathname === item.path ? "text-primary font-medium" : ""
-                          } w-full flex items-center gap-2`}
-                        >
-                          {item.icon && <item.icon className="h-4 w-4" />}
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
+                      item.subItems ? (
+                        // For items with subcategories
+                        <DropdownMenu key={item.path}>
+                          <DropdownMenuTrigger className="w-full flex items-center justify-between px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground cursor-default rounded-sm">
+                            <span className="flex items-center gap-2">
+                              {item.icon && <item.icon className="h-4 w-4" />}
+                              {item.label}
+                            </span>
+                            <ChevronDown className="h-4 w-4" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent side="right" className="w-48">
+                            {item.subItems.map((subItem) => (
+                              <DropdownMenuItem key={subItem.path} asChild>
+                                <Link
+                                  to={subItem.path}
+                                  className={`${
+                                    location.pathname === subItem.path ? "text-primary font-medium" : ""
+                                  } w-full flex items-center gap-2`}
+                                >
+                                  {subItem.icon && <subItem.icon className="h-4 w-4" />}
+                                  {subItem.label}
+                                </Link>
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        // For regular items
+                        <DropdownMenuItem key={item.path} asChild>
+                          <Link
+                            to={item.path}
+                            className={`${
+                              location.pathname === item.path ? "text-primary font-medium" : ""
+                            } w-full flex items-center gap-2`}
+                          >
+                            {item.icon && <item.icon className="h-4 w-4" />}
+                            {item.label}
+                          </Link>
+                        </DropdownMenuItem>
+                      )
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -171,19 +221,45 @@ const NavBar = () => {
                 <h3 className="text-sm font-medium text-muted-foreground">{category.name}</h3>
                 <div className="space-y-1 pl-2">
                   {category.items.map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className={`${
-                        location.pathname === item.path
-                          ? "text-primary font-medium"
-                          : "text-foreground"
-                      } block py-1.5 hover:text-primary transition-colors flex items-center gap-2`}
-                      onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    >
-                      {item.icon && <item.icon className="h-4 w-4" />}
-                      {item.label}
-                    </Link>
+                    item.subItems ? (
+                      <div key={item.path} className="space-y-1">
+                        <div className="flex items-center gap-2 py-1.5">
+                          {item.icon && <item.icon className="h-4 w-4" />}
+                          <span className="font-medium">{item.label}</span>
+                        </div>
+                        <div className="pl-6 space-y-1">
+                          {item.subItems.map((subItem) => (
+                            <Link
+                              key={subItem.path}
+                              to={subItem.path}
+                              className={`${
+                                location.pathname === subItem.path
+                                  ? "text-primary font-medium"
+                                  : "text-foreground"
+                              } block py-1.5 hover:text-primary transition-colors flex items-center gap-2`}
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              {subItem.icon && <subItem.icon className="h-4 w-4" />}
+                              {subItem.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className={`${
+                          location.pathname === item.path
+                            ? "text-primary font-medium"
+                            : "text-foreground"
+                        } block py-1.5 hover:text-primary transition-colors flex items-center gap-2`}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.icon && <item.icon className="h-4 w-4" />}
+                        {item.label}
+                      </Link>
+                    )
                   ))}
                 </div>
               </div>
