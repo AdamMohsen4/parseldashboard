@@ -1,18 +1,15 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Package, Facebook, Twitter, Instagram, Linkedin, Mail, Phone } from 'lucide-react';
-
 const Footer: React.FC = () => {
-  return (
-    <footer className="bg-nordic-dark text-white">
+  return <footer className="bg-nordic-dark text-white">
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Package className="h-6 w-6 text-nordic-blue" />
-              <span className="text-xl font-semibold tracking-tight">ParcelNordic</span>
+              <span className="text-xl font-semibold tracking-tight">E-Parsel</span>
             </div>
             <p className="text-gray-300 text-sm max-w-xs">
               Simplified parcel shipping for SMEs across the Nordic region. Book, track, and manage your shipments effortlessly.
@@ -125,8 +122,6 @@ const Footer: React.FC = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
