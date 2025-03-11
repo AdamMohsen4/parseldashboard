@@ -15,6 +15,7 @@ import { submitThreePLRequest } from "@/services/threePLService";
 import { ThreePLResponse } from "@/types/threePL";
 import SimpleRequestForm from "@/components/three-pl/SimpleRequestForm";
 import DocumentUpload from "@/components/three-pl/DocumentUpload";
+import EcommerceIntegration from "@/components/three-pl/EcommerceIntegration";
 
 const productCategories = [
   "Electronics",
@@ -50,44 +51,36 @@ const ThreePLServicePage = () => {
   const { isSignedIn, user } = useUser();
   const [activeTab, setActiveTab] = useState("detailed");
   
-  // Company information
   const [companyName, setCompanyName] = useState("");
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   
-  // Product details
   const [productType, setProductType] = useState("");
   const [productCategory, setProductCategory] = useState("");
   const [hazardousMaterials, setHazardousMaterials] = useState(false);
   const [specialHandling, setSpecialHandling] = useState(false);
   const [specialHandlingNotes, setSpecialHandlingNotes] = useState("");
   
-  // Storage requirements
   const [estimatedVolume, setEstimatedVolume] = useState("");
   const [temperatureControlled, setTemperatureControlled] = useState(false);
   const [securityRequirements, setSecurityRequirements] = useState("Standard");
   
-  // Fulfillment details
   const [averageOrders, setAverageOrders] = useState("");
   const [selectedPeakMonths, setSelectedPeakMonths] = useState<string[]>([]);
   const [internationalShipping, setInternationalShipping] = useState(false);
   
-  // Additional information
   const [integrationNeeded, setIntegrationNeeded] = useState(false);
   const [selectedIntegrations, setSelectedIntegrations] = useState<string[]>([]);
   const [customRequirements, setCustomRequirements] = useState("");
   
-  // Document upload
   const [documentUrl, setDocumentUrl] = useState("");
   
-  // E-commerce integration
   const [ecommercePlatform, setEcommercePlatform] = useState("");
   const [ecommerceStoreUrl, setEcommerceStoreUrl] = useState("");
   const [ecommerceSkuCount, setEcommerceSkuCount] = useState("");
   const [ecommerceOrderVolume, setEcommerceOrderVolume] = useState("");
   
-  // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [submissionResult, setSubmissionResult] = useState<ThreePLResponse | null>(null);
@@ -130,7 +123,6 @@ const ThreePLServicePage = () => {
     ecommerceOrderVolume?: string;
   }) => {
     if (!isSignedIn || !user) {
-      // Trigger Clerk sign-in dialog
       document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click();
       return;
     }
@@ -191,7 +183,6 @@ const ThreePLServicePage = () => {
 
   const handleSubmitRequest = async () => {
     if (!isSignedIn || !user) {
-      // Trigger Clerk sign-in dialog
       document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click();
       return;
     }
@@ -496,24 +487,17 @@ const ThreePLServicePage = () => {
                         checked={integrationNeeded}
                         onCheckedChange={(checked) => setIntegrationNeeded(checked as boolean)}
                       />
-                      <Label htmlFor="integrationNeeded">Requires system integration</Label>
+                      <Label htmlFor="integrationNeeded">Requires e-commerce platform integration</Label>
                     </div>
                     
                     {integrationNeeded && (
-                      <div>
-                        <Label className="block mb-2">Integration Systems (select all that apply)</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          {integrationSystems.map(system => (
-                            <div key={system} className="flex items-center space-x-2">
-                              <Checkbox 
-                                id={`system-${system}`} 
-                                checked={selectedIntegrations.includes(system)}
-                                onCheckedChange={() => handleIntegrationToggle(system)}
-                              />
-                              <Label htmlFor={`system-${system}`}>{system}</Label>
-                            </div>
-                          ))}
-                        </div>
+                      <div className="mt-4">
+                        <EcommerceIntegration 
+                          onPlatformChange={setEcommercePlatform}
+                          onStoreUrlChange={setEcommerceStoreUrl}
+                          onSkuCountChange={setEcommerceSkuCount}
+                          onOrderVolumeChange={setEcommerceOrderVolume}
+                        />
                       </div>
                     )}
                     
@@ -555,7 +539,6 @@ const ThreePLServicePage = () => {
             </TabsContent>
           </Tabs>
           
-          {/* Confirmation dialog */}
           {showConfirmation && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
               <Card className="max-w-lg w-full">
@@ -598,7 +581,6 @@ const ThreePLServicePage = () => {
             </div>
           )}
           
-          {/* Submission result */}
           {submissionResult && submissionResult.success && (
             <div className="mt-8 bg-green-50 p-6 rounded-lg border border-green-200">
               <h3 className="text-xl font-medium text-green-800 mb-2">Request Submitted Successfully!</h3>
