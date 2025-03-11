@@ -6,7 +6,6 @@ import { saveShipment } from "./shipmentService";
 import { BookingRequest, BookingResponse } from "@/types/booking";
 import { calculateTotalPrice, calculateEstimatedDelivery, generateShipmentId, generateTrackingCode } from "./bookingUtils";
 import { saveBookingToSupabase } from "./bookingDb";
-import { EcommerceShippingRequest } from "@/types/threePL";
 
 export type { BookingRequest, BookingResponse };
 
@@ -129,53 +128,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     return {
       success: false,
       message: "An unexpected error occurred"
-    };
-  }
-};
-
-// NEW: Function to handle ecommerce shipping requests
-export const bookEcommerceShipment = async (request: EcommerceShippingRequest): Promise<BookingResponse> => {
-  try {
-    console.log("Booking ecommerce shipment with request:", request);
-    
-    // Default dimensions if not provided
-    const dimensions = {
-      length: request.dimensions?.length || "20",
-      width: request.dimensions?.width || "15", 
-      height: request.dimensions?.height || "10"
-    };
-    
-    // Default weight if not provided
-    const weight = request.weight || "1";
-    
-    // Special discounted rate for ecommerce integrations
-    const carrierPrice = 7; // Even better than the regular ecommerce rate
-    
-    // Convert to a standard booking request
-    const bookingRequest: BookingRequest = {
-      weight,
-      dimensions,
-      pickup: request.pickup,
-      delivery: request.delivery,
-      carrier: {
-        name: "E-Parsel Nordic",
-        price: carrierPrice
-      },
-      deliverySpeed: "standard",
-      includeCompliance: false,
-      userId: `${request.platform}:${request.storeId}`,
-      customerType: "ecommerce",
-      businessName: request.businessName,
-    };
-    
-    // Use the standard booking flow
-    return await bookShipment(bookingRequest);
-    
-  } catch (error) {
-    console.error("Error booking ecommerce shipment:", error);
-    return {
-      success: false,
-      message: "Failed to process ecommerce shipping request"
     };
   }
 };

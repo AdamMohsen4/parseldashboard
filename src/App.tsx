@@ -1,115 +1,100 @@
 
-import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ClerkLoaded, useUser } from "@clerk/clerk-react";
+import AuthWrapper from "./components/auth/AuthWrapper";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import DashboardPage from "./pages/DashboardPage";
+import BookingPage from "./pages/BookingPage";
 import ShipmentBookingPage from "./pages/ShipmentBookingPage";
+import ThreePLServicePage from "./pages/ThreePLServicePage";
 import TrackingPage from "./pages/TrackingPage";
 import CompliancePage from "./pages/CompliancePage";
-import CollaboratePage from "./pages/CollaboratePage";
-import BookingPage from "./pages/BookingPage";
-import SupportPage from "./pages/SupportPage";
-import ThreePLServicePage from "./pages/ThreePLServicePage";
+import DashboardPage from "./pages/DashboardPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
-import EcommerceIntegrationPage from "./pages/EcommerceIntegrationPage";
-import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
-import { Toaster } from "@/components/ui/toaster";
-import "./i18n";
+import CollaboratePage from "./pages/CollaboratePage";
+import SupportPage from "./pages/SupportPage";
+import NotFound from "./pages/NotFound";
 
-// Check for the Clerk publishable key
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const queryClient = new QueryClient();
 
-// Clerk-protected route component
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <SignedIn>{children}</SignedIn>
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
-    </>
-  );
-}
-
-// Scroll to top component
-function ScrollToTop() {
-  const { pathname } = useLocation();
-  
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  
-  return null;
-}
-
-function App() {
-  if (!PUBLISHABLE_KEY) {
-    return (
-      <div className="p-4">
-        <h1 className="text-red-500 text-xl font-bold">
-          Missing Publishable Key
-        </h1>
-        <p className="text-gray-700">
-          Add your Clerk publishable key to the .env file to enable authentication.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-      <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/shipment" element={<ShipmentBookingPage />} />
-          <Route path="/shipment/:customerType" element={<ShipmentBookingPage />} />
-          <Route path="/book" element={<BookingPage />} />
-          <Route path="/compliance" element={<CompliancePage />} />
-          <Route path="/collaborate" element={<CollaboratePage />} />
-          <Route path="/three-pl" element={<ThreePLServicePage />} />
-          <Route path="/ecommerce-integration" element={<EcommerceIntegrationPage />} />
-          
-          <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/tracking" 
-            element={
-              <ProtectedRoute>
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter basename="">
+        <ClerkLoaded>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/book" element={<BookingPage />} />
+            
+            {/* Protected routes */}
+            <Route path="/shipment" element={
+              <AuthWrapper requireAuth>
+                <ShipmentBookingPage />
+              </AuthWrapper>
+            } />
+            <Route path="/shipment/business" element={
+              <AuthWrapper requireAuth>
+                <ShipmentBookingPage customerType="business" />
+              </AuthWrapper>
+            } />
+            <Route path="/shipment/private" element={
+              <AuthWrapper requireAuth>
+                <ShipmentBookingPage customerType="private" />
+              </AuthWrapper>
+            } />
+            <Route path="/shipment/ecommerce" element={
+              <AuthWrapper requireAuth>
+                <ShipmentBookingPage customerType="ecommerce" />
+              </AuthWrapper>
+            } />
+            <Route path="/3pl" element={
+              <AuthWrapper requireAuth>
+                <ThreePLServicePage />
+              </AuthWrapper>
+            } />
+            <Route path="/tracking" element={
+              <AuthWrapper requireAuth>
                 <TrackingPage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/support" 
-            element={
-              <ProtectedRoute>
-                <SupportPage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/admin" 
-            element={
-              <ProtectedRoute>
+              </AuthWrapper>
+            } />
+            <Route path="/compliance" element={
+              <AuthWrapper requireAuth>
+                <CompliancePage />
+              </AuthWrapper>
+            } />
+            <Route path="/dashboard" element={
+              <AuthWrapper requireAuth>
+                <DashboardPage />
+              </AuthWrapper>
+            } />
+            <Route path="/admin-dashboard" element={
+              <AuthWrapper requireAuth requireAdmin>
                 <AdminDashboardPage />
-              </ProtectedRoute>
-            } 
-          />
-          
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Toaster />
+              </AuthWrapper>
+            } />
+            <Route path="/collaborate" element={
+              <AuthWrapper requireAuth>
+                <CollaboratePage />
+              </AuthWrapper>
+            } />
+            <Route path="/support" element={
+              <AuthWrapper requireAuth>
+                <SupportPage />
+              </AuthWrapper>
+            } />
+            
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ClerkLoaded>
       </BrowserRouter>
-    </ClerkProvider>
-  );
-}
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;
