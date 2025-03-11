@@ -1,14 +1,17 @@
+
 import { useUser, SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+
 interface AuthWrapperProps {
   children: React.ReactNode;
   requireAuth?: boolean;
   requireAdmin?: boolean;
 }
+
 const AuthWrapper = ({
   children,
   requireAuth = false,
@@ -84,8 +87,10 @@ const AuthWrapper = ({
     navigate("/dashboard");
     return null;
   }
+
   return <>{children}</>;
 };
+
 export const AuthButtons = () => {
   const {
     isSignedIn,
@@ -94,6 +99,7 @@ export const AuthButtons = () => {
 
   // Check if user has admin role
   const isAdmin = isSignedIn && user?.publicMetadata?.role === "admin";
+
   if (isSignedIn) {
     return <div className="flex items-center gap-2">
         {isAdmin && <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
@@ -102,8 +108,10 @@ export const AuthButtons = () => {
         <UserButton afterSignOutUrl="/" />
       </div>;
   }
+
   return <div className="flex space-x-2">
-      <SignInButton className="bg-transparent">
+      <SignInButton>
+        {/* Render a button inside SignInButton instead of applying className to SignInButton itself */}
         <Button variant="outline">Login</Button>
       </SignInButton>
       <SignUpButton>
@@ -111,4 +119,5 @@ export const AuthButtons = () => {
       </SignUpButton>
     </div>;
 };
+
 export default AuthWrapper;
