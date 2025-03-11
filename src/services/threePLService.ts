@@ -1,4 +1,3 @@
-
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ThreePLRequest, ThreePLResponse } from "@/types/threePL";
@@ -13,56 +12,6 @@ export const uploadDocument = async (file: File, userId: string): Promise<string
     console.log("Uploading file to:", filePath);
     console.log("User ID:", userId);
     
-    // First, check if the bucket exists
-    const { data: buckets, error: listError } = await supabase.storage
-      .listBuckets();
-      
-    if (listError) {
-      console.error("Error listing buckets:", listError);
-      toast({
-        title: "Upload Failed",
-        description: "Storage configuration error. Please contact support.",
-        variant: "destructive",
-      });
-      return null;
-    }
-    
-    // Check if our bucket exists
-    const bucketExists = buckets.some(bucket => bucket.name === 'three_pl_documents');
-    
-    if (!bucketExists) {
-      console.log("Bucket does not exist, creating it...");
-      
-      try {
-        const { data: newBucket, error: createError } = await supabase.storage
-          .createBucket('three_pl_documents', {
-            public: true,
-            fileSizeLimit: 10485760, // 10MB limit
-          });
-          
-        if (createError) {
-          console.error("Error creating bucket:", createError);
-          toast({
-            title: "Upload Failed",
-            description: "Storage setup error. Please contact support.",
-            variant: "destructive",
-          });
-          return null;
-        }
-        
-        console.log("Created new bucket:", newBucket);
-      } catch (createBucketError) {
-        console.error("Error creating bucket:", createBucketError);
-        toast({
-          title: "Upload Failed",
-          description: "Unable to configure storage. Please contact support.",
-          variant: "destructive",
-        });
-        return null;
-      }
-    }
-    
-    // Create user folder if it doesn't exist
     try {
       console.log("Attempting to upload file...");
       
@@ -71,7 +20,7 @@ export const uploadDocument = async (file: File, userId: string): Promise<string
         .from('three_pl_documents')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: true // Changed to true to overwrite if file exists
+          upsert: true // Overwrite if file exists
         });
       
       if (uploadError) {
@@ -86,7 +35,7 @@ export const uploadDocument = async (file: File, userId: string): Promise<string
       
       console.log("Upload successful, getting public URL");
       
-      // Get the public URL for the uploaded file
+      // Get the public URL for the uploaded file - IMPORTANT: add await here
       const { data: publicUrlData } = await supabase.storage
         .from('three_pl_documents')
         .getPublicUrl(filePath);
