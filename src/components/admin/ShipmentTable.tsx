@@ -79,31 +79,31 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
                       onClick={() => onStatusChange(shipment.id, shipment.user_id, "pending")}
-                      className="hover:bg-accent/5 hover:text-primary/90 cursor-pointer"
+                      className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
                     >
                       Set as Pending
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onStatusChange(shipment.id, shipment.user_id, "picked_up")}
-                      className="hover:bg-accent/5 hover:text-primary/90 cursor-pointer"
+                      className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
                     >
                       Set as Picked Up
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onStatusChange(shipment.id, shipment.user_id, "in_transit")}
-                      className="hover:bg-accent/5 hover:text-primary/90 cursor-pointer"
+                      className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
                     >
                       Set as In Transit
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onStatusChange(shipment.id, shipment.user_id, "delivered")}
-                      className="hover:bg-accent/5 hover:text-primary/90 cursor-pointer"
+                      className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
                     >
                       Set as Delivered
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onStatusChange(shipment.id, shipment.user_id, "exception")}
-                      className="hover:bg-accent/5 hover:text-primary/90 cursor-pointer"
+                      className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
                     >
                       Set as Exception
                     </DropdownMenuItem>
