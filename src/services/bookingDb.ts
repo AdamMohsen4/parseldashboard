@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { BookingRequest } from "@/types/booking";
 
@@ -8,10 +7,11 @@ export const saveBookingToSupabase = async (
   labelUrl: string,
   pickupTime: string,
   totalPrice: number,
-  estimatedDelivery: string
+  estimatedDelivery: string,
+  cancellationDeadline: Date
 ) => {
   try {
-    console.log("Saving booking to Supabase with payload:", { 
+    console.log("Saving booking to Supabase with payload:", {
       user_id: request.userId,
       tracking_code: trackingCode,
       carrier_name: request.carrier.name,
@@ -31,10 +31,10 @@ export const saveBookingToSupabase = async (
       estimated_delivery: estimatedDelivery,
       customer_type: request.customerType || 'private',
       business_name: request.businessName,
-      vat_number: request.vatNumber
+      vat_number: request.vatNumber,
+      cancellation_deadline: cancellationDeadline.toISOString()
     });
     
-    // Insert booking with the user ID as a string
     const { data, error } = await supabase
       .from('booking')
       .insert({
@@ -57,7 +57,8 @@ export const saveBookingToSupabase = async (
         estimated_delivery: estimatedDelivery,
         customer_type: request.customerType || 'private',
         business_name: request.businessName,
-        vat_number: request.vatNumber
+        vat_number: request.vatNumber,
+        cancellation_deadline: cancellationDeadline.toISOString()
       })
       .select()
       .maybeSingle();
@@ -75,7 +76,6 @@ export const saveBookingToSupabase = async (
   }
 };
 
-// New function to fetch bookings with optional limit
 export const fetchBookingsFromSupabase = async (userId: string, limit?: number) => {
   try {
     let query = supabase
@@ -102,14 +102,13 @@ export const fetchBookingsFromSupabase = async (userId: string, limit?: number) 
   }
 };
 
-// New function for e-commerce integrations to find bookings by external order number
 export const findBookingByOrderNumber = async (userId: string, orderNumber: string) => {
   try {
     const { data, error } = await supabase
       .from('booking')
       .select('*')
       .eq('user_id', userId)
-      .ilike('business_name', `%${orderNumber}%`) // Using business_name field to store order numbers for e-commerce
+      .ilike('business_name', `%${orderNumber}%`)
       .maybeSingle();
     
     if (error) {

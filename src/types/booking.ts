@@ -1,4 +1,3 @@
-
 export type CustomerType = "business" | "private" | "ecommerce";
 
 export interface BookingRequest {
@@ -34,6 +33,9 @@ export interface BookingRequest {
   customerType?: CustomerType;
   businessName?: string;
   vatNumber?: string;
+  
+  // Add cancellation window
+  cancellationDeadline?: Date;
 }
 
 export interface BookingResponse {
@@ -44,6 +46,10 @@ export interface BookingResponse {
   pickupTime?: string;
   totalPrice?: number;
   message?: string;
+  
+  // Add cancellation details
+  cancellationDeadline?: string;
+  canBeCancelled?: boolean;
 }
 
 // API Key interface for e-commerce integration

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +9,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
-import { bookShipment } from "@/services/bookingService";
+import { bookShipment, cancelBooking } from "@/services/bookingService";
 import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Briefcase, ShoppingCart, User } from "lucide-react";
@@ -39,17 +38,17 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [selectedCustomerType, setSelectedCustomerType] = useState<CustomerType>(customerType || null);
   const [businessName, setBusinessName] = useState("");
   const [vatNumber, setVatNumber] = useState("");
-  
+
   // If no customer type is selected and we're on the base route, show the selection screen
   const showCustomerTypeSelection = !selectedCustomerType && location.pathname === "/shipment";
-  
+
   // Update selected customer type when the prop changes
   useEffect(() => {
     if (customerType) {
       setSelectedCustomerType(customerType);
     }
   }, [customerType]);
-  
+
   // Fixed price carrier - price differs by customer type
   const getCarrierPrice = () => {
     switch (selectedCustomerType) {
@@ -58,33 +57,25 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       default: return 10; // Standard rate for private customers
     }
   };
-  
-  const carrier = { 
-    id: 1, 
-    name: "E-Parsel Nordic", 
-    price: getCarrierPrice(), 
-    eta: "3 days", 
-    icon: "📦" 
+
+  const carrier = {
+    id: 1,
+    name: "E-Parsel Nordic",
+    price: getCarrierPrice(),
+    eta: "3 days",
+    icon: "📦"
   };
-  
+
   const handleCustomerTypeSelect = (type: CustomerType) => {
     if (type) {
       navigate(`/shipment/${type}`);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setShowBookingConfirmation(true);
-    toast({
-      title: "Booking Submitted",
-      description: "Your shipment has been booked successfully!",
-    });
-  };
-
+  const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  
   const handleBookNow = async () => {
     if (!isSignedIn || !user) {
-      // Trigger Clerk sign-in dialog
       document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click();
       return;
     }
@@ -92,8 +83,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     setIsBooking(true);
     
     try {
-      console.log("Creating booking with user ID:", user.id);
-      
       const result = await bookShipment({
         weight,
         dimensions: { length, width, height },
@@ -103,7 +92,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         deliverySpeed,
         includeCompliance: compliance,
         userId: user.id,
-        // Add customer type and business details
         customerType: selectedCustomerType || "private",
         businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
         vatNumber: selectedCustomerType === "business" ? vatNumber : undefined
@@ -111,6 +99,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       
       if (result.success) {
         setBookingResult(result);
+        setBookingConfirmed(true);
         toast({
           title: "Shipment Booked",
           description: `Your shipment has been booked with tracking code: ${result.trackingCode}`,
@@ -132,6 +121,22 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     } finally {
       setIsBooking(false);
     }
+  };
+
+  const handleCancelBooking = async () => {
+    if (!bookingResult?.trackingCode || !user?.id) return;
+    
+    const cancelled = await cancelBooking(bookingResult.trackingCode, user.id);
+    if (cancelled) {
+      setBookingConfirmed(false);
+      setBookingResult(null);
+    }
+  };
+
+  // Remove the calculate rate button and simplify the form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleBookNow();
   };
 
   const createTestBooking = () => {
@@ -388,7 +393,13 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                   </div>
                   
                   <div className="flex flex-col space-y-2">
-                    <Button type="submit" className="w-full">Calculate Rate</Button>
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={isBooking || bookingConfirmed}
+                    >
+                      {isBooking ? "Processing..." : bookingConfirmed ? "Booked" : "Book Shipment"}
+                    </Button>
                     {process.env.NODE_ENV === 'development' && (
                       <Button 
                         type="button" 
@@ -468,7 +479,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     </div>
                   )}
                   
-                  {/* Booking result */}
+                  {/* Booking result with cancellation */}
                   {bookingResult && (
                     <div className="mt-8 bg-green-50 p-4 rounded-lg border border-green-500">
                       <h4 className="font-medium mb-2 text-green-700">Booking Confirmed!</h4>
@@ -476,12 +487,26 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                         <p><strong>Tracking Code:</strong> {bookingResult.trackingCode}</p>
                         <p><strong>Pickup Time:</strong> {bookingResult.pickupTime}</p>
                         <p><strong>Total Price:</strong> €{bookingResult.totalPrice}</p>
-                        <div className="pt-3">
+                        {bookingResult.cancellationDeadline && (
+                          <p className="text-gray-600">
+                            Cancellation available until: {new Date(bookingResult.cancellationDeadline).toLocaleString()}
+                          </p>
+                        )}
+                        <div className="pt-3 flex gap-2">
                           <Button size="sm" variant="outline" asChild>
                             <a href={bookingResult.labelUrl} target="_blank" rel="noopener noreferrer">
                               Download Label
                             </a>
                           </Button>
+                          {bookingResult.cancellationDeadline && (
+                            <Button 
+                              size="sm" 
+                              variant="destructive"
+                              onClick={handleCancelBooking}
+                            >
+                              Cancel Booking
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </div>

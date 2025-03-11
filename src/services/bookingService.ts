@@ -1,4 +1,3 @@
-
 import { toast } from "@/components/ui/use-toast";
 import { generateLabel } from "./labelService";
 import { schedulePickup } from "./pickupService";
@@ -9,9 +8,7 @@ import { saveBookingToSupabase } from "./bookingDb";
 
 export type { BookingRequest, BookingResponse };
 
-// Input validation function to check required fields
 const validateBookingRequest = (request: BookingRequest): { valid: boolean; message?: string } => {
-  // Check for required fields
   if (!request.weight || parseFloat(request.weight) <= 0) {
     return { valid: false, message: "Invalid package weight" };
   }
@@ -39,12 +36,10 @@ const validateBookingRequest = (request: BookingRequest): { valid: boolean; mess
     return { valid: false, message: "User ID is required" };
   }
 
-  // Additional business logic validation
   if (request.weight && parseFloat(request.weight) > 100) {
     return { valid: false, message: "Package weight exceeds maximum allowed (100kg)" };
   }
 
-  // All validations passed
   return { valid: true };
 };
 
@@ -52,7 +47,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
   try {
     console.log("Booking shipment with request:", request);
     
-    // Validate the request
     const validation = validateBookingRequest(request);
     if (!validation.valid) {
       toast({
@@ -67,11 +61,11 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       };
     }
     
-    // Generate IDs
     const shipmentId = generateShipmentId();
     const trackingCode = generateTrackingCode();
+    const cancellationDeadline = new Date();
+    cancellationDeadline.setHours(cancellationDeadline.getHours() + 1);
     
-    // Step 1: Generate label
     const labelResult = await generateLabel({
       shipmentId,
       carrierName: request.carrier.name,
@@ -87,7 +81,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     if (!labelResult.success) {
       toast({
         title: "Label Generation Failed",
-        description: "Unable to generate shipping label. Please try again or contact support.",
+        description: "Unable to generate shipping label. Please try again.",
         variant: "destructive",
       });
       
@@ -97,7 +91,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       };
     }
     
-    // Step 2: Schedule pickup
     const pickupResult = await schedulePickup({
       shipmentId,
       carrierName: request.carrier.name,
@@ -118,22 +111,19 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       };
     }
     
-    // Calculate total price and delivery date
     const totalPrice = calculateTotalPrice(request.carrier.price, request.includeCompliance);
     const estimatedDelivery = calculateEstimatedDelivery(request.deliverySpeed);
     
-    // Step 3: Save the booking to Supabase
-    console.log("Attempting to save booking to Supabase with userId:", request.userId);
     const supabaseSaveSuccess = await saveBookingToSupabase(
       request,
       trackingCode,
       labelResult.labelUrl,
       pickupResult.pickupTime!,
       totalPrice,
-      estimatedDelivery
+      estimatedDelivery,
+      cancellationDeadline
     );
     
-    // If Supabase save fails, fall back to local storage
     if (!supabaseSaveSuccess) {
       console.error("Supabase save failed, falling back to local storage");
       toast({
@@ -171,8 +161,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
           variant: "destructive",
         });
         
-        // Still return success since the booking was processed
-        // but with a warning that it might not be retrievable later
         return {
           success: true,
           shipmentId,
@@ -191,27 +179,25 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       });
     }
     
-    // Return the combined result
     return {
       success: true,
       shipmentId,
       trackingCode,
       labelUrl: labelResult.labelUrl,
       pickupTime: pickupResult.pickupTime,
-      totalPrice
+      totalPrice,
+      cancellationDeadline: cancellationDeadline.toISOString(),
+      canBeCancelled: true
     };
     
   } catch (error) {
     console.error("Error booking shipment:", error);
     
-    // Provide more detailed error messaging based on where the error occurred
     let errorMessage = "An unexpected error occurred";
     
     if (error instanceof Error) {
-      // Log the full error for debugging
       console.error("Error details:", error.message, error.stack);
       
-      // Tailor the user-facing message based on error content if possible
       if (error.message.includes("label")) {
         errorMessage = "Error generating shipping label";
       } else if (error.message.includes("pickup")) {
@@ -233,3 +219,66 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     };
   }
 };
+
+export const cancelBooking = async (trackingCode: string, userId: string): Promise<boolean> => {
+  try {
+    const { data: booking, error } = await supabase
+      .from('booking')
+      .select('*')
+      .eq('tracking_code', trackingCode)
+      .eq('user_id', userId)
+      .single();
+      
+    if (error || !booking) {
+      toast({
+        title: "Booking Not Found",
+        description: "Unable to find the specified booking.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    const cancellationDeadline = new Date(booking.created_at);
+    cancellationDeadline.setHours(cancellationDeadline.getHours() + 1);
+    
+    if (new Date() > cancellationDeadline) {
+      toast({
+        title: "Cancellation Failed",
+        description: "The cancellation window (1 hour) has expired.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    const { error: updateError } = await supabase
+      .from('booking')
+      .update({ status: 'cancelled' })
+      .eq('tracking_code', trackingCode)
+      .eq('user_id', userId);
+      
+    if (updateError) {
+      toast({
+        title: "Cancellation Failed",
+        description: "Unable to cancel the booking. Please try again.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    toast({
+      title: "Booking Cancelled",
+      description: "Your shipment has been successfully cancelled.",
+    });
+    
+    return true;
+  } catch (error) {
+    console.error("Error cancelling booking:", error);
+    toast({
+      title: "Cancellation Error",
+      description: "An unexpected error occurred. Please try again.",
+      variant: "destructive",
+    });
+    return false;
+  }
+};
+
