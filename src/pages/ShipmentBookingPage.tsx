@@ -12,8 +12,10 @@ import { useUser } from "@clerk/clerk-react";
 import { bookShipment, cancelBooking } from "@/services/bookingService";
 import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Briefcase, ShoppingCart, User } from "lucide-react";
+import { Briefcase, Download, ShoppingCart, User } from "lucide-react";
 import { getBookingByTrackingCode } from "@/services/bookingDb";
+import LabelLanguageSelector from "@/components/labels/LabelLanguageSelector";
+import { generateLabel } from "@/services/labelService";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 
@@ -41,6 +43,8 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [vatNumber, setVatNumber] = useState("");
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [canCancelBooking, setCanCancelBooking] = useState(false);
+  const [labelLanguage, setLabelLanguage] = useState("en");
+  const [isGeneratingLabel, setIsGeneratingLabel] = useState(false);
   
   useEffect(() => {
     const checkSavedBooking = async () => {
@@ -220,6 +224,74 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     setDelivery("Helsinki, FI");
     setShowBookingConfirmation(true);
     handleBookNow();
+  };
+
+  const handleGenerateLabel = async () => {
+    if (!bookingResult) return;
+    
+    const trackingCode = bookingResult.trackingCode || bookingResult.tracking_code;
+    const shipmentId = bookingResult.shipmentId || "SHIP-" + Math.floor(Math.random() * 1000000);
+    
+    if (!trackingCode) {
+      toast({
+        title: "Error",
+        description: "Unable to generate label: missing tracking code",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsGeneratingLabel(true);
+    
+    try {
+      const dimensions = `${length}x${width}x${height} cm`;
+      const result = await generateLabel({
+        shipmentId,
+        carrierName: bookingResult.carrier_name || "E-Parsel Nordic",
+        trackingCode,
+        senderAddress: pickup,
+        recipientAddress: delivery,
+        packageDetails: {
+          weight: weight,
+          dimensions: dimensions
+        },
+        language: labelLanguage
+      });
+      
+      if (result.success) {
+        if (!bookingResult.labelUrl) {
+          setBookingResult({
+            ...bookingResult,
+            labelUrl: result.labelUrl
+          });
+        }
+        
+        window.open(result.labelUrl, '_blank');
+        
+        toast({
+          title: "Label Generated",
+          description: `Label has been generated in ${labelLanguage === 'en' ? 'English' : 
+                        labelLanguage === 'fi' ? 'Finnish' : 
+                        labelLanguage === 'sv' ? 'Swedish' : 
+                        labelLanguage === 'no' ? 'Norwegian' : 'Danish'}`,
+        });
+      } else {
+        toast({
+          title: "Label Generation Failed",
+          description: result.message || "Unable to generate shipping label",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error generating label:", error);
+      toast({
+        title: "Label Generation Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingLabel(false);
+    }
   };
 
   if (showCustomerTypeSelection) {
@@ -578,15 +650,34 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     </div>
                   )}
                   
-                  {bookingResult && bookingResult.labelUrl && (
+                  {bookingResult && (
                     <div className="mt-8 bg-blue-50 p-4 rounded-lg border border-blue-500">
                       <h4 className="font-medium mb-2 text-blue-700">Shipping Label</h4>
-                      <div className="pt-2">
-                        <Button size="sm" variant="outline" asChild>
-                          <a href={bookingResult.labelUrl} target="_blank" rel="noopener noreferrer">
-                            Download Label
-                          </a>
-                        </Button>
+                      
+                      <div className="space-y-3">
+                        <LabelLanguageSelector 
+                          value={labelLanguage}
+                          onChange={setLabelLanguage}
+                        />
+                        
+                        <div className="pt-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={handleGenerateLabel}
+                            disabled={isGeneratingLabel}
+                            className="flex items-center gap-2"
+                          >
+                            <Download className="h-4 w-4" />
+                            {isGeneratingLabel ? "Generating..." : "Generate & Download Label"}
+                          </Button>
+                          
+                          {bookingResult.labelUrl && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              A label has already been generated. Generate again to get a new version in your selected language.
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
