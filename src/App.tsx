@@ -9,6 +9,7 @@ import AuthWrapper from "./components/auth/AuthWrapper";
 import Index from "./pages/Index";
 import BookingPage from "./pages/BookingPage";
 import ShipmentBookingPage from "./pages/ShipmentBookingPage";
+import ThreePLServicePage from "./pages/ThreePLServicePage";
 import TrackingPage from "./pages/TrackingPage";
 import CompliancePage from "./pages/CompliancePage";
 import DashboardPage from "./pages/DashboardPage";
@@ -47,6 +48,11 @@ const App = () => (
             <Route path="/shipment" element={
               <ProtectedRoute>
                 <ShipmentBookingPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/3pl" element={
+              <ProtectedRoute>
+                <ThreePLServicePage />
               </ProtectedRoute>
             } />
             <Route path="/tracking" element={
