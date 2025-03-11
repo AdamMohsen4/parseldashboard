@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Layout from "@/components/layout/Layout";
@@ -30,7 +29,7 @@ const TransportationPartnersPage = () => {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="posti">Posti</TabsTrigger>
-            <TabsTrigger value="jys">Jys</TabsTrigger>
+            <TabsTrigger value="jakeluyhtio">Jakeluyhtio</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview" className="mt-6">
@@ -63,8 +62,13 @@ const TransportationPartnersPage = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Package className="h-5 w-5 text-primary" /> 
-                    Jys
+                    <div className="flex items-center">
+                      <img 
+                        src="/lovable-uploads/999aad3b-fea5-47ef-bf42-4541b244b869.png" 
+                        alt="Jakeluyhtio logo" 
+                        className="h-8 w-auto mr-2" 
+                      />
+                    </div>
                   </CardTitle>
                   <CardDescription>International Logistics Provider</CardDescription>
                 </CardHeader>
@@ -184,13 +188,20 @@ const TransportationPartnersPage = () => {
             </Card>
           </TabsContent>
           
-          <TabsContent value="jys" className="mt-6">
+          <TabsContent value="jakeluyhtio" className="mt-6">
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
-                    <CardTitle>Jys Global Logistics</CardTitle>
-                    <CardDescription>International shipping and logistics expertise</CardDescription>
+                    <CardTitle className="flex items-center gap-2">
+                      <img 
+                        src="/lovable-uploads/999aad3b-fea5-47ef-bf42-4541b244b869.png" 
+                        alt="Jakeluyhtio logo" 
+                        className="h-8 w-auto mr-2" 
+                      />
+                      <span>Transportation Services</span>
+                    </CardTitle>
+                    <CardDescription>Your trusted partner for international deliveries</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -199,7 +210,7 @@ const TransportationPartnersPage = () => {
                   <div>
                     <h3 className="text-lg font-medium mb-2">Company Overview</h3>
                     <p className="text-muted-foreground">
-                      Jys is an international logistics provider with decades of experience in global freight operations. 
+                      Jakeluyhtio is an international logistics provider with decades of experience in global freight operations. 
                       Their extensive network spans over 120 countries, making them an ideal partner for cross-border shipping needs.
                     </p>
                   </div>
@@ -219,7 +230,7 @@ const TransportationPartnersPage = () => {
                   <div>
                     <h3 className="text-lg font-medium mb-2">Global Presence</h3>
                     <p className="text-muted-foreground mb-2">
-                      Jys operates in key markets worldwide with specialized handling for different regions:
+                      Jakeluyhtio operates in key markets worldwide with specialized handling for different regions:
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="border rounded-md p-3">
@@ -250,9 +261,9 @@ const TransportationPartnersPage = () => {
                   </div>
                   
                   <div className="bg-muted p-4 rounded-md">
-                    <h3 className="text-lg font-medium mb-2">Why We Partner With Jys</h3>
+                    <h3 className="text-lg font-medium mb-2">Why We Partner With Jakeluyhtio</h3>
                     <p className="text-muted-foreground">
-                      Our partnership with Jys enables us to provide seamless international shipping solutions with 
+                      Our partnership with Jakeluyhtio enables us to provide seamless international shipping solutions with 
                       expert customs handling, reliable documentation, and global reach for businesses of all sizes.
                     </p>
                   </div>
