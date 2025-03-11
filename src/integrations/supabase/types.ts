@@ -224,6 +224,84 @@ export type Database = {
         }
         Relationships: []
       }
+      three_pl_requests: {
+        Row: {
+          average_orders_per_month: string | null
+          company_name: string
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at: string | null
+          custom_requirements: string | null
+          document_url: string | null
+          estimated_volume: string | null
+          hazardous_materials: boolean | null
+          id: string
+          integration_needed: boolean | null
+          integration_systems: string[] | null
+          international_shipping: boolean | null
+          peak_season_months: string[] | null
+          product_category: string | null
+          product_type: string | null
+          request_id: string | null
+          security_requirements: string | null
+          special_handling_needed: boolean | null
+          special_handling_notes: string | null
+          temperature_controlled: boolean | null
+          user_id: string
+        }
+        Insert: {
+          average_orders_per_month?: string | null
+          company_name: string
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at?: string | null
+          custom_requirements?: string | null
+          document_url?: string | null
+          estimated_volume?: string | null
+          hazardous_materials?: boolean | null
+          id?: string
+          integration_needed?: boolean | null
+          integration_systems?: string[] | null
+          international_shipping?: boolean | null
+          peak_season_months?: string[] | null
+          product_category?: string | null
+          product_type?: string | null
+          request_id?: string | null
+          security_requirements?: string | null
+          special_handling_needed?: boolean | null
+          special_handling_notes?: string | null
+          temperature_controlled?: boolean | null
+          user_id: string
+        }
+        Update: {
+          average_orders_per_month?: string | null
+          company_name?: string
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string
+          created_at?: string | null
+          custom_requirements?: string | null
+          document_url?: string | null
+          estimated_volume?: string | null
+          hazardous_materials?: boolean | null
+          id?: string
+          integration_needed?: boolean | null
+          integration_systems?: string[] | null
+          international_shipping?: boolean | null
+          peak_season_months?: string[] | null
+          product_category?: string | null
+          product_type?: string | null
+          request_id?: string | null
+          security_requirements?: string | null
+          special_handling_needed?: boolean | null
+          special_handling_notes?: string | null
+          temperature_controlled?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

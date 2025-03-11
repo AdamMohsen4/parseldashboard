@@ -28,6 +28,9 @@ export interface ThreePLRequest {
   integrationSystems?: string[];
   customRequirements?: string;
   
+  // Document upload
+  documentUrl?: string;
+  
   // User ID
   userId: string;
 }
@@ -37,3 +40,4 @@ export interface ThreePLResponse {
   requestId?: string;
   message?: string;
 }
+
