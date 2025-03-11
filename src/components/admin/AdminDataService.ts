@@ -201,7 +201,7 @@ export const loadTicketMessages = async (ticketId: string) => {
   }
 };
 
-export const handleShipmentStatusChange = async (shipmentId: string, userId: string, newStatus: string) => {
+export const handleShipmentStatusChange = async (shipmentId: number, userId: string, newStatus: "pending" | "picked_up" | "in_transit" | "delivered" | "exception") => {
   try {
     const { error } = await supabase
       .from('booking')
@@ -225,7 +225,7 @@ export const handleShipmentStatusChange = async (shipmentId: string, userId: str
       description: `Status updated by admin`
     };
     
-    await updateShipmentStatus(shipmentId, userId, newStatus, event);
+    await updateShipmentStatus(shipmentId.toString(), userId, newStatus, event);
     
     toast({
       title: "Status Updated",
