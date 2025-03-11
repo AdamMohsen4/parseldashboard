@@ -60,3 +60,38 @@ export interface EcommercePlatform {
   description: string;
   apiDocUrl?: string;
 }
+
+// NEW: E-commerce integration button configuration
+export interface EcommerceIntegrationButton {
+  type: "script" | "link" | "button";
+  variant?: "light" | "dark";
+  size?: "small" | "medium" | "large";
+  label?: string;
+  includeIcon?: boolean;
+}
+
+// NEW: E-commerce integration script configuration
+export interface EcommerceIntegrationScript {
+  scriptUrl: string;
+  apiKey: string;
+  buttonConfig?: EcommerceIntegrationButton;
+  callbackUrl?: string;
+}
+
+// NEW: E-commerce quick shipping request
+export interface EcommerceShippingRequest {
+  platform: string;
+  storeId: string;
+  apiKey: string;
+  orderId: string;
+  weight?: string;
+  dimensions?: {
+    length?: string;
+    width?: string;
+    height?: string;
+  };
+  pickup: string;
+  delivery: string;
+  customerType: "ecommerce";
+  businessName: string;
+}

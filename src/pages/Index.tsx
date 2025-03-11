@@ -1,10 +1,11 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, Package, Shield, LineChart, CheckCircle, Truck, Map } from "lucide-react";
+import { ArrowRight, Package, Shield, LineChart, CheckCircle, Truck, Map, ShoppingCart } from "lucide-react";
 import PartnersCarousel from "@/components/home/PartnersCarousel";
 
 const Index = () => {
@@ -138,6 +139,119 @@ const Index = () => {
           </div>
         </div>
       </section>
+      
+      {/* NEW: E-commerce Integration section */}
+      <section className="py-24 bg-gradient-to-b from-background via-primary/5 to-background">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12 animate-fade-in">
+              <div className="inline-block bg-primary/10 px-4 py-2 rounded-full text-primary font-medium text-sm mb-2">
+                For Online Retailers
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                Add "Ship with E-Parsel" to Your Store
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Seamlessly integrate our shipping services into your e-commerce checkout with just a few lines of code.
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-background/90 to-background/70 backdrop-blur-sm animate-fade-in">
+                <CardContent className="p-0">
+                  <div className="p-8">
+                    <div className="flex items-center gap-3 mb-6 text-primary">
+                      <ShoppingCart className="h-6 w-6" />
+                      <h3 className="text-xl font-semibold">E-commerce Integration</h3>
+                    </div>
+                    
+                    <ul className="space-y-3 mb-8">
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                        <span>Add a "Ship with E-Parsel" button to your checkout</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                        <span>Automatically sync orders and shipping details</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                        <span>Special discounted rates for e-commerce orders</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                        <span>Works with Shopify, WooCommerce, Magento and more</span>
+                      </li>
+                    </ul>
+                    
+                    <div className="p-4 bg-muted rounded-md mb-6">
+                      <code className="text-sm text-muted-foreground whitespace-nowrap overflow-x-auto block">
+                        &lt;script src="https://cdn.e-parsel.com/integration.js"&gt;&lt;/script&gt;
+                      </code>
+                    </div>
+                    
+                    <Button className="w-full" size="lg" asChild>
+                      <Link to="/ecommerce-integration">
+                        Get Your Integration Code
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <div className="relative rounded-lg overflow-hidden shadow-2xl animate-fade-in">
+                <div className="aspect-[4/3] bg-gradient-to-tr from-primary/10 to-background/80 flex items-center justify-center">
+                  <div className="w-4/5 bg-white rounded-lg shadow-lg p-6">
+                    <div className="space-y-4 mb-6">
+                      <div className="flex justify-between items-center">
+                        <h4 className="font-medium">Cart Summary</h4>
+                        <span className="text-sm text-muted-foreground">3 items</span>
+                      </div>
+                      <div className="space-y-2 pb-4 border-b">
+                        <div className="flex justify-between">
+                          <span>Subtotal</span>
+                          <span>€75.00</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Tax</span>
+                          <span>€15.00</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Shipping</span>
+                          <span>€8.00</span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between font-bold">
+                        <span>Total</span>
+                        <span>€98.00</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col gap-3">
+                      <button className="bg-blue-600 text-white py-2 px-4 rounded-md font-medium">
+                        Proceed to Checkout
+                      </button>
+                      <div className="relative flex items-center justify-center">
+                        <div className="absolute inset-0 flex items-center">
+                          <span className="w-full border-t border-gray-200" />
+                        </div>
+                        <span className="relative bg-white px-2 text-xs text-gray-500">
+                          or
+                        </span>
+                      </div>
+                      <button className="inline-flex items-center justify-center gap-2 py-2 px-4 bg-gray-900 text-white rounded-md text-sm font-medium">
+                        <Package className="h-4 w-4" />
+                        Ship with E-Parsel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* CTA section */}
       <section className="py-24 px-4 relative overflow-hidden">
@@ -188,6 +302,7 @@ const Index = () => {
                 <li><Link to="/about" className="text-muted-foreground hover:text-primary">{t('footer.about')}</Link></li>
                 <li><Link to="/contact" className="text-muted-foreground hover:text-primary">{t('footer.contact')}</Link></li>
                 <li><Link to="/terms" className="text-muted-foreground hover:text-primary">{t('footer.terms')}</Link></li>
+                <li><Link to="/ecommerce-integration" className="text-muted-foreground hover:text-primary">E-commerce Integration</Link></li>
               </ul>
             </div>
             <div>
@@ -208,4 +323,3 @@ const Index = () => {
 };
 
 export default Index;
-

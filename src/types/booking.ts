@@ -34,6 +34,12 @@ export interface BookingRequest {
   customerType?: CustomerType;
   businessName?: string;
   vatNumber?: string;
+  
+  // E-commerce integration fields (optional)
+  ecommerceOrderId?: string;
+  ecommercePlatform?: string;
+  ecommerceStoreId?: string;
+  callbackUrl?: string;
 }
 
 export interface BookingResponse {
@@ -44,4 +50,8 @@ export interface BookingResponse {
   pickupTime?: string;
   totalPrice?: number;
   message?: string;
+  
+  // E-commerce callback data
+  ecommerceOrderStatus?: "shipping" | "label_created";
+  ecommerceTrackingUrl?: string;
 }
