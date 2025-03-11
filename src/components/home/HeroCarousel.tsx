@@ -5,19 +5,19 @@ import { cn } from "@/lib/utils";
 const images = [
   {
     src: "uploads/40bf477a-ad0b-486e-9a0d-83c1aff0401a.png",
-    alt: "E-Parcel Logistics Facility Aerial View"
+    alt: ""
   },
   {
-    src: "/uploads/vitamin-supplements.jpg",
-    alt: "Various vitamin supplements in bottles"
+    src: "/lovable-uploads/336788e8-5b45-42aa-bb86-bb8a79d66846.png",
+    alt: ""
   },
   {
-    src: "/uploads/ecommerce-packaging.jpg",
-    alt: "E-commerce order being packaged"
+    src: "/lovable-uploads/57d84551-41c3-4a7c-a7f0-c1ec0ec17b02.png",
+    alt: ""
   },
   {
-    src: "/uploads/person-with-box.jpg",
-    alt: "Person holding a delivery box"
+    src: "/lovable-uploads/da01aba6-9a3e-4988-bf5a-adaa6a9e94bf.png",
+    alt: ""
   }
 ];
 
