@@ -30,6 +30,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const NavBar = () => {
   const { isSignedIn, user } = useUser();
@@ -39,6 +45,9 @@ const NavBar = () => {
   
   // Check if user has admin role
   const isAdmin = isSignedIn && user?.publicMetadata?.role === "admin";
+
+  // Common hover style for all navbar items
+  const hoverClass = "hover:bg-gray-100/70 hover:text-primary transition-colors rounded-md";
 
   // Organize nav items into categories
   const categories = [
@@ -98,17 +107,26 @@ const NavBar = () => {
           
           {/* Admin Dashboard Link - Prominently displayed when admin */}
           {isAdmin && (
-            <Link 
-              to="/admin-dashboard" 
-              className={`hidden md:flex items-center gap-2 ${
-                location.pathname === "/admin-dashboard" 
-                  ? "bg-primary text-primary-foreground" 
-                  : "bg-accent/10 hover:bg-accent/20"
-              } px-3 py-1.5 rounded-md font-medium transition-colors`}
-            >
-              <Shield className="h-4 w-4" />
-              {t('nav.adminDashboard', 'Admin Dashboard')}
-            </Link>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link 
+                    to="/admin-dashboard" 
+                    className={`hidden md:flex items-center gap-2 ${
+                      location.pathname === "/admin-dashboard" 
+                        ? "bg-primary text-primary-foreground" 
+                        : "bg-accent/10 hover:bg-accent/20"
+                    } px-3 py-1.5 rounded-md font-medium transition-colors`}
+                  >
+                    <Shield className="h-4 w-4" />
+                    {t('nav.adminDashboard', 'Admin Dashboard')}
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Access administrative controls</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
           
           {/* Mobile menu button */}
@@ -132,7 +150,7 @@ const NavBar = () => {
                       location.pathname === item.path
                         ? "text-primary font-medium"
                         : "text-foreground"
-                    } hover:text-primary hover:bg-gray-100/70 px-2 py-1 rounded transition-colors flex items-center gap-1`}
+                    } ${hoverClass} px-2 py-1 flex items-center gap-1`}
                   >
                     {item.icon && <item.icon className="h-4 w-4" />}
                     {item.label}
@@ -141,7 +159,7 @@ const NavBar = () => {
               ) : (
                 // Use dropdown for other categories
                 <DropdownMenu key={category.name}>
-                  <DropdownMenuTrigger className="flex items-center gap-1 hover:text-primary hover:bg-gray-100/70 px-2 py-1 rounded transition-colors">
+                  <DropdownMenuTrigger className={`flex items-center gap-1 ${hoverClass} px-2 py-1`}>
                     {category.name} <ChevronDown className="h-4 w-4" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -151,7 +169,7 @@ const NavBar = () => {
                       item.subItems ? (
                         // For items with subcategories
                         <DropdownMenu key={item.path}>
-                          <DropdownMenuTrigger className="w-full flex items-center justify-between px-2 py-1.5 text-sm hover:bg-gray-100/70 hover:text-primary cursor-default rounded-sm">
+                          <DropdownMenuTrigger className={`w-full flex items-center justify-between px-2 py-1.5 text-sm ${hoverClass} cursor-default`}>
                             <span className="flex items-center gap-2">
                               {item.icon && <item.icon className="h-4 w-4" />}
                               {item.label}
@@ -165,7 +183,7 @@ const NavBar = () => {
                                   to={subItem.path}
                                   className={`${
                                     location.pathname === subItem.path ? "text-primary font-medium" : ""
-                                  } w-full flex items-center gap-2 hover:bg-gray-100/70`}
+                                  } w-full flex items-center gap-2 ${hoverClass} px-2 py-1`}
                                 >
                                   {subItem.icon && <subItem.icon className="h-4 w-4" />}
                                   {subItem.label}
@@ -181,7 +199,7 @@ const NavBar = () => {
                             to={item.path}
                             className={`${
                               location.pathname === item.path ? "text-primary font-medium" : ""
-                            } w-full flex items-center gap-2 hover:bg-gray-100/70`}
+                            } w-full flex items-center gap-2 ${hoverClass} px-2 py-1`}
                           >
                             {item.icon && <item.icon className="h-4 w-4" />}
                             {item.label}
@@ -211,7 +229,7 @@ const NavBar = () => {
                   location.pathname === "/admin-dashboard" 
                     ? "text-primary font-medium" 
                     : "text-foreground"
-                } px-2 py-1.5 rounded-md hover:bg-gray-100/70 transition-colors`}
+                } px-2 py-1.5 ${hoverClass}`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Shield className="h-4 w-4" />
@@ -239,7 +257,7 @@ const NavBar = () => {
                                 location.pathname === subItem.path
                                   ? "text-primary font-medium"
                                   : "text-foreground"
-                              } block py-1.5 hover:bg-gray-100/70 hover:text-primary transition-colors flex items-center gap-2 rounded`}
+                              } block py-1.5 ${hoverClass} flex items-center gap-2 px-2`}
                               onClick={() => setIsMenuOpen(false)}
                             >
                               {subItem.icon && <subItem.icon className="h-4 w-4" />}
@@ -256,7 +274,7 @@ const NavBar = () => {
                           location.pathname === item.path
                             ? "text-primary font-medium"
                             : "text-foreground"
-                        } block py-1.5 hover:bg-gray-100/70 hover:text-primary transition-colors flex items-center gap-2 rounded px-2`}
+                        } block py-1.5 ${hoverClass} flex items-center gap-2 px-2`}
                         onClick={() => setIsMenuOpen(false)}
                       >
                         {item.icon && <item.icon className="h-4 w-4" />}
