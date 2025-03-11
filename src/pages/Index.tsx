@@ -7,16 +7,18 @@ import { useTranslation } from "react-i18next";
 import { ArrowRight, Package, Shield, LineChart, CheckCircle, Truck, Map } from "lucide-react";
 import PartnersCarousel from "@/components/home/PartnersCarousel";
 import HeroCarousel from "@/components/home/HeroCarousel";
-
 const Index = () => {
-  const { isSignedIn } = useUser();
-  const { t } = useTranslation();
-  
+  const {
+    isSignedIn
+  } = useUser();
+  const {
+    t
+  } = useTranslation();
   return <div className="min-h-screen bg-background">
       <NavBar />
 
       {/* Hero section */}
-      <section className="py-24 px-4 relative overflow-hidden">
+      <section className="px-4 relative overflow-hidden py-[52px]">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 -z-10" />
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -24,7 +26,7 @@ const Index = () => {
               <div className="inline-block bg-primary/10 px-4 py-2 rounded-full text-primary font-medium text-sm mb-2">
                 {t('home.hero.badge')}
               </div>
-              <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+              <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80 mx-0 my-0">
                 {t('home.hero.title')}
               </h1>
               <p className="text-xl text-muted-foreground leading-relaxed">
@@ -202,5 +204,4 @@ const Index = () => {
       </footer>
     </div>;
 };
-
 export default Index;
