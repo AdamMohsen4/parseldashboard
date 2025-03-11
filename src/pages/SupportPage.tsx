@@ -26,7 +26,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-// Define support ticket interface
+// Define support ticket interface to match our Supabase table
 interface SupportTicket {
   id: string;
   user_id: string;
