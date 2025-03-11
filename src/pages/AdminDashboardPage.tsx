@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
-import { BarChart, CheckCircle, FileText, Search, Users, Calendar, Building, MessageCircle, HelpCircle } from "lucide-react";
+import { BarChart, CheckCircle, FileText, Search, Users, Calendar, Building, MessageCircle, HelpCircle, Eye } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { 
   DropdownMenu, 
@@ -24,6 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { updateShipmentStatus } from "@/services/shipmentService";
 import { useUser } from "@clerk/clerk-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const AdminDashboardPage = () => {
   const { user } = useUser();
@@ -42,25 +43,24 @@ const AdminDashboardPage = () => {
     openSupportTickets: 0
   });
 
-  // Shipments state
   const [shipments, setShipments] = useState([]);
   const [filteredShipments, setFilteredShipments] = useState([]);
   const [shipmentSearchQuery, setShipmentSearchQuery] = useState("");
 
-  // Demo requests state
   const [demoRequests, setDemoRequests] = useState([]);
   const [filteredDemoRequests, setFilteredDemoRequests] = useState([]);
   const [demoSearchQuery, setDemoSearchQuery] = useState("");
 
-  // Collaborations state
   const [collaborations, setCollaborations] = useState([]);
   const [filteredCollaborations, setFilteredCollaborations] = useState([]);
   const [collaborationSearchQuery, setCollaborationSearchQuery] = useState("");
 
-  // Support tickets state
   const [supportTickets, setSupportTickets] = useState([]);
   const [filteredSupportTickets, setFilteredSupportTickets] = useState([]);
   const [supportSearchQuery, setSupportSearchQuery] = useState("");
+
+  const [selectedTicket, setSelectedTicket] = useState<any>(null);
+  const [ticketDialogOpen, setTicketDialogOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -289,6 +289,10 @@ const AdminDashboardPage = () => {
         description: `Support ticket status changed to ${newStatus}.`,
       });
       
+      if (selectedTicket && selectedTicket.id === ticketId) {
+        setSelectedTicket({...selectedTicket, status: newStatus});
+      }
+      
       loadSupportTickets();
       loadStats();
     } catch (error) {
@@ -474,6 +478,11 @@ const AdminDashboardPage = () => {
     } catch (error) {
       console.error("Error loading stats:", error);
     }
+  };
+
+  const openTicketDetails = (ticket) => {
+    setSelectedTicket(ticket);
+    setTicketDialogOpen(true);
   };
 
   return (
@@ -789,6 +798,7 @@ const AdminDashboardPage = () => {
                         onStatusChange={handleSupportTicketStatusChange}
                         getStatusBadgeColor={getStatusBadgeColor}
                         formatDate={formatDate}
+                        onOpenTicket={openTicketDetails}
                       />
                     </TabsContent>
                     
@@ -799,6 +809,7 @@ const AdminDashboardPage = () => {
                         onStatusChange={handleSupportTicketStatusChange}
                         getStatusBadgeColor={getStatusBadgeColor}
                         formatDate={formatDate}
+                        onOpenTicket={openTicketDetails}
                       />
                     </TabsContent>
                     
@@ -809,6 +820,7 @@ const AdminDashboardPage = () => {
                         onStatusChange={handleSupportTicketStatusChange}
                         getStatusBadgeColor={getStatusBadgeColor}
                         formatDate={formatDate}
+                        onOpenTicket={openTicketDetails}
                       />
                     </TabsContent>
                     
@@ -819,6 +831,7 @@ const AdminDashboardPage = () => {
                         onStatusChange={handleSupportTicketStatusChange}
                         getStatusBadgeColor={getStatusBadgeColor}
                         formatDate={formatDate}
+                        onOpenTicket={openTicketDetails}
                       />
                     </TabsContent>
                     
@@ -829,6 +842,7 @@ const AdminDashboardPage = () => {
                         onStatusChange={handleSupportTicketStatusChange}
                         getStatusBadgeColor={getStatusBadgeColor}
                         formatDate={formatDate}
+                        onOpenTicket={openTicketDetails}
                       />
                     </TabsContent>
                   </Tabs>
@@ -838,6 +852,85 @@ const AdminDashboardPage = () => {
           </Card>
         </div>
       </div>
+
+      <Dialog open={ticketDialogOpen} onOpenChange={setTicketDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          {selectedTicket && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{selectedTicket.subject}</DialogTitle>
+                <DialogDescription className="flex items-center justify-between pt-2">
+                  <div className="flex items-center gap-2">
+                    <Badge className={getStatusBadgeColor(selectedTicket.status)}>
+                      {selectedTicket.status === 'in_progress' ? 'In Progress' : 
+                        selectedTicket.status.charAt(0).toUpperCase() + selectedTicket.status.slice(1)}
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">
+                      Priority: {selectedTicket.priority.charAt(0).toUpperCase() + selectedTicket.priority.slice(1)}
+                    </span>
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    {formatDate(selectedTicket.created_at)}
+                  </span>
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="mt-4 space-y-4">
+                <div>
+                  <h4 className="text-sm font-medium">Category</h4>
+                  <p className="flex items-center gap-1.5 text-sm mt-1">
+                    {selectedTicket.category === 'billing' && <FileText className="h-4 w-4" />}
+                    {selectedTicket.category === 'shipping' && <BarChart className="h-4 w-4" />}
+                    {selectedTicket.category === 'technical' && <HelpCircle className="h-4 w-4" />}
+                    {selectedTicket.category === 'general' && <MessageCircle className="h-4 w-4" />}
+                    {selectedTicket.category.charAt(0).toUpperCase() + selectedTicket.category.slice(1)}
+                  </p>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-medium">User ID</h4>
+                  <p className="text-sm mt-1">{selectedTicket.user_id}</p>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-medium">Message</h4>
+                  <div className="mt-1 p-3 bg-muted rounded-md text-sm">
+                    <p className="whitespace-pre-wrap">{selectedTicket.message}</p>
+                  </div>
+                </div>
+                
+                <div className="flex justify-between pt-4">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline">
+                        Update Status
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      <DropdownMenuItem onClick={() => handleSupportTicketStatusChange(selectedTicket.id, 'open')}>
+                        Set as Open
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleSupportTicketStatusChange(selectedTicket.id, 'in_progress')}>
+                        Set as In Progress
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleSupportTicketStatusChange(selectedTicket.id, 'resolved')}>
+                        Set as Resolved
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleSupportTicketStatusChange(selectedTicket.id, 'closed')}>
+                        Set as Closed
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  
+                  <Button variant="default" onClick={() => setTicketDialogOpen(false)}>
+                    Close
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -1024,7 +1117,7 @@ const CollaborationsTable = ({ collaborations, isLoading, formatDate }) => {
   );
 };
 
-const SupportTicketsTable = ({ supportTickets, isLoading, onStatusChange, getStatusBadgeColor, formatDate }) => {
+const SupportTicketsTable = ({ supportTickets, isLoading, onStatusChange, getStatusBadgeColor, formatDate, onOpenTicket }) => {
   if (isLoading) {
     return <div className="text-center py-8">Loading support tickets...</div>;
   }
@@ -1079,27 +1172,32 @@ const SupportTicketsTable = ({ supportTickets, isLoading, onStatusChange, getSta
                 </Badge>
               </TableCell>
               <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      Update Status
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onStatusChange(ticket.id, 'open')}>
-                      Set as Open
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onStatusChange(ticket.id, 'in_progress')}>
-                      Set as In Progress
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onStatusChange(ticket.id, 'resolved')}>
-                      Set as Resolved
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onStatusChange(ticket.id, 'closed')}>
-                      Set as Closed
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => onOpenTicket(ticket)}>
+                    <Eye className="h-4 w-4 mr-1" /> View
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        Status
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => onStatusChange(ticket.id, 'open')}>
+                        Set as Open
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onStatusChange(ticket.id, 'in_progress')}>
+                        Set as In Progress
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onStatusChange(ticket.id, 'resolved')}>
+                        Set as Resolved
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onStatusChange(ticket.id, 'closed')}>
+                        Set as Closed
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </TableCell>
             </TableRow>
           ))}
