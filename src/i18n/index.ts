@@ -11,7 +11,8 @@ export const resources = {
         tracking: 'Tracking',
         compliance: 'Compliance',
         dashboard: 'Dashboard',
-        collaborate: 'Collaborate'
+        collaborate: 'Collaborate',
+        transportationPartners: 'Transportation Partners'
       },
       common: {
         signIn: 'Sign In',
@@ -257,7 +258,8 @@ export const resources = {
         tracking: 'Spårning',
         compliance: 'Efterlevnad',
         dashboard: 'Översikt',
-        collaborate: 'Samarbeta'
+        collaborate: 'Samarbeta',
+        transportationPartners: 'Transportpartners'
       },
       common: {
         signIn: 'Logga In',
@@ -503,7 +505,8 @@ export const resources = {
         tracking: 'Seuranta',
         compliance: 'Vaatimustenmukaisuus',
         dashboard: 'Hallintapaneeli',
-        collaborate: 'Yhteistyö'
+        collaborate: 'Yhteistyö',
+        transportationPartners: 'Kuljetuskumppanit'
       },
       common: {
         signIn: 'Kirjaudu Sisään',

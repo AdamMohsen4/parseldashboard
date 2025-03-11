@@ -70,6 +70,7 @@ const NavBar = () => {
         items: [
           { path: "/3pl", label: t('nav.3pl', '3PL Services'), icon: Warehouse },
           { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
+          { path: "/transportation-partners", label: t('nav.transportationPartners', 'Transportation Partners'), icon: Truck },
           { path: "/book", label: t('nav.book'), icon: Phone },
         ]
       },

@@ -29,8 +29,8 @@ const TransportationPartnersPage = () => {
         <Tabs defaultValue="overview" className="w-full max-w-4xl mx-auto">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="postit">Postit</TabsTrigger>
-            <TabsTrigger value="jysk">JYSK</TabsTrigger>
+            <TabsTrigger value="posti">Posti</TabsTrigger>
+            <TabsTrigger value="jys">Jys</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview" className="mt-6">
@@ -38,8 +38,13 @@ const TransportationPartnersPage = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Truck className="h-5 w-5 text-primary" /> 
-                    Postit
+                    <div className="flex items-center">
+                      <img 
+                        src="/lovable-uploads/4d88d3ca-7d74-4fc7-af8f-849c3eeed233.png" 
+                        alt="Posti logo" 
+                        className="h-8 w-auto mr-2" 
+                      />
+                    </div>
                   </CardTitle>
                   <CardDescription>Express Courier Services</CardDescription>
                 </CardHeader>
@@ -59,7 +64,7 @@ const TransportationPartnersPage = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Package className="h-5 w-5 text-primary" /> 
-                    JYSK
+                    Jys
                   </CardTitle>
                   <CardDescription>International Logistics Provider</CardDescription>
                 </CardHeader>
@@ -104,12 +109,19 @@ const TransportationPartnersPage = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="postit" className="mt-6">
+          <TabsContent value="posti" className="mt-6">
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
-                    <CardTitle>Postit Transportation Services</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      <img 
+                        src="/lovable-uploads/4d88d3ca-7d74-4fc7-af8f-849c3eeed233.png" 
+                        alt="Posti logo" 
+                        className="h-8 w-auto mr-2" 
+                      />
+                      <span>Transportation Services</span>
+                    </CardTitle>
                     <CardDescription>Your trusted partner for domestic deliveries</CardDescription>
                   </div>
                 </div>
@@ -119,7 +131,7 @@ const TransportationPartnersPage = () => {
                   <div>
                     <h3 className="text-lg font-medium mb-2">Company Overview</h3>
                     <p className="text-muted-foreground">
-                      Postit is a leading domestic courier service specializing in same-day and next-day deliveries. 
+                      Posti is a leading domestic courier service specializing in same-day and next-day deliveries. 
                       With a vast network of couriers and sorting centers, they ensure quick and reliable service throughout the country.
                     </p>
                   </div>
@@ -138,7 +150,7 @@ const TransportationPartnersPage = () => {
                   <div>
                     <h3 className="text-lg font-medium mb-2">Coverage Area</h3>
                     <p className="text-muted-foreground mb-2">
-                      Postit serves all major cities and rural areas with different service levels:
+                      Posti serves all major cities and rural areas with different service levels:
                     </p>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="border rounded-md p-3">
@@ -161,9 +173,9 @@ const TransportationPartnersPage = () => {
                   </div>
                   
                   <div className="bg-muted p-4 rounded-md">
-                    <h3 className="text-lg font-medium mb-2">Why We Partner With Postit</h3>
+                    <h3 className="text-lg font-medium mb-2">Why We Partner With Posti</h3>
                     <p className="text-muted-foreground">
-                      Our partnership with Postit allows us to offer exceptional domestic delivery services with 
+                      Our partnership with Posti allows us to offer exceptional domestic delivery services with 
                       comprehensive tracking, reliable timelines, and excellent customer support.
                     </p>
                   </div>
@@ -172,12 +184,12 @@ const TransportationPartnersPage = () => {
             </Card>
           </TabsContent>
           
-          <TabsContent value="jysk" className="mt-6">
+          <TabsContent value="jys" className="mt-6">
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
-                    <CardTitle>JYSK Global Logistics</CardTitle>
+                    <CardTitle>Jys Global Logistics</CardTitle>
                     <CardDescription>International shipping and logistics expertise</CardDescription>
                   </div>
                 </div>
@@ -187,7 +199,7 @@ const TransportationPartnersPage = () => {
                   <div>
                     <h3 className="text-lg font-medium mb-2">Company Overview</h3>
                     <p className="text-muted-foreground">
-                      JYSK is an international logistics provider with decades of experience in global freight operations. 
+                      Jys is an international logistics provider with decades of experience in global freight operations. 
                       Their extensive network spans over 120 countries, making them an ideal partner for cross-border shipping needs.
                     </p>
                   </div>
@@ -207,7 +219,7 @@ const TransportationPartnersPage = () => {
                   <div>
                     <h3 className="text-lg font-medium mb-2">Global Presence</h3>
                     <p className="text-muted-foreground mb-2">
-                      JYSK operates in key markets worldwide with specialized handling for different regions:
+                      Jys operates in key markets worldwide with specialized handling for different regions:
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="border rounded-md p-3">
@@ -238,9 +250,9 @@ const TransportationPartnersPage = () => {
                   </div>
                   
                   <div className="bg-muted p-4 rounded-md">
-                    <h3 className="text-lg font-medium mb-2">Why We Partner With JYSK</h3>
+                    <h3 className="text-lg font-medium mb-2">Why We Partner With Jys</h3>
                     <p className="text-muted-foreground">
-                      Our partnership with JYSK enables us to provide seamless international shipping solutions with 
+                      Our partnership with Jys enables us to provide seamless international shipping solutions with 
                       expert customs handling, reliable documentation, and global reach for businesses of all sizes.
                     </p>
                   </div>
