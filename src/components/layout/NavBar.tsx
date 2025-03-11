@@ -5,7 +5,7 @@ import { AuthButtons } from "@/components/auth/AuthWrapper";
 import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../common/LanguageSwitcher";
-import { Menu, Users, Package, Warehouse, ChevronDown, Truck, FileCheck, LayoutDashboard } from "lucide-react";
+import { Menu, Users, Package, Warehouse, ChevronDown, Truck, FileCheck, LayoutDashboard, Phone } from "lucide-react";
 import { useState } from "react";
 import { 
   DropdownMenu, 
@@ -36,21 +36,22 @@ const NavBar = () => {
         items: [
           { path: "/shipment", label: t('nav.shipment', 'Ship Package'), icon: Package },
           { path: "/tracking", label: t('nav.tracking'), icon: Truck },
-          { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
+
         ]
       },
       {
         name: t('nav.categories.services', 'Services'),
         items: [
           { path: "/3pl", label: t('nav.3pl', '3PL Services'), icon: Warehouse },
-          { path: "/book", label: t('nav.book'), icon: null },
-          { path: "/dashboard", label: t('nav.dashboard'), icon: LayoutDashboard },
+          { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
         ]
       },
       {
         name: t('nav.categories.workspace', 'Workspace'),
         items: [
           { path: "/collaborate", label: t('nav.collaborate', 'Collaborate'), icon: Users },
+          { path: "/book", label: t('nav.book'), icon: Phone },
+          { path: "/dashboard", label: t('nav.dashboard'), icon: LayoutDashboard },
         ]
       }
     ] : [])
