@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/AuthWrapper";
@@ -46,8 +45,8 @@ const NavBar = () => {
   // Check if user has admin role
   const isAdmin = isSignedIn && user?.publicMetadata?.role === "admin";
 
-  // Common hover style for all navbar items
-  const hoverClass = "hover:bg-gray-100/70 hover:text-primary transition-colors rounded-md";
+  // Softer hover style for all navbar items
+  const hoverClass = "hover:bg-gray-100/40 hover:text-primary/90 transition-colors rounded-md";
 
   // Organize nav items into categories
   const categories = [
@@ -115,7 +114,7 @@ const NavBar = () => {
                     className={`hidden md:flex items-center gap-2 ${
                       location.pathname === "/admin-dashboard" 
                         ? "bg-primary text-primary-foreground" 
-                        : "bg-accent/10 hover:bg-accent/20"
+                        : "bg-accent/10 hover:bg-accent/15"
                     } px-3 py-1.5 rounded-md font-medium transition-colors`}
                   >
                     <Shield className="h-4 w-4" />

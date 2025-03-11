@@ -34,13 +34,16 @@ const LanguageSwitcher = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => changeLanguage('en')}>
+        <DropdownMenuItem onClick={() => changeLanguage('en')}
+          className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer">
           {getLanguageName('en')}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => changeLanguage('sv')}>
+        <DropdownMenuItem onClick={() => changeLanguage('sv')}
+          className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer">
           {getLanguageName('sv')}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => changeLanguage('fi')}>
+        <DropdownMenuItem onClick={() => changeLanguage('fi')}
+          className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer">
           {getLanguageName('fi')}
         </DropdownMenuItem>
       </DropdownMenuContent>
