@@ -1,4 +1,3 @@
-
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,7 +8,6 @@ import { ClerkLoaded, useUser } from "@clerk/clerk-react";
 import AuthWrapper from "./components/auth/AuthWrapper";
 import Index from "./pages/Index";
 import BookingPage from "./pages/BookingPage";
-// Import non-lazy loaded components
 import NotFound from "./pages/NotFound";
 
 // Lazy load less frequently used pages
@@ -35,7 +33,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 60 * 1000, // 1 minute
-      cacheTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 5 * 60 * 1000, // 5 minutes
     },
   },
 });
