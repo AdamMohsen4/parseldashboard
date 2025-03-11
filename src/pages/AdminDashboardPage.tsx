@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
-import { BarChart, CheckCircle, FileText, Search, Users, Calendar, Building } from "lucide-react";
+import { BarChart, CheckCircle, FileText, Search, Users, Calendar, Building, MessageCircle, HelpCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { 
   DropdownMenu, 
@@ -30,13 +30,16 @@ const AdminDashboardPage = () => {
   const [mainTab, setMainTab] = useState("shipments");
   const [shipmentsTab, setShipmentsTab] = useState("all");
   const [demosTab, setDemosTab] = useState("all");
+  const [supportTab, setSupportTab] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     totalShipments: 0,
     pendingShipments: 0,
     completedShipments: 0,
     totalDemoRequests: 0,
-    totalCollaborations: 0
+    totalCollaborations: 0,
+    totalSupportTickets: 0,
+    openSupportTickets: 0
   });
 
   // Shipments state
@@ -54,13 +57,17 @@ const AdminDashboardPage = () => {
   const [filteredCollaborations, setFilteredCollaborations] = useState([]);
   const [collaborationSearchQuery, setCollaborationSearchQuery] = useState("");
 
+  // Support tickets state
+  const [supportTickets, setSupportTickets] = useState([]);
+  const [filteredSupportTickets, setFilteredSupportTickets] = useState([]);
+  const [supportSearchQuery, setSupportSearchQuery] = useState("");
+
   useEffect(() => {
     if (user) {
       loadData();
     }
   }, [user]);
 
-  // Filter effects
   useEffect(() => {
     if (shipments.length > 0) {
       filterShipments();
@@ -79,6 +86,12 @@ const AdminDashboardPage = () => {
     }
   }, [collaborationSearchQuery, collaborations]);
 
+  useEffect(() => {
+    if (supportTickets.length > 0) {
+      filterSupportTickets();
+    }
+  }, [supportSearchQuery, supportTickets]);
+
   const loadData = async () => {
     setIsLoading(true);
     try {
@@ -86,6 +99,7 @@ const AdminDashboardPage = () => {
         loadShipments(),
         loadDemoRequests(),
         loadCollaborations(),
+        loadSupportTickets(),
         loadStats()
       ]);
     } catch (error) {
@@ -152,6 +166,25 @@ const AdminDashboardPage = () => {
     );
     
     setFilteredCollaborations(filtered);
+  };
+
+  const filterSupportTickets = () => {
+    if (!supportSearchQuery.trim()) {
+      setFilteredSupportTickets(supportTickets);
+      return;
+    }
+    
+    const lowerCaseQuery = supportSearchQuery.toLowerCase();
+    const filtered = supportTickets.filter(ticket => 
+      ticket.subject?.toLowerCase().includes(lowerCaseQuery) ||
+      ticket.message?.toLowerCase().includes(lowerCaseQuery) ||
+      ticket.user_id?.toLowerCase().includes(lowerCaseQuery) ||
+      ticket.category?.toLowerCase().includes(lowerCaseQuery) ||
+      ticket.priority?.toLowerCase().includes(lowerCaseQuery) ||
+      ticket.status?.toLowerCase().includes(lowerCaseQuery)
+    );
+    
+    setFilteredSupportTickets(filtered);
   };
 
   const handleStatusChange = async (shipmentId, userId, newStatus) => {
@@ -226,6 +259,40 @@ const AdminDashboardPage = () => {
       loadDemoRequests();
     } catch (error) {
       console.error("Error updating demo status:", error);
+      toast({
+        title: "Update Failed",
+        description: "An unexpected error occurred while updating the status.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSupportTicketStatusChange = async (ticketId, newStatus) => {
+    try {
+      const { error } = await supabase
+        .from('support_tickets')
+        .update({ status: newStatus })
+        .eq('id', ticketId);
+      
+      if (error) {
+        console.error("Supabase update error:", error);
+        toast({
+          title: "Status Update Failed",
+          description: "Could not update the support ticket status.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      toast({
+        title: "Status Updated",
+        description: `Support ticket status changed to ${newStatus}.`,
+      });
+      
+      loadSupportTickets();
+      loadStats();
+    } catch (error) {
+      console.error("Error updating support ticket status:", error);
       toast({
         title: "Update Failed",
         description: "An unexpected error occurred while updating the status.",
@@ -329,9 +396,34 @@ const AdminDashboardPage = () => {
     }
   };
 
+  const loadSupportTickets = async () => {
+    try {
+      console.log("Loading support tickets from Supabase...");
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error("Error loading support tickets:", error);
+        toast({
+          title: "Error Loading Support Tickets",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      console.log("Support tickets loaded:", data?.length || 0);
+      setSupportTickets(data || []);
+      setFilteredSupportTickets(data || []);
+    } catch (error) {
+      console.error("Error in loadSupportTickets:", error);
+    }
+  };
+
   const loadStats = async () => {
     try {
-      // Get shipment counts
       const { count: totalCount, error: totalError } = await supabase
         .from('booking')
         .select('*', { count: 'exact', head: true });
@@ -346,27 +438,37 @@ const AdminDashboardPage = () => {
         .select('*', { count: 'exact', head: true })
         .eq('status', 'delivered');
         
-      // Get demo requests count
       const { count: demoCount, error: demoError } = await supabase
         .from('demo_requests')
         .select('*', { count: 'exact', head: true });
         
-      // Get collaborations count
       const { count: collabCount, error: collabError } = await supabase
         .from('collaborations')
         .select('*', { count: 'exact', head: true });
       
-      if (!totalError && !pendingError && !completedError && !demoError && !collabError) {
+      const { count: supportCount, error: supportError } = await supabase
+        .from('support_tickets')
+        .select('*', { count: 'exact', head: true });
+      
+      const { count: openSupportCount, error: openSupportError } = await supabase
+        .from('support_tickets')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'open');
+      
+      if (!totalError && !pendingError && !completedError && !demoError && !collabError && 
+          !supportError && !openSupportError) {
         setStats({
           totalShipments: totalCount || 0,
           pendingShipments: pendingCount || 0,
           completedShipments: completedCount || 0,
           totalDemoRequests: demoCount || 0,
-          totalCollaborations: collabCount || 0
+          totalCollaborations: collabCount || 0,
+          totalSupportTickets: supportCount || 0,
+          openSupportTickets: openSupportCount || 0
         });
       } else {
         console.error("Error fetching stats:", { 
-          totalError, pendingError, completedError, demoError, collabError 
+          totalError, pendingError, completedError, demoError, collabError, supportError, openSupportError
         });
       }
     } catch (error) {
@@ -384,7 +486,7 @@ const AdminDashboardPage = () => {
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
               <p className="text-muted-foreground">
-                Manage shipments, demo requests, and collaborations
+                Manage shipments, demo requests, collaborations and support tickets
               </p>
             </div>
             <Button onClick={handleRefreshData}>
@@ -392,8 +494,8 @@ const AdminDashboardPage = () => {
             </Button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <Card>
+          <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+            <Card className="md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Total Shipments
@@ -404,7 +506,7 @@ const AdminDashboardPage = () => {
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Pending Shipments
@@ -415,7 +517,7 @@ const AdminDashboardPage = () => {
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Completed Shipments
@@ -431,7 +533,7 @@ const AdminDashboardPage = () => {
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Demo Requests
@@ -442,7 +544,7 @@ const AdminDashboardPage = () => {
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="md:col-span-1">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Collaborations
@@ -450,6 +552,33 @@ const AdminDashboardPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalCollaborations}</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="md:col-span-1">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Support Tickets
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalSupportTickets}</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="md:col-span-1">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Open Tickets
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.openSupportTickets}</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  {stats.totalSupportTickets > 0 
+                    ? `${Math.round((stats.openSupportTickets / stats.totalSupportTickets) * 100)}% open rate` 
+                    : 'No support tickets'}
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -461,18 +590,21 @@ const AdminDashboardPage = () => {
                   <TabsTrigger value="shipments">Shipments</TabsTrigger>
                   <TabsTrigger value="demos">Demo Requests</TabsTrigger>
                   <TabsTrigger value="collaborations">Collaborations</TabsTrigger>
+                  <TabsTrigger value="support">Support Tickets</TabsTrigger>
                 </TabsList>
                 
                 <CardTitle>
                   {mainTab === "shipments" && "Shipment Management"}
                   {mainTab === "demos" && "Demo Requests Management"}
                   {mainTab === "collaborations" && "Collaborations Management"}
+                  {mainTab === "support" && "Support Tickets Management"}
                 </CardTitle>
                 
                 <CardDescription>
                   {mainTab === "shipments" && "View and manage all shipments across the platform"}
                   {mainTab === "demos" && "Review and respond to demo requests from potential customers"}
                   {mainTab === "collaborations" && "Manage business collaboration proposals"}
+                  {mainTab === "support" && "Respond to customer support inquiries and issues"}
                 </CardDescription>
               </Tabs>
             </CardHeader>
@@ -628,6 +760,78 @@ const AdminDashboardPage = () => {
                     isLoading={isLoading} 
                     formatDate={formatDate}
                   />
+                </TabsContent>
+                
+                <TabsContent value="support">
+                  <div className="mb-4 flex items-center gap-2">
+                    <Search className="text-muted-foreground h-5 w-5" />
+                    <Input
+                      placeholder="Search by subject, message, user ID, category..."
+                      value={supportSearchQuery}
+                      onChange={(e) => setSupportSearchQuery(e.target.value)}
+                      className="max-w-sm"
+                    />
+                  </div>
+                  
+                  <Tabs value={supportTab} onValueChange={setSupportTab}>
+                    <TabsList className="mb-4">
+                      <TabsTrigger value="all">All Tickets</TabsTrigger>
+                      <TabsTrigger value="open">Open</TabsTrigger>
+                      <TabsTrigger value="in_progress">In Progress</TabsTrigger>
+                      <TabsTrigger value="resolved">Resolved</TabsTrigger>
+                      <TabsTrigger value="closed">Closed</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="all">
+                      <SupportTicketsTable 
+                        supportTickets={filteredSupportTickets} 
+                        isLoading={isLoading} 
+                        onStatusChange={handleSupportTicketStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="open">
+                      <SupportTicketsTable 
+                        supportTickets={filteredSupportTickets.filter(t => t.status === 'open')} 
+                        isLoading={isLoading} 
+                        onStatusChange={handleSupportTicketStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="in_progress">
+                      <SupportTicketsTable 
+                        supportTickets={filteredSupportTickets.filter(t => t.status === 'in_progress')} 
+                        isLoading={isLoading}
+                        onStatusChange={handleSupportTicketStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="resolved">
+                      <SupportTicketsTable 
+                        supportTickets={filteredSupportTickets.filter(t => t.status === 'resolved')} 
+                        isLoading={isLoading}
+                        onStatusChange={handleSupportTicketStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="closed">
+                      <SupportTicketsTable 
+                        supportTickets={filteredSupportTickets.filter(t => t.status === 'closed')} 
+                        isLoading={isLoading}
+                        onStatusChange={handleSupportTicketStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                  </Tabs>
                 </TabsContent>
               </Tabs>
             </CardContent>
@@ -820,5 +1024,89 @@ const CollaborationsTable = ({ collaborations, isLoading, formatDate }) => {
   );
 };
 
-export default AdminDashboardPage;
+const SupportTicketsTable = ({ supportTickets, isLoading, onStatusChange, getStatusBadgeColor, formatDate }) => {
+  if (isLoading) {
+    return <div className="text-center py-8">Loading support tickets...</div>;
+  }
+  
+  if (supportTickets.length === 0) {
+    return <div className="text-center py-8 text-muted-foreground">No support tickets found</div>;
+  }
+  
+  return (
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Subject</TableHead>
+            <TableHead>User ID</TableHead>
+            <TableHead>Category</TableHead>
+            <TableHead>Priority</TableHead>
+            <TableHead>Created</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {supportTickets.map((ticket) => (
+            <TableRow key={ticket.id}>
+              <TableCell className="font-medium max-w-xs truncate" title={ticket.subject}>
+                {ticket.subject}
+              </TableCell>
+              <TableCell>{ticket.user_id ? ticket.user_id.substring(0, 8) + '...' : 'N/A'}</TableCell>
+              <TableCell>
+                {ticket.category === 'billing' && <span className="flex items-center gap-1.5"><FileText className="h-4 w-4" /> Billing</span>}
+                {ticket.category === 'shipping' && <span className="flex items-center gap-1.5"><BarChart className="h-4 w-4" /> Shipping</span>}
+                {ticket.category === 'technical' && <span className="flex items-center gap-1.5"><HelpCircle className="h-4 w-4" /> Technical</span>}
+                {ticket.category === 'general' && <span className="flex items-center gap-1.5"><MessageCircle className="h-4 w-4" /> General</span>}
+                {!['billing', 'shipping', 'technical', 'general'].includes(ticket.category) && ticket.category}
+              </TableCell>
+              <TableCell>
+                <Badge className={
+                  ticket.priority === 'urgent' ? "bg-red-100 text-red-800" :
+                  ticket.priority === 'high' ? "bg-orange-100 text-orange-800" :
+                  ticket.priority === 'medium' ? "bg-blue-100 text-blue-800" :
+                  "bg-green-100 text-green-800"
+                }>
+                  {ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}
+                </Badge>
+              </TableCell>
+              <TableCell>{formatDate(ticket.created_at)}</TableCell>
+              <TableCell>
+                <Badge className={getStatusBadgeColor(ticket.status)}>
+                  {ticket.status === 'in_progress' ? 'In Progress' : 
+                    ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      Update Status
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => onStatusChange(ticket.id, 'open')}>
+                      Set as Open
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onStatusChange(ticket.id, 'in_progress')}>
+                      Set as In Progress
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onStatusChange(ticket.id, 'resolved')}>
+                      Set as Resolved
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onStatusChange(ticket.id, 'closed')}>
+                      Set as Closed
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+};
 
+export default AdminDashboardPage;
