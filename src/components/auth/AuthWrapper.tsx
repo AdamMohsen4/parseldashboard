@@ -25,12 +25,14 @@ const AuthWrapper = ({ children, requireAuth = false, requireAdmin = false }: Au
     if (isSignedIn && user) {
       // Get the JWT token from Clerk
       getToken({ template: "supabase" }).then((token) => {
-        // Set the auth token in Supabase
-        supabase.auth.setSession({ 
-          access_token: token as string, 
-          refresh_token: ''
-        });
-        console.log("Supabase auth token set from Clerk");
+        if (token) {
+          // Set the auth token in Supabase
+          supabase.auth.setSession({ 
+            access_token: token as string, 
+            refresh_token: ''
+          });
+          console.log("Supabase auth token set from Clerk");
+        }
       });
     } else {
       // Clear the Supabase session when not signed in

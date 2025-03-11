@@ -100,119 +100,6 @@ const AdminDashboardPage = () => {
     }
   };
 
-  const loadShipments = async () => {
-    try {
-      console.log("Loading shipments from Supabase...");
-      const { data, error } = await supabase
-        .from('booking')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error("Error loading shipments:", error);
-        toast({
-          title: "Error Loading Shipments",
-          description: error.message,
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      console.log("Shipments loaded:", data?.length || 0);
-      setShipments(data || []);
-      setFilteredShipments(data || []);
-    } catch (error) {
-      console.error("Error in loadShipments:", error);
-    }
-  };
-
-  const loadDemoRequests = async () => {
-    try {
-      console.log("Loading demo requests from Supabase...");
-      const { data, error } = await supabase
-        .from('demo_requests')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error("Error loading demo requests:", error);
-        return;
-      }
-      
-      console.log("Demo requests loaded:", data?.length || 0);
-      setDemoRequests(data || []);
-      setFilteredDemoRequests(data || []);
-    } catch (error) {
-      console.error("Error in loadDemoRequests:", error);
-    }
-  };
-
-  const loadCollaborations = async () => {
-    try {
-      console.log("Loading collaborations from Supabase...");
-      const { data, error } = await supabase
-        .from('collaborations')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error("Error loading collaborations:", error);
-        return;
-      }
-      
-      console.log("Collaborations loaded:", data?.length || 0);
-      setCollaborations(data || []);
-      setFilteredCollaborations(data || []);
-    } catch (error) {
-      console.error("Error in loadCollaborations:", error);
-    }
-  };
-
-  const loadStats = async () => {
-    try {
-      // Get shipment counts
-      const { count: totalCount, error: totalError } = await supabase
-        .from('booking')
-        .select('*', { count: 'exact', head: true });
-      
-      const { count: pendingCount, error: pendingError } = await supabase
-        .from('booking')
-        .select('*', { count: 'exact', head: true })
-        .in('status', ['pending', 'picked_up', 'in_transit']);
-      
-      const { count: completedCount, error: completedError } = await supabase
-        .from('booking')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'delivered');
-        
-      // Get demo requests count
-      const { count: demoCount, error: demoError } = await supabase
-        .from('demo_requests')
-        .select('*', { count: 'exact', head: true });
-        
-      // Get collaborations count
-      const { count: collabCount, error: collabError } = await supabase
-        .from('collaborations')
-        .select('*', { count: 'exact', head: true });
-      
-      if (!totalError && !pendingError && !completedError && !demoError && !collabError) {
-        setStats({
-          totalShipments: totalCount || 0,
-          pendingShipments: pendingCount || 0,
-          completedShipments: completedCount || 0,
-          totalDemoRequests: demoCount || 0,
-          totalCollaborations: collabCount || 0
-        });
-      } else {
-        console.error("Error fetching stats:", { 
-          totalError, pendingError, completedError, demoError, collabError 
-        });
-      }
-    } catch (error) {
-      console.error("Error loading stats:", error);
-    }
-  };
-
   const filterShipments = () => {
     if (!shipmentSearchQuery.trim()) {
       setFilteredShipments(shipments);
@@ -374,6 +261,119 @@ const AdminDashboardPage = () => {
     });
   };
 
+  const loadShipments = async () => {
+    try {
+      console.log("Loading shipments from Supabase...");
+      const { data, error } = await supabase
+        .from('booking')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error("Error loading shipments:", error);
+        toast({
+          title: "Error Loading Shipments",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      console.log("Shipments loaded:", data?.length || 0);
+      setShipments(data || []);
+      setFilteredShipments(data || []);
+    } catch (error) {
+      console.error("Error in loadShipments:", error);
+    }
+  };
+
+  const loadDemoRequests = async () => {
+    try {
+      console.log("Loading demo requests from Supabase...");
+      const { data, error } = await supabase
+        .from('demo_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error("Error loading demo requests:", error);
+        return;
+      }
+      
+      console.log("Demo requests loaded:", data?.length || 0);
+      setDemoRequests(data || []);
+      setFilteredDemoRequests(data || []);
+    } catch (error) {
+      console.error("Error in loadDemoRequests:", error);
+    }
+  };
+
+  const loadCollaborations = async () => {
+    try {
+      console.log("Loading collaborations from Supabase...");
+      const { data, error } = await supabase
+        .from('collaborations')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error("Error loading collaborations:", error);
+        return;
+      }
+      
+      console.log("Collaborations loaded:", data?.length || 0);
+      setCollaborations(data || []);
+      setFilteredCollaborations(data || []);
+    } catch (error) {
+      console.error("Error in loadCollaborations:", error);
+    }
+  };
+
+  const loadStats = async () => {
+    try {
+      // Get shipment counts
+      const { count: totalCount, error: totalError } = await supabase
+        .from('booking')
+        .select('*', { count: 'exact', head: true });
+      
+      const { count: pendingCount, error: pendingError } = await supabase
+        .from('booking')
+        .select('*', { count: 'exact', head: true })
+        .in('status', ['pending', 'picked_up', 'in_transit']);
+      
+      const { count: completedCount, error: completedError } = await supabase
+        .from('booking')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'delivered');
+        
+      // Get demo requests count
+      const { count: demoCount, error: demoError } = await supabase
+        .from('demo_requests')
+        .select('*', { count: 'exact', head: true });
+        
+      // Get collaborations count
+      const { count: collabCount, error: collabError } = await supabase
+        .from('collaborations')
+        .select('*', { count: 'exact', head: true });
+      
+      if (!totalError && !pendingError && !completedError && !demoError && !collabError) {
+        setStats({
+          totalShipments: totalCount || 0,
+          pendingShipments: pendingCount || 0,
+          completedShipments: completedCount || 0,
+          totalDemoRequests: demoCount || 0,
+          totalCollaborations: collabCount || 0
+        });
+      } else {
+        console.error("Error fetching stats:", { 
+          totalError, pendingError, completedError, demoError, collabError 
+        });
+      }
+    } catch (error) {
+      console.error("Error loading stats:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <NavBar />
@@ -478,156 +478,158 @@ const AdminDashboardPage = () => {
             </CardHeader>
             
             <CardContent>
-              <TabsContent value="shipments">
-                <div className="mb-4 flex items-center gap-2">
-                  <Search className="text-muted-foreground h-5 w-5" />
-                  <Input
-                    placeholder="Search by tracking code, user, address..."
-                    value={shipmentSearchQuery}
-                    onChange={(e) => setShipmentSearchQuery(e.target.value)}
-                    className="max-w-sm"
-                  />
-                </div>
+              <Tabs value={mainTab}>
+                <TabsContent value="shipments">
+                  <div className="mb-4 flex items-center gap-2">
+                    <Search className="text-muted-foreground h-5 w-5" />
+                    <Input
+                      placeholder="Search by tracking code, user, address..."
+                      value={shipmentSearchQuery}
+                      onChange={(e) => setShipmentSearchQuery(e.target.value)}
+                      className="max-w-sm"
+                    />
+                  </div>
+                  
+                  <Tabs value={shipmentsTab} onValueChange={setShipmentsTab}>
+                    <TabsList className="mb-4">
+                      <TabsTrigger value="all">All Shipments</TabsTrigger>
+                      <TabsTrigger value="pending">Pending</TabsTrigger>
+                      <TabsTrigger value="in_transit">In Transit</TabsTrigger>
+                      <TabsTrigger value="delivered">Delivered</TabsTrigger>
+                      <TabsTrigger value="exception">Exceptions</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="all">
+                      <ShipmentTable 
+                        shipments={filteredShipments} 
+                        isLoading={isLoading} 
+                        onStatusChange={handleStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="pending">
+                      <ShipmentTable 
+                        shipments={filteredShipments.filter(s => s.status === 'pending')} 
+                        isLoading={isLoading} 
+                        onStatusChange={handleStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="in_transit">
+                      <ShipmentTable 
+                        shipments={filteredShipments.filter(s => s.status === 'in_transit')} 
+                        isLoading={isLoading}
+                        onStatusChange={handleStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="delivered">
+                      <ShipmentTable 
+                        shipments={filteredShipments.filter(s => s.status === 'delivered')} 
+                        isLoading={isLoading}
+                        onStatusChange={handleStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="exception">
+                      <ShipmentTable 
+                        shipments={filteredShipments.filter(s => s.status === 'exception')} 
+                        isLoading={isLoading}
+                        onStatusChange={handleStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                  </Tabs>
+                </TabsContent>
                 
-                <Tabs value={shipmentsTab} onValueChange={setShipmentsTab}>
-                  <TabsList className="mb-4">
-                    <TabsTrigger value="all">All Shipments</TabsTrigger>
-                    <TabsTrigger value="pending">Pending</TabsTrigger>
-                    <TabsTrigger value="in_transit">In Transit</TabsTrigger>
-                    <TabsTrigger value="delivered">Delivered</TabsTrigger>
-                    <TabsTrigger value="exception">Exceptions</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="all">
-                    <ShipmentTable 
-                      shipments={filteredShipments} 
-                      isLoading={isLoading} 
-                      onStatusChange={handleStatusChange}
-                      getStatusBadgeColor={getStatusBadgeColor}
-                      formatDate={formatDate}
+                <TabsContent value="demos">
+                  <div className="mb-4 flex items-center gap-2">
+                    <Search className="text-muted-foreground h-5 w-5" />
+                    <Input
+                      placeholder="Search by name, email, company..."
+                      value={demoSearchQuery}
+                      onChange={(e) => setDemoSearchQuery(e.target.value)}
+                      className="max-w-sm"
                     />
-                  </TabsContent>
+                  </div>
                   
-                  <TabsContent value="pending">
-                    <ShipmentTable 
-                      shipments={filteredShipments.filter(s => s.status === 'pending')} 
-                      isLoading={isLoading} 
-                      onStatusChange={handleStatusChange}
-                      getStatusBadgeColor={getStatusBadgeColor}
-                      formatDate={formatDate}
-                    />
-                  </TabsContent>
-                  
-                  <TabsContent value="in_transit">
-                    <ShipmentTable 
-                      shipments={filteredShipments.filter(s => s.status === 'in_transit')} 
-                      isLoading={isLoading}
-                      onStatusChange={handleStatusChange}
-                      getStatusBadgeColor={getStatusBadgeColor}
-                      formatDate={formatDate}
-                    />
-                  </TabsContent>
-                  
-                  <TabsContent value="delivered">
-                    <ShipmentTable 
-                      shipments={filteredShipments.filter(s => s.status === 'delivered')} 
-                      isLoading={isLoading}
-                      onStatusChange={handleStatusChange}
-                      getStatusBadgeColor={getStatusBadgeColor}
-                      formatDate={formatDate}
-                    />
-                  </TabsContent>
-                  
-                  <TabsContent value="exception">
-                    <ShipmentTable 
-                      shipments={filteredShipments.filter(s => s.status === 'exception')} 
-                      isLoading={isLoading}
-                      onStatusChange={handleStatusChange}
-                      getStatusBadgeColor={getStatusBadgeColor}
-                      formatDate={formatDate}
-                    />
-                  </TabsContent>
-                </Tabs>
-              </TabsContent>
-              
-              <TabsContent value="demos">
-                <div className="mb-4 flex items-center gap-2">
-                  <Search className="text-muted-foreground h-5 w-5" />
-                  <Input
-                    placeholder="Search by name, email, company..."
-                    value={demoSearchQuery}
-                    onChange={(e) => setDemoSearchQuery(e.target.value)}
-                    className="max-w-sm"
-                  />
-                </div>
+                  <Tabs value={demosTab} onValueChange={setDemosTab}>
+                    <TabsList className="mb-4">
+                      <TabsTrigger value="all">All Requests</TabsTrigger>
+                      <TabsTrigger value="pending">Pending</TabsTrigger>
+                      <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
+                      <TabsTrigger value="completed">Completed</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="all">
+                      <DemoRequestsTable 
+                        demoRequests={filteredDemoRequests} 
+                        isLoading={isLoading} 
+                        onStatusChange={handleDemoStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="pending">
+                      <DemoRequestsTable 
+                        demoRequests={filteredDemoRequests.filter(d => d.status === 'pending')} 
+                        isLoading={isLoading} 
+                        onStatusChange={handleDemoStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="scheduled">
+                      <DemoRequestsTable 
+                        demoRequests={filteredDemoRequests.filter(d => d.status === 'scheduled')} 
+                        isLoading={isLoading}
+                        onStatusChange={handleDemoStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="completed">
+                      <DemoRequestsTable 
+                        demoRequests={filteredDemoRequests.filter(d => d.status === 'completed')} 
+                        isLoading={isLoading}
+                        onStatusChange={handleDemoStatusChange}
+                        getStatusBadgeColor={getStatusBadgeColor}
+                        formatDate={formatDate}
+                      />
+                    </TabsContent>
+                  </Tabs>
+                </TabsContent>
                 
-                <Tabs value={demosTab} onValueChange={setDemosTab}>
-                  <TabsList className="mb-4">
-                    <TabsTrigger value="all">All Requests</TabsTrigger>
-                    <TabsTrigger value="pending">Pending</TabsTrigger>
-                    <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
-                    <TabsTrigger value="completed">Completed</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="all">
-                    <DemoRequestsTable 
-                      demoRequests={filteredDemoRequests} 
-                      isLoading={isLoading} 
-                      onStatusChange={handleDemoStatusChange}
-                      getStatusBadgeColor={getStatusBadgeColor}
-                      formatDate={formatDate}
+                <TabsContent value="collaborations">
+                  <div className="mb-4 flex items-center gap-2">
+                    <Search className="text-muted-foreground h-5 w-5" />
+                    <Input
+                      placeholder="Search by business, destination, contact..."
+                      value={collaborationSearchQuery}
+                      onChange={(e) => setCollaborationSearchQuery(e.target.value)}
+                      className="max-w-sm"
                     />
-                  </TabsContent>
+                  </div>
                   
-                  <TabsContent value="pending">
-                    <DemoRequestsTable 
-                      demoRequests={filteredDemoRequests.filter(d => d.status === 'pending')} 
-                      isLoading={isLoading} 
-                      onStatusChange={handleDemoStatusChange}
-                      getStatusBadgeColor={getStatusBadgeColor}
-                      formatDate={formatDate}
-                    />
-                  </TabsContent>
-                  
-                  <TabsContent value="scheduled">
-                    <DemoRequestsTable 
-                      demoRequests={filteredDemoRequests.filter(d => d.status === 'scheduled')} 
-                      isLoading={isLoading}
-                      onStatusChange={handleDemoStatusChange}
-                      getStatusBadgeColor={getStatusBadgeColor}
-                      formatDate={formatDate}
-                    />
-                  </TabsContent>
-                  
-                  <TabsContent value="completed">
-                    <DemoRequestsTable 
-                      demoRequests={filteredDemoRequests.filter(d => d.status === 'completed')} 
-                      isLoading={isLoading}
-                      onStatusChange={handleDemoStatusChange}
-                      getStatusBadgeColor={getStatusBadgeColor}
-                      formatDate={formatDate}
-                    />
-                  </TabsContent>
-                </Tabs>
-              </TabsContent>
-              
-              <TabsContent value="collaborations">
-                <div className="mb-4 flex items-center gap-2">
-                  <Search className="text-muted-foreground h-5 w-5" />
-                  <Input
-                    placeholder="Search by business, destination, contact..."
-                    value={collaborationSearchQuery}
-                    onChange={(e) => setCollaborationSearchQuery(e.target.value)}
-                    className="max-w-sm"
+                  <CollaborationsTable 
+                    collaborations={filteredCollaborations} 
+                    isLoading={isLoading} 
+                    formatDate={formatDate}
                   />
-                </div>
-                
-                <CollaborationsTable 
-                  collaborations={filteredCollaborations} 
-                  isLoading={isLoading} 
-                  formatDate={formatDate}
-                />
-              </TabsContent>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         </div>
@@ -819,3 +821,4 @@ const CollaborationsTable = ({ collaborations, isLoading, formatDate }) => {
 };
 
 export default AdminDashboardPage;
+
