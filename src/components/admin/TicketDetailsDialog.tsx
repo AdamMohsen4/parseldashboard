@@ -140,21 +140,25 @@ const TicketDetailsDialog: React.FC<TicketDetailsDialogProps> = ({
               <DropdownMenuContent align="start">
                 <DropdownMenuItem
                   onClick={() => handleSupportTicketStatusChange(selectedTicket.id, "open")}
+                  className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
                 >
                   Set as Open
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleSupportTicketStatusChange(selectedTicket.id, "in_progress")}
+                  className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
                 >
                   Set as In Progress
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleSupportTicketStatusChange(selectedTicket.id, "resolved")}
+                  className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
                 >
                   Set as Resolved
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleSupportTicketStatusChange(selectedTicket.id, "closed")}
+                  className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
                 >
                   Set as Closed
                 </DropdownMenuItem>

@@ -125,16 +125,28 @@ const SupportTicketsTable: React.FC<SupportTicketsTableProps> = ({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => onStatusChange(ticket.id, "open")}>
+                      <DropdownMenuItem 
+                        onClick={() => onStatusChange(ticket.id, "open")}
+                        className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
+                      >
                         Set as Open
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onStatusChange(ticket.id, "in_progress")}>
+                      <DropdownMenuItem 
+                        onClick={() => onStatusChange(ticket.id, "in_progress")}
+                        className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
+                      >
                         Set as In Progress
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onStatusChange(ticket.id, "resolved")}>
+                      <DropdownMenuItem 
+                        onClick={() => onStatusChange(ticket.id, "resolved")}
+                        className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
+                      >
                         Set as Resolved
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onStatusChange(ticket.id, "closed")}>
+                      <DropdownMenuItem 
+                        onClick={() => onStatusChange(ticket.id, "closed")}
+                        className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
+                      >
                         Set as Closed
                       </DropdownMenuItem>
                     </DropdownMenuContent>
