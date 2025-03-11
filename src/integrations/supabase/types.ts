@@ -9,11 +9,43 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          api_key: string
+          business_name: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          api_key: string
+          business_name: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          api_key?: string
+          business_name?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       booking: {
         Row: {
+          business_name: string | null
           carrier_name: string | null
           carrier_price: number | null
           created_at: string
+          customer_type: string | null
           delivery_address: string | null
           delivery_speed: string | null
           dimension_height: string | null
@@ -29,12 +61,15 @@ export type Database = {
           total_price: number | null
           tracking_code: string | null
           user_id: string | null
+          vat_number: string | null
           weight: string | null
         }
         Insert: {
+          business_name?: string | null
           carrier_name?: string | null
           carrier_price?: number | null
           created_at?: string
+          customer_type?: string | null
           delivery_address?: string | null
           delivery_speed?: string | null
           dimension_height?: string | null
@@ -50,12 +85,15 @@ export type Database = {
           total_price?: number | null
           tracking_code?: string | null
           user_id?: string | null
+          vat_number?: string | null
           weight?: string | null
         }
         Update: {
+          business_name?: string | null
           carrier_name?: string | null
           carrier_price?: number | null
           created_at?: string
+          customer_type?: string | null
           delivery_address?: string | null
           delivery_speed?: string | null
           dimension_height?: string | null
@@ -71,6 +109,7 @@ export type Database = {
           total_price?: number | null
           tracking_code?: string | null
           user_id?: string | null
+          vat_number?: string | null
           weight?: string | null
         }
         Relationships: []

@@ -28,7 +28,10 @@ export const saveBookingToSupabase = async (
       pickup_time: pickupTime,
       total_price: totalPrice,
       status: 'pending',
-      estimated_delivery: estimatedDelivery
+      estimated_delivery: estimatedDelivery,
+      customer_type: request.customerType || 'private',
+      business_name: request.businessName,
+      vat_number: request.vatNumber
     });
     
     // Insert booking with the user ID as a string
@@ -51,7 +54,10 @@ export const saveBookingToSupabase = async (
         pickup_time: pickupTime,
         total_price: totalPrice,
         status: 'pending',
-        estimated_delivery: estimatedDelivery
+        estimated_delivery: estimatedDelivery,
+        customer_type: request.customerType || 'private',
+        business_name: request.businessName,
+        vat_number: request.vatNumber
       })
       .select()
       .maybeSingle();
@@ -93,5 +99,27 @@ export const fetchBookingsFromSupabase = async (userId: string, limit?: number) 
   } catch (error) {
     console.error("Error fetching bookings:", error);
     return [];
+  }
+};
+
+// New function for e-commerce integrations to find bookings by external order number
+export const findBookingByOrderNumber = async (userId: string, orderNumber: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('booking')
+      .select('*')
+      .eq('user_id', userId)
+      .ilike('business_name', `%${orderNumber}%`) // Using business_name field to store order numbers for e-commerce
+      .maybeSingle();
+    
+    if (error) {
+      console.error("Error finding booking by order number:", error);
+      return null;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error("Error in findBookingByOrderNumber:", error);
+    return null;
   }
 };

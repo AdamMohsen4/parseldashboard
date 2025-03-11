@@ -16,6 +16,7 @@ import DashboardPage from "./pages/DashboardPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import CollaboratePage from "./pages/CollaboratePage";
 import SupportPage from "./pages/SupportPage";
+import IntegrationPage from "./pages/IntegrationPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -85,6 +86,11 @@ const App = () => (
             <Route path="/support" element={
               <AuthWrapper requireAuth>
                 <SupportPage />
+              </AuthWrapper>
+            } />
+            <Route path="/integration" element={
+              <AuthWrapper requireAuth>
+                <IntegrationPage />
               </AuthWrapper>
             } />
             

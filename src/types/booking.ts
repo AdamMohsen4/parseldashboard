@@ -45,3 +45,43 @@ export interface BookingResponse {
   totalPrice?: number;
   message?: string;
 }
+
+// API Key interface for e-commerce integration
+export interface ApiKey {
+  id: string;
+  userId: string;
+  apiKey: string;
+  businessName: string;
+  createdAt: string;
+  lastUsedAt?: string;
+  isActive: boolean;
+}
+
+// E-commerce API request interface
+export interface EcommerceShipmentRequest {
+  apiKey: string;
+  orderNumber: string;
+  weight: string;
+  dimensions: {
+    length: string;
+    width: string;
+    height: string;
+  };
+  pickup: string;
+  delivery: string;
+  customerEmail?: string;
+  customerName?: string;
+  customerPhone?: string;
+  productDescription?: string;
+  includeCompliance?: boolean;
+}
+
+// E-commerce API response interface
+export interface EcommerceShipmentResponse {
+  success: boolean;
+  trackingCode?: string;
+  labelUrl?: string;
+  estimatedDelivery?: string;
+  shipmentId?: string;
+  message?: string;
+}
