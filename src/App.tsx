@@ -15,6 +15,7 @@ import CompliancePage from "./pages/CompliancePage";
 import DashboardPage from "./pages/DashboardPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import CollaboratePage from "./pages/CollaboratePage";
+import SupportPage from "./pages/SupportPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -79,6 +80,11 @@ const App = () => (
             <Route path="/collaborate" element={
               <AuthWrapper requireAuth>
                 <CollaboratePage />
+              </AuthWrapper>
+            } />
+            <Route path="/support" element={
+              <AuthWrapper requireAuth>
+                <SupportPage />
               </AuthWrapper>
             } />
             

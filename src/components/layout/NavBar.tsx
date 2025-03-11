@@ -18,7 +18,8 @@ import {
   Shield,
   User,
   Briefcase,
-  ShoppingCart
+  ShoppingCart,
+  HelpCircle
 } from "lucide-react";
 import { useState } from "react";
 import { 
@@ -77,6 +78,7 @@ const NavBar = () => {
         items: [
           { path: "/collaborate", label: t('nav.collaborate', 'Collaborate'), icon: Users },
           { path: "/dashboard", label: t('nav.dashboard'), icon: LayoutDashboard },
+          { path: "/support", label: t('nav.support', 'Customer Support'), icon: HelpCircle },
         ]
       }
     ] : [])
