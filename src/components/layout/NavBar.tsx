@@ -132,7 +132,7 @@ const NavBar = () => {
                       location.pathname === item.path
                         ? "text-primary font-medium"
                         : "text-foreground"
-                    } hover:text-primary transition-colors flex items-center gap-1`}
+                    } hover:text-primary hover:bg-gray-100/70 px-2 py-1 rounded transition-colors flex items-center gap-1`}
                   >
                     {item.icon && <item.icon className="h-4 w-4" />}
                     {item.label}
@@ -141,7 +141,7 @@ const NavBar = () => {
               ) : (
                 // Use dropdown for other categories
                 <DropdownMenu key={category.name}>
-                  <DropdownMenuTrigger className="flex items-center gap-1 hover:text-primary transition-colors">
+                  <DropdownMenuTrigger className="flex items-center gap-1 hover:text-primary hover:bg-gray-100/70 px-2 py-1 rounded transition-colors">
                     {category.name} <ChevronDown className="h-4 w-4" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -151,7 +151,7 @@ const NavBar = () => {
                       item.subItems ? (
                         // For items with subcategories
                         <DropdownMenu key={item.path}>
-                          <DropdownMenuTrigger className="w-full flex items-center justify-between px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground cursor-default rounded-sm">
+                          <DropdownMenuTrigger className="w-full flex items-center justify-between px-2 py-1.5 text-sm hover:bg-gray-100/70 hover:text-primary cursor-default rounded-sm">
                             <span className="flex items-center gap-2">
                               {item.icon && <item.icon className="h-4 w-4" />}
                               {item.label}
@@ -165,7 +165,7 @@ const NavBar = () => {
                                   to={subItem.path}
                                   className={`${
                                     location.pathname === subItem.path ? "text-primary font-medium" : ""
-                                  } w-full flex items-center gap-2`}
+                                  } w-full flex items-center gap-2 hover:bg-gray-100/70`}
                                 >
                                   {subItem.icon && <subItem.icon className="h-4 w-4" />}
                                   {subItem.label}
@@ -181,7 +181,7 @@ const NavBar = () => {
                             to={item.path}
                             className={`${
                               location.pathname === item.path ? "text-primary font-medium" : ""
-                            } w-full flex items-center gap-2`}
+                            } w-full flex items-center gap-2 hover:bg-gray-100/70`}
                           >
                             {item.icon && <item.icon className="h-4 w-4" />}
                             {item.label}
@@ -211,7 +211,7 @@ const NavBar = () => {
                   location.pathname === "/admin-dashboard" 
                     ? "text-primary font-medium" 
                     : "text-foreground"
-                } px-2 py-1.5 rounded-md hover:bg-accent/10 transition-colors`}
+                } px-2 py-1.5 rounded-md hover:bg-gray-100/70 transition-colors`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Shield className="h-4 w-4" />
@@ -239,7 +239,7 @@ const NavBar = () => {
                                 location.pathname === subItem.path
                                   ? "text-primary font-medium"
                                   : "text-foreground"
-                              } block py-1.5 hover:text-primary transition-colors flex items-center gap-2`}
+                              } block py-1.5 hover:bg-gray-100/70 hover:text-primary transition-colors flex items-center gap-2 rounded`}
                               onClick={() => setIsMenuOpen(false)}
                             >
                               {subItem.icon && <subItem.icon className="h-4 w-4" />}
@@ -256,7 +256,7 @@ const NavBar = () => {
                           location.pathname === item.path
                             ? "text-primary font-medium"
                             : "text-foreground"
-                        } block py-1.5 hover:text-primary transition-colors flex items-center gap-2`}
+                        } block py-1.5 hover:bg-gray-100/70 hover:text-primary transition-colors flex items-center gap-2 rounded px-2`}
                         onClick={() => setIsMenuOpen(false)}
                       >
                         {item.icon && <item.icon className="h-4 w-4" />}
