@@ -1,3 +1,4 @@
+
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ThreePLRequest, ThreePLResponse } from "@/types/threePL";
@@ -106,7 +107,12 @@ export const submitThreePLRequest = async (request: ThreePLRequest): Promise<Thr
         integration_needed: request.integrationNeeded,
         integration_systems: request.integrationSystems,
         custom_requirements: request.customRequirements,
-        document_url: request.documentUrl
+        document_url: request.documentUrl,
+        // Add e-commerce specific fields
+        ecommerce_platform: request.ecommercePlatform,
+        ecommerce_store_url: request.ecommerceStoreUrl,
+        ecommerce_sku_count: request.ecommerceSkuCount,
+        ecommerce_order_volume: request.ecommerceOrderVolume
       });
     
     if (error) {
@@ -147,4 +153,37 @@ export const submitThreePLRequest = async (request: ThreePLRequest): Promise<Thr
       message: "An unexpected error occurred"
     };
   }
+};
+
+// Function to validate e-commerce platform connection details
+export const validateEcommerceConnection = async (
+  platform: string, 
+  apiKey: string, 
+  storeUrl: string
+): Promise<{valid: boolean, message: string}> => {
+  // In a real implementation, this would attempt to connect to the e-commerce platform API
+  // For this demo, we'll just validate that all fields are provided
+  
+  console.log(`Validating connection to ${platform} at ${storeUrl}`);
+  
+  if (!platform || !apiKey || !storeUrl) {
+    return {
+      valid: false,
+      message: "All connection details are required"
+    };
+  }
+  
+  // Simple URL validation
+  if (!storeUrl.startsWith('http://') && !storeUrl.startsWith('https://')) {
+    return {
+      valid: false,
+      message: "Store URL must begin with http:// or https://"
+    };
+  }
+  
+  // Mock successful validation
+  return {
+    valid: true,
+    message: `Successfully connected to ${platform}`
+  };
 };

@@ -81,6 +81,12 @@ const ThreePLServicePage = () => {
   // Document upload
   const [documentUrl, setDocumentUrl] = useState("");
   
+  // E-commerce integration
+  const [ecommercePlatform, setEcommercePlatform] = useState("");
+  const [ecommerceStoreUrl, setEcommerceStoreUrl] = useState("");
+  const [ecommerceSkuCount, setEcommerceSkuCount] = useState("");
+  const [ecommerceOrderVolume, setEcommerceOrderVolume] = useState("");
+  
   // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -118,6 +124,10 @@ const ThreePLServicePage = () => {
     contactPhone: string;
     requirements: string;
     documentUrl: string;
+    ecommercePlatform?: string;
+    ecommerceStoreUrl?: string;
+    ecommerceSkuCount?: string;
+    ecommerceOrderVolume?: string;
   }) => {
     if (!isSignedIn || !user) {
       // Trigger Clerk sign-in dialog
@@ -143,10 +153,14 @@ const ThreePLServicePage = () => {
         averageOrdersPerMonth: "See uploaded document or brief description",
         peakSeasonMonths: [],
         internationalShipping: false,
-        integrationNeeded: false,
+        integrationNeeded: !!formData.ecommercePlatform,
         customRequirements: formData.requirements,
         documentUrl: formData.documentUrl,
-        userId: user.id
+        userId: user.id,
+        ecommercePlatform: formData.ecommercePlatform,
+        ecommerceStoreUrl: formData.ecommerceStoreUrl,
+        ecommerceSkuCount: formData.ecommerceSkuCount,
+        ecommerceOrderVolume: formData.ecommerceOrderVolume
       });
       
       setSubmissionResult(result);
@@ -205,7 +219,16 @@ const ThreePLServicePage = () => {
         integrationSystems: integrationNeeded ? selectedIntegrations : undefined,
         customRequirements,
         documentUrl,
-        userId: user.id
+        userId: user.id,
+        ecommercePlatform: integrationNeeded && selectedIntegrations?.includes("Shopify") ? "Shopify" : 
+                          integrationNeeded && selectedIntegrations?.includes("WooCommerce") ? "WooCommerce" :
+                          integrationNeeded && selectedIntegrations?.includes("Magento") ? "Magento" :
+                          integrationNeeded && selectedIntegrations?.includes("BigCommerce") ? "BigCommerce" :
+                          integrationNeeded && selectedIntegrations?.includes("Amazon") ? "Amazon" : 
+                          undefined,
+        ecommerceStoreUrl: ecommerceStoreUrl,
+        ecommerceSkuCount: ecommerceSkuCount,
+        ecommerceOrderVolume: ecommerceOrderVolume
       });
       
       setSubmissionResult(result);

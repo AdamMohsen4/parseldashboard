@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import DocumentUpload from "./DocumentUpload";
+import EcommerceIntegration from "./EcommerceIntegration";
 import { toast } from "@/components/ui/use-toast";
 
 interface SimpleRequestFormProps {
@@ -17,6 +19,10 @@ interface SimpleRequestFormProps {
     contactPhone: string;
     requirements: string;
     documentUrl: string;
+    ecommercePlatform?: string;
+    ecommerceStoreUrl?: string;
+    ecommerceSkuCount?: string;
+    ecommerceOrderVolume?: string;
   }) => void;
   isSubmitting: boolean;
 }
@@ -32,6 +38,11 @@ const SimpleRequestForm: React.FC<SimpleRequestFormProps> = ({
   const [contactPhone, setContactPhone] = useState("");
   const [requirements, setRequirements] = useState("");
   const [documentUrl, setDocumentUrl] = useState("");
+  const [showEcommerceIntegration, setShowEcommerceIntegration] = useState(false);
+  const [ecommercePlatform, setEcommercePlatform] = useState("");
+  const [ecommerceStoreUrl, setEcommerceStoreUrl] = useState("");
+  const [ecommerceSkuCount, setEcommerceSkuCount] = useState("");
+  const [ecommerceOrderVolume, setEcommerceOrderVolume] = useState("");
 
   const handleDocumentUploaded = (url: string) => {
     console.log("Document uploaded, URL:", url);
@@ -56,7 +67,11 @@ const SimpleRequestForm: React.FC<SimpleRequestFormProps> = ({
       contactEmail,
       contactPhone,
       requirements,
-      documentUrl
+      documentUrl,
+      ecommercePlatform: showEcommerceIntegration ? ecommercePlatform : undefined,
+      ecommerceStoreUrl: showEcommerceIntegration ? ecommerceStoreUrl : undefined,
+      ecommerceSkuCount: showEcommerceIntegration ? ecommerceSkuCount : undefined,
+      ecommerceOrderVolume: showEcommerceIntegration ? ecommerceOrderVolume : undefined
     });
   };
 
@@ -122,6 +137,27 @@ const SimpleRequestForm: React.FC<SimpleRequestFormProps> = ({
             userId={userId} 
             onDocumentUploaded={handleDocumentUploaded} 
           />
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="showEcommerce" 
+              checked={showEcommerceIntegration}
+              onCheckedChange={(checked) => setShowEcommerceIntegration(checked as boolean)}
+            />
+            <Label htmlFor="showEcommerce">I need e-commerce platform integration</Label>
+          </div>
+          
+          {showEcommerceIntegration && (
+            <div className="mt-4">
+              <h3 className="text-lg font-medium mb-2">E-commerce Integration</h3>
+              <EcommerceIntegration 
+                onPlatformChange={setEcommercePlatform}
+                onStoreUrlChange={setEcommerceStoreUrl}
+                onSkuCountChange={setEcommerceSkuCount}
+                onOrderVolumeChange={setEcommerceOrderVolume}
+              />
+            </div>
+          )}
           
           <div className="flex justify-end">
             <Button 
