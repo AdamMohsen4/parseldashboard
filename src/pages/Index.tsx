@@ -6,10 +6,33 @@ import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Package, Shield, LineChart, CheckCircle, Truck, Map } from "lucide-react";
 import PartnersCarousel from "@/components/home/PartnersCarousel";
+import ImageCarousel from "@/components/home/ImageCarousel";
 
 const Index = () => {
   const { isSignedIn } = useUser();
   const { t } = useTranslation();
+  
+  // Carousel images data
+  const carouselImages = [
+    {
+      src: "uploads/40bf477a-ad0b-486e-9a0d-83c1aff0401a.png",
+      alt: "E-Parcel Logistics Facility",
+      title: t('home.carousel.logistics.title', 'State-of-the-Art Logistics'),
+      description: t('home.carousel.logistics.description', 'Our modern facilities enable seamless shipping and handling of your parcels.')
+    },
+    {
+      src: "uploads/7326fca2-a314-40a0-8acb-41c65a241827.jpg",
+      alt: "Delivery Service",
+      title: t('home.carousel.delivery.title', 'Fast & Reliable Delivery'),
+      description: t('home.carousel.delivery.description', 'Experienced drivers ensuring your packages arrive on time, every time.')
+    },
+    {
+      src: "https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55",
+      alt: "Warehouse Operations",
+      title: t('home.carousel.warehouse.title', 'Efficient Warehouse Operations'),
+      description: t('home.carousel.warehouse.description', 'Advanced technology and skilled staff to handle your inventory needs.')
+    }
+  ];
   
   return <div className="min-h-screen bg-background">
       <NavBar />
@@ -44,11 +67,10 @@ const Index = () => {
               </div>
             </div>
             <div className="relative rounded-lg overflow-hidden shadow-2xl animate-fade-in">
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent" />
-              <img 
-                alt="E-Parcel Logistics Facility Aerial View" 
-                className="w-full h-auto rounded-lg transform transition-transform hover:scale-105 duration-700" 
-                src="uploads/40bf477a-ad0b-486e-9a0d-83c1aff0401a.png" 
+              <ImageCarousel 
+                images={carouselImages}
+                autoSlideInterval={6000}
+                className="w-full h-full"
               />
             </div>
           </div>
@@ -139,6 +161,45 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Image Carousel Section - NEW */}
+      <section className="py-16 px-4 bg-secondary/5">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-12 animate-fade-in">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+              {t('home.showcase.title', 'Our Service in Action')}
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              {t('home.showcase.description', 'See how we help businesses and individuals with their logistics needs')}
+            </p>
+          </div>
+          
+          <ImageCarousel 
+            images={[
+              {
+                src: "https://images.unsplash.com/photo-1543701863-ca3207a4662b",
+                alt: "Shipping and Logistics",
+                title: t('home.showcase.shipping.title', 'Global Shipping Network'),
+                description: t('home.showcase.shipping.description', 'Connected to major shipping routes worldwide')
+              },
+              {
+                src: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7",
+                alt: "Warehouse Technology",
+                title: t('home.showcase.warehouse.title', 'Smart Warehouse Technology'),
+                description: t('home.showcase.warehouse.description', 'Using AI and automation for efficient operations')
+              },
+              {
+                src: "https://images.unsplash.com/photo-1573030889348-c6b0f8b15e40",
+                alt: "Sustainable Packaging",
+                title: t('home.showcase.sustainable.title', 'Eco-Friendly Solutions'),
+                description: t('home.showcase.sustainable.description', 'Committed to reducing our environmental impact')
+              }
+            ]}
+            autoSlideInterval={5000}
+            className="rounded-xl overflow-hidden shadow-xl max-w-4xl mx-auto"
+          />
+        </div>
+      </section>
+
       {/* CTA section */}
       <section className="py-24 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
@@ -208,4 +269,3 @@ const Index = () => {
 };
 
 export default Index;
-
