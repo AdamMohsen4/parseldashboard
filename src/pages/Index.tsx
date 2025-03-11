@@ -6,6 +6,7 @@ import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Package, Shield, LineChart, CheckCircle, Truck, Map } from "lucide-react";
 import PartnersCarousel from "@/components/home/PartnersCarousel";
+import HeroCarousel from "@/components/home/HeroCarousel";
 
 const Index = () => {
   const { isSignedIn } = useUser();
@@ -43,13 +44,8 @@ const Index = () => {
                   </Button>}
               </div>
             </div>
-            <div className="relative rounded-lg overflow-hidden shadow-2xl animate-fade-in">
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent" />
-              <img 
-                alt="E-Parcel Logistics Facility Aerial View" 
-                className="w-full h-auto rounded-lg transform transition-transform hover:scale-105 duration-700" 
-                src="uploads/40bf477a-ad0b-486e-9a0d-83c1aff0401a.png" 
-              />
+            <div className="relative h-[400px] rounded-lg overflow-hidden">
+              <HeroCarousel />
             </div>
           </div>
         </div>
@@ -208,4 +204,3 @@ const Index = () => {
 };
 
 export default Index;
-
