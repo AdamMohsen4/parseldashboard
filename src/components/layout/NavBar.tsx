@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/AuthWrapper";
@@ -177,12 +178,12 @@ const NavBar = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="right" className="w-48">
                             {item.subItems.map((subItem) => (
-                              <DropdownMenuItem key={subItem.path} asChild>
+                              <DropdownMenuItem key={subItem.path} asChild className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer">
                                 <Link
                                   to={subItem.path}
                                   className={`${
                                     location.pathname === subItem.path ? "text-primary font-medium" : ""
-                                  } w-full flex items-center gap-2 ${hoverClass} px-2 py-1`}
+                                  } w-full flex items-center gap-2 px-2 py-1`}
                                 >
                                   {subItem.icon && <subItem.icon className="h-4 w-4" />}
                                   {subItem.label}
@@ -193,12 +194,12 @@ const NavBar = () => {
                         </DropdownMenu>
                       ) : (
                         // For regular items
-                        <DropdownMenuItem key={item.path} asChild>
+                        <DropdownMenuItem key={item.path} asChild className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer">
                           <Link
                             to={item.path}
                             className={`${
                               location.pathname === item.path ? "text-primary font-medium" : ""
-                            } w-full flex items-center gap-2 ${hoverClass} px-2 py-1`}
+                            } w-full flex items-center gap-2 px-2 py-1`}
                           >
                             {item.icon && <item.icon className="h-4 w-4" />}
                             {item.label}
