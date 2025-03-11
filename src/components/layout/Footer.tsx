@@ -32,7 +32,7 @@ const Footer: React.FC = () => {
           
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-medium mb-4">Quick Links</h4>
+            <h4 className="text-lg font-medium mb-4 text-zinc-200">Quick Links</h4>
             <ul className="space-y-2">
               <li>
                 <Link to="/dashboard" className="text-gray-300 hover:text-nordic-blue transition-colors">
@@ -59,7 +59,7 @@ const Footer: React.FC = () => {
           
           {/* Resources */}
           <div>
-            <h4 className="text-lg font-medium mb-4">Resources</h4>
+            <h4 className="text-lg font-medium mb-4 text-zinc-200">Resources</h4>
             <ul className="space-y-2">
               <li>
                 <a href="#" className="text-gray-300 hover:text-nordic-blue transition-colors">
@@ -86,7 +86,7 @@ const Footer: React.FC = () => {
           
           {/* Contact */}
           <div>
-            <h4 className="text-lg font-medium mb-4">Contact Us</h4>
+            <h4 className="text-lg font-medium mb-4 text-zinc-100">Contact Us</h4>
             <ul className="space-y-3">
               <li className="flex items-start space-x-3">
                 <Mail className="h-5 w-5 text-gray-400 mt-0.5" />
