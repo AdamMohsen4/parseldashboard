@@ -23,6 +23,15 @@ const queryClient = new QueryClient();
 const ProtectedRoute = ({ children, requireAdmin = false }: { children: React.ReactNode, requireAdmin?: boolean }) => {
   const { isSignedIn, isLoaded, user } = useUser();
   
+  // Log authentication state for debugging
+  if (isLoaded) {
+    console.log("Protected route:", { 
+      isSignedIn, 
+      userRole: user?.publicMetadata?.role || "none",
+      requireAdmin
+    });
+  }
+  
   if (!isLoaded) {
     return <div>Loading...</div>;
   }
@@ -33,6 +42,7 @@ const ProtectedRoute = ({ children, requireAdmin = false }: { children: React.Re
   
   // Check if admin role is required and user has it
   if (requireAdmin && user?.publicMetadata?.role !== "admin") {
+    console.log("Admin required but user has role:", user?.publicMetadata?.role);
     return <Navigate to="/dashboard" />;
   }
   

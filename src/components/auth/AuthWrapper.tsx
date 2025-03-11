@@ -2,6 +2,8 @@
 import { useUser, SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { toast } from "@/components/ui/use-toast";
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -16,14 +18,40 @@ const AuthWrapper = ({ children, requireAuth = false, requireAdmin = false }: Au
   // Check if user has admin role
   const isAdmin = isSignedIn && user?.publicMetadata?.role === "admin";
 
+  // Log auth status for debugging
+  useEffect(() => {
+    if (isLoaded) {
+      console.log("Auth state:", { 
+        isSignedIn, 
+        isAdmin, 
+        userRole: user?.publicMetadata?.role || "none",
+        requireAuth,
+        requireAdmin
+      });
+    }
+  }, [isLoaded, isSignedIn, isAdmin, requireAuth, requireAdmin, user]);
+
   // If authentication is required but user is not signed in
   if (requireAuth && isLoaded && !isSignedIn) {
+    console.log("User not signed in, redirecting to home");
     navigate("/");
     return null;
   }
   
   // If admin role is required but user doesn't have it
   if (requireAdmin && isLoaded && (!isSignedIn || !isAdmin)) {
+    console.log("Admin access required but user is not admin, redirecting to dashboard");
+    
+    // Show a toast message to explain the redirection
+    if (isSignedIn) {
+      toast({
+        title: "Admin Access Required",
+        description: "You need admin privileges to access this page. Current role: " + 
+                    (user?.publicMetadata?.role || "undefined"),
+        variant: "destructive",
+      });
+    }
+    
     navigate("/dashboard");
     return null;
   }
@@ -32,10 +60,22 @@ const AuthWrapper = ({ children, requireAuth = false, requireAdmin = false }: Au
 };
 
 export const AuthButtons = () => {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
+  
+  // Check if user has admin role
+  const isAdmin = isSignedIn && user?.publicMetadata?.role === "admin";
 
   if (isSignedIn) {
-    return <UserButton afterSignOutUrl="/" />;
+    return (
+      <div className="flex items-center gap-2">
+        {isAdmin && (
+          <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+            Admin
+          </span>
+        )}
+        <UserButton afterSignOutUrl="/" />
+      </div>
+    );
   }
 
   return (

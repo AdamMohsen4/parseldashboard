@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/AuthWrapper";
@@ -48,7 +49,6 @@ const NavBar = () => {
           { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
           { path: "/book", label: t('nav.book'), icon: Phone },
           { path: "/dashboard", label: t('nav.dashboard'), icon: LayoutDashboard },
-          ...(isAdmin ? [{ path: "/admin-dashboard", label: t('nav.adminDashboard', 'Admin Dashboard'), icon: Shield }] : []),
         ]
       },
       {
@@ -70,6 +70,21 @@ const NavBar = () => {
             </Link>
             <span className="ml-2 text-sm bg-accent/10 text-accent px-2 py-0.5 rounded-full">SME Portal</span>
           </div>
+          
+          {/* Admin Dashboard Link - Prominently displayed when admin */}
+          {isAdmin && (
+            <Link 
+              to="/admin-dashboard" 
+              className={`hidden md:flex items-center gap-2 ${
+                location.pathname === "/admin-dashboard" 
+                  ? "bg-primary text-primary-foreground" 
+                  : "bg-accent/10 hover:bg-accent/20"
+              } px-3 py-1.5 rounded-md font-medium transition-colors`}
+            >
+              <Shield className="h-4 w-4" />
+              {t('nav.adminDashboard', 'Admin Dashboard')}
+            </Link>
+          )}
           
           {/* Mobile menu button */}
           <button 
@@ -134,6 +149,22 @@ const NavBar = () => {
         {/* Mobile navigation */}
         {isMenuOpen && (
           <nav className="md:hidden py-4 space-y-4">
+            {/* Add Admin Dashboard Link to Mobile Menu */}
+            {isAdmin && (
+              <Link
+                to="/admin-dashboard"
+                className={`flex items-center gap-2 ${
+                  location.pathname === "/admin-dashboard" 
+                    ? "text-primary font-medium" 
+                    : "text-foreground"
+                } px-2 py-1.5 rounded-md hover:bg-accent/10 transition-colors`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Shield className="h-4 w-4" />
+                {t('nav.adminDashboard', 'Admin Dashboard')}
+              </Link>
+            )}
+            
             {categories.map((category) => (
               <div key={category.name} className="space-y-2">
                 <h3 className="text-sm font-medium text-muted-foreground">{category.name}</h3>
@@ -147,7 +178,7 @@ const NavBar = () => {
                           ? "text-primary font-medium"
                           : "text-foreground"
                       } block py-1.5 hover:text-primary transition-colors flex items-center gap-2`}
-                      onClick={() => setIsMenuOpen(false)}
+                      onClick={() => setIsMenuOpen(!isMenuOpen)}
                     >
                       {item.icon && <item.icon className="h-4 w-4" />}
                       {item.label}
