@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useUser } from "@clerk/clerk-react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
@@ -45,7 +45,7 @@ const SupportPage = () => {
   const [loading, setLoading] = useState(false);
   const [ticketsLoaded, setTicketsLoaded] = useState(false);
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>({
+  const { control, register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       subject: "",
@@ -101,6 +101,8 @@ const SupportPage = () => {
         status: "open",
       };
 
+      console.log("Submitting ticket:", newTicket);
+
       const { error } = await supabase
         .from("support_tickets")
         .insert(newTicket);
@@ -139,32 +141,50 @@ const SupportPage = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
                 <Label htmlFor="category">{t('support.category', 'Category')}</Label>
-                <Select defaultValue="general" {...register("category")}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('support.selectCategory', 'Select category')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="general">{t('support.categories.general', 'General Inquiry')}</SelectItem>
-                    <SelectItem value="shipping">{t('support.categories.shipping', 'Shipping Issue')}</SelectItem>
-                    <SelectItem value="billing">{t('support.categories.billing', 'Billing')}</SelectItem>
-                    <SelectItem value="technical">{t('support.categories.technical', 'Technical Support')}</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="category"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger id="category">
+                        <SelectValue placeholder={t('support.selectCategory', 'Select category')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="general">{t('support.categories.general', 'General Inquiry')}</SelectItem>
+                        <SelectItem value="shipping">{t('support.categories.shipping', 'Shipping Issue')}</SelectItem>
+                        <SelectItem value="billing">{t('support.categories.billing', 'Billing')}</SelectItem>
+                        <SelectItem value="technical">{t('support.categories.technical', 'Technical Support')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
               
               <div>
                 <Label htmlFor="priority">{t('support.priority', 'Priority')}</Label>
-                <Select defaultValue="medium" {...register("priority")}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('support.selectPriority', 'Select priority')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">{t('support.priorities.low', 'Low')}</SelectItem>
-                    <SelectItem value="medium">{t('support.priorities.medium', 'Medium')}</SelectItem>
-                    <SelectItem value="high">{t('support.priorities.high', 'High')}</SelectItem>
-                    <SelectItem value="urgent">{t('support.priorities.urgent', 'Urgent')}</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="priority"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger id="priority">
+                        <SelectValue placeholder={t('support.selectPriority', 'Select priority')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">{t('support.priorities.low', 'Low')}</SelectItem>
+                        <SelectItem value="medium">{t('support.priorities.medium', 'Medium')}</SelectItem>
+                        <SelectItem value="high">{t('support.priorities.high', 'High')}</SelectItem>
+                        <SelectItem value="urgent">{t('support.priorities.urgent', 'Urgent')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
               
               <div>
