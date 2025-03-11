@@ -7,20 +7,18 @@ import { useTranslation } from "react-i18next";
 import { ArrowRight, Package, Shield, LineChart, CheckCircle, Truck, Map } from "lucide-react";
 import PartnersCarousel from "@/components/home/PartnersCarousel";
 import HeroCarousel from "@/components/home/HeroCarousel";
+
 const Index = () => {
-  const {
-    isSignedIn
-  } = useUser();
-  const {
-    t
-  } = useTranslation();
+  const { isSignedIn } = useUser();
+  const { t } = useTranslation();
+  
   return <div className="min-h-screen bg-background">
       <NavBar />
 
       {/* Hero section */}
-      <section className="px-4 relative overflow-hidden py-[55px]">
+      <section className="px-4 relative overflow-hidden py-16">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 -z-10" />
-        <div className="container mx-auto max-w-6xl">
+        <div className="container mx-auto max-w-7xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 animate-fade-in">
               <div className="inline-block bg-primary/10 px-4 py-2 rounded-full text-primary font-medium text-sm mb-2">
@@ -46,7 +44,7 @@ const Index = () => {
                   </Button>}
               </div>
             </div>
-            <div className="relative h-[400px] rounded-lg overflow-hidden">
+            <div className="relative h-[500px] rounded-lg overflow-hidden shadow-xl">
               <HeroCarousel />
             </div>
           </div>
@@ -204,4 +202,5 @@ const Index = () => {
       </footer>
     </div>;
 };
+
 export default Index;
