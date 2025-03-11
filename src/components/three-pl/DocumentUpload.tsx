@@ -20,7 +20,34 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ userId, onDocumentUploa
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      
+      // Validate file size (10MB max)
+      if (file.size > 10 * 1024 * 1024) {
+        setUploadError("File too large. Maximum size is 10MB.");
+        toast({
+          title: "File Too Large",
+          description: "Maximum file size is 10MB. Please select a smaller file.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Validate file type
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
+      const allowedTypes = ['pdf', 'docx', 'doc', 'xlsx', 'xls'];
+      
+      if (!fileExt || !allowedTypes.includes(fileExt)) {
+        setUploadError("Invalid file type. Allowed: PDF, DOCX, XLS, XLSX");
+        toast({
+          title: "Invalid File Type",
+          description: "Please upload a PDF, DOCX, XLS, or XLSX file.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setSelectedFile(file);
       setUploadError(null);
       setUploadComplete(false);
     }
@@ -30,7 +57,7 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ userId, onDocumentUploa
     if (!selectedFile || !userId) {
       toast({
         title: "Upload Error",
-        description: "No file selected or user not logged in.",
+        description: userId ? "No file selected." : "User not logged in.",
         variant: "destructive",
       });
       return;
@@ -41,16 +68,10 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ userId, onDocumentUploa
     setUploadError(null);
 
     try {
-      // Check file size (max 10MB)
-      if (selectedFile.size > 10 * 1024 * 1024) {
-        setUploadError("File too large. Maximum size is 10MB.");
-        setIsUploading(false);
-        return;
-      }
-      
       const url = await uploadDocument(selectedFile, userId);
       
       if (url) {
+        console.log("Upload successful, document URL:", url);
         setUploadComplete(true);
         onDocumentUploaded(url);
         toast({
@@ -59,15 +80,17 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ userId, onDocumentUploa
         });
       } else {
         setUploadError("Failed to get document URL after upload");
+        onDocumentUploaded(""); // Clear any previously set URL
         toast({
           title: "Upload Failed",
-          description: "There was a problem uploading your document.",
+          description: "There was a problem finalizing your document upload.",
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error("Error in document upload:", error);
       setUploadError("An unexpected error occurred");
+      onDocumentUploaded(""); // Clear any previously set URL
       toast({
         title: "Upload Error",
         description: "An unexpected error occurred during upload.",

@@ -13,18 +13,41 @@ export const uploadDocument = async (file: File, userId: string): Promise<string
     console.log("Uploading file to:", filePath);
     console.log("User ID:", userId);
     
-    // Check if bucket exists and is accessible
+    // Check if bucket exists, create it if it doesn't
     const { data: bucketData, error: bucketError } = await supabase.storage
       .getBucket('three_pl_documents');
       
     if (bucketError) {
       console.error("Error accessing bucket:", bucketError);
-      toast({
-        title: "Upload Failed",
-        description: "Storage bucket not accessible. Please contact support.",
-        variant: "destructive",
-      });
-      return null;
+      
+      // Try to create the bucket if it doesn't exist
+      try {
+        const { data: newBucket, error: createError } = await supabase.storage
+          .createBucket('three_pl_documents', {
+            public: true,
+            fileSizeLimit: 10485760, // 10MB limit
+          });
+          
+        if (createError) {
+          console.error("Error creating bucket:", createError);
+          toast({
+            title: "Upload Failed",
+            description: "Storage configuration error. Please contact support.",
+            variant: "destructive",
+          });
+          return null;
+        }
+        
+        console.log("Created new bucket:", newBucket);
+      } catch (createBucketError) {
+        console.error("Error creating bucket:", createBucketError);
+        toast({
+          title: "Upload Failed",
+          description: "Unable to configure storage. Please contact support.",
+          variant: "destructive",
+        });
+        return null;
+      }
     }
     
     // Upload file to Supabase storage
@@ -39,18 +62,32 @@ export const uploadDocument = async (file: File, userId: string): Promise<string
       console.error("Error uploading document:", error);
       toast({
         title: "Upload Failed",
-        description: "There was a problem uploading your document. Please try again.",
+        description: error.message || "There was a problem uploading your document. Please try again.",
         variant: "destructive",
       });
       return null;
     }
     
+    console.log("Upload successful, getting public URL");
+    
     // Get the public URL for the uploaded file
-    const { data: { publicUrl } } = supabase.storage
+    const { data: publicUrlData } = supabase.storage
       .from('three_pl_documents')
       .getPublicUrl(filePath);
     
-    return publicUrl;
+    if (!publicUrlData || !publicUrlData.publicUrl) {
+      console.error("Failed to get public URL:", publicUrlData);
+      toast({
+        title: "Upload Issue",
+        description: "File uploaded but could not retrieve URL. Please try again.",
+        variant: "destructive",
+      });
+      return null;
+    }
+    
+    console.log("Document public URL:", publicUrlData.publicUrl);
+    
+    return publicUrlData.publicUrl;
   } catch (error) {
     console.error("Document upload error:", error);
     toast({
