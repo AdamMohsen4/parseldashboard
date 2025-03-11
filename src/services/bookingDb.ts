@@ -1,5 +1,10 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { BookingRequest } from "@/types/booking";
+
+// Add cache for bookings
+const bookingsCache = new Map();
+const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes
 
 export const saveBookingToSupabase = async (
   request: BookingRequest,
@@ -68,6 +73,9 @@ export const saveBookingToSupabase = async (
       return false;
     }
     
+    // Clear cache after new booking
+    clearCacheForUser(request.userId);
+    
     console.log("Successfully saved booking to Supabase with response:", data);
     return true;
   } catch (error) {
@@ -76,8 +84,28 @@ export const saveBookingToSupabase = async (
   }
 };
 
+const clearCacheForUser = (userId: string) => {
+  const keysToDelete = [];
+  for (const key of bookingsCache.keys()) {
+    if (key.includes(userId)) {
+      keysToDelete.push(key);
+    }
+  }
+  
+  keysToDelete.forEach(key => bookingsCache.delete(key));
+};
+
 export const fetchBookingsFromSupabase = async (userId: string, limit?: number) => {
   try {
+    const cacheKey = `bookings-${userId}-${limit || 'all'}`;
+    
+    // Check cache first
+    const cachedData = bookingsCache.get(cacheKey);
+    if (cachedData && (Date.now() - cachedData.timestamp < CACHE_EXPIRY)) {
+      console.log("Returning bookings from cache");
+      return cachedData.data;
+    }
+    
     let query = supabase
       .from('booking')
       .select('*')
@@ -95,6 +123,12 @@ export const fetchBookingsFromSupabase = async (userId: string, limit?: number) 
       return [];
     }
     
+    // Store in cache
+    bookingsCache.set(cacheKey, {
+      data: data || [],
+      timestamp: Date.now()
+    });
+    
     return data || [];
   } catch (error) {
     console.error("Error fetching bookings:", error);
@@ -104,6 +138,15 @@ export const fetchBookingsFromSupabase = async (userId: string, limit?: number) 
 
 export const findBookingByOrderNumber = async (userId: string, orderNumber: string) => {
   try {
+    const cacheKey = `booking-order-${userId}-${orderNumber}`;
+    
+    // Check cache first
+    const cachedData = bookingsCache.get(cacheKey);
+    if (cachedData && (Date.now() - cachedData.timestamp < CACHE_EXPIRY)) {
+      console.log("Returning booking from cache");
+      return cachedData.data;
+    }
+    
     const { data, error } = await supabase
       .from('booking')
       .select('*')
@@ -116,6 +159,12 @@ export const findBookingByOrderNumber = async (userId: string, orderNumber: stri
       return null;
     }
     
+    // Store in cache
+    bookingsCache.set(cacheKey, {
+      data: data,
+      timestamp: Date.now()
+    });
+    
     return data;
   } catch (error) {
     console.error("Error in findBookingByOrderNumber:", error);
@@ -125,6 +174,15 @@ export const findBookingByOrderNumber = async (userId: string, orderNumber: stri
 
 export const getBookingByTrackingCode = async (trackingCode: string, userId: string) => {
   try {
+    const cacheKey = `booking-tracking-${userId}-${trackingCode}`;
+    
+    // Check cache first
+    const cachedData = bookingsCache.get(cacheKey);
+    if (cachedData && (Date.now() - cachedData.timestamp < CACHE_EXPIRY)) {
+      console.log("Returning booking from cache");
+      return cachedData.data;
+    }
+    
     const { data, error } = await supabase
       .from('booking')
       .select('*')
@@ -136,6 +194,12 @@ export const getBookingByTrackingCode = async (trackingCode: string, userId: str
       console.error("Error fetching booking by tracking code:", error);
       return null;
     }
+    
+    // Store in cache
+    bookingsCache.set(cacheKey, {
+      data: data,
+      timestamp: Date.now()
+    });
     
     return data;
   } catch (error) {

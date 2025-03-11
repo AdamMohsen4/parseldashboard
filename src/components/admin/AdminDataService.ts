@@ -1,7 +1,15 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { updateShipmentStatus } from "@/services/shipmentService";
+
+// Cache for admin stats
+let statsCache = null;
+let statsCacheTimestamp = 0;
+const STATS_CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes
+
+// Cache for data lists
+const dataCache = new Map();
+const DATA_CACHE_EXPIRY = 3 * 60 * 1000; // 3 minutes
 
 export interface AdminStats {
   totalShipments: number;
@@ -15,6 +23,12 @@ export interface AdminStats {
 
 export const loadStats = async (): Promise<AdminStats> => {
   try {
+    // Check if we have valid cache
+    if (statsCache && (Date.now() - statsCacheTimestamp < STATS_CACHE_EXPIRY)) {
+      console.log("Returning admin stats from cache");
+      return statsCache;
+    }
+
     const { count: totalCount, error: totalError } = await supabase
       .from('booking')
       .select('*', { count: 'exact', head: true });
@@ -48,7 +62,8 @@ export const loadStats = async (): Promise<AdminStats> => {
     
     if (!totalError && !pendingError && !completedError && !demoError && 
         !collabError && !supportError && !openSupportError) {
-      return {
+      
+      const stats = {
         totalShipments: totalCount || 0,
         pendingShipments: pendingCount || 0,
         completedShipments: completedCount || 0,
@@ -57,6 +72,12 @@ export const loadStats = async (): Promise<AdminStats> => {
         totalSupportTickets: supportCount || 0,
         openSupportTickets: openSupportCount || 0
       };
+      
+      // Update cache
+      statsCache = stats;
+      statsCacheTimestamp = Date.now();
+      
+      return stats;
     } else {
       console.error("Error fetching stats:", { 
         totalError, pendingError, completedError, demoError, collabError, supportError, openSupportError
@@ -85,8 +106,24 @@ export const loadStats = async (): Promise<AdminStats> => {
   }
 };
 
+// Helper to invalidate all caches
+const invalidateAllCaches = () => {
+  statsCache = null;
+  statsCacheTimestamp = 0;
+  dataCache.clear();
+};
+
 export const loadShipments = async () => {
   try {
+    const cacheKey = 'admin-shipments';
+    
+    // Check cache first
+    const cachedData = dataCache.get(cacheKey);
+    if (cachedData && (Date.now() - cachedData.timestamp < DATA_CACHE_EXPIRY)) {
+      console.log("Returning shipments from cache");
+      return cachedData.data;
+    }
+    
     console.log("Loading shipments from Supabase...");
     const { data, error } = await supabase
       .from('booking')
@@ -103,6 +140,12 @@ export const loadShipments = async () => {
       return [];
     }
     
+    // Store in cache
+    dataCache.set(cacheKey, {
+      data: data || [],
+      timestamp: Date.now()
+    });
+    
     console.log("Shipments loaded:", data?.length || 0);
     return data || [];
   } catch (error) {
@@ -113,6 +156,15 @@ export const loadShipments = async () => {
 
 export const loadDemoRequests = async () => {
   try {
+    const cacheKey = 'admin-demos';
+    
+    // Check cache first
+    const cachedData = dataCache.get(cacheKey);
+    if (cachedData && (Date.now() - cachedData.timestamp < DATA_CACHE_EXPIRY)) {
+      console.log("Returning demo requests from cache");
+      return cachedData.data;
+    }
+    
     console.log("Loading demo requests from Supabase...");
     const { data, error } = await supabase
       .from('demo_requests')
@@ -124,6 +176,12 @@ export const loadDemoRequests = async () => {
       return [];
     }
     
+    // Store in cache
+    dataCache.set(cacheKey, {
+      data: data || [],
+      timestamp: Date.now()
+    });
+    
     console.log("Demo requests loaded:", data?.length || 0);
     return data || [];
   } catch (error) {
@@ -134,6 +192,15 @@ export const loadDemoRequests = async () => {
 
 export const loadCollaborations = async () => {
   try {
+    const cacheKey = 'admin-collaborations';
+    
+    // Check cache first
+    const cachedData = dataCache.get(cacheKey);
+    if (cachedData && (Date.now() - cachedData.timestamp < DATA_CACHE_EXPIRY)) {
+      console.log("Returning collaborations from cache");
+      return cachedData.data;
+    }
+    
     console.log("Loading collaborations from Supabase...");
     const { data, error } = await supabase
       .from('collaborations')
@@ -145,6 +212,12 @@ export const loadCollaborations = async () => {
       return [];
     }
     
+    // Store in cache
+    dataCache.set(cacheKey, {
+      data: data || [],
+      timestamp: Date.now()
+    });
+    
     console.log("Collaborations loaded:", data?.length || 0);
     return data || [];
   } catch (error) {
@@ -155,6 +228,15 @@ export const loadCollaborations = async () => {
 
 export const loadSupportTickets = async () => {
   try {
+    const cacheKey = 'admin-support-tickets';
+    
+    // Check cache first
+    const cachedData = dataCache.get(cacheKey);
+    if (cachedData && (Date.now() - cachedData.timestamp < DATA_CACHE_EXPIRY)) {
+      console.log("Returning support tickets from cache");
+      return cachedData.data;
+    }
+    
     console.log("Loading support tickets from Supabase...");
     const { data, error } = await supabase
       .from('support_tickets')
@@ -171,6 +253,12 @@ export const loadSupportTickets = async () => {
       return [];
     }
     
+    // Store in cache
+    dataCache.set(cacheKey, {
+      data: data || [],
+      timestamp: Date.now()
+    });
+    
     console.log("Support tickets loaded:", data?.length || 0);
     return data || [];
   } catch (error) {
@@ -181,6 +269,15 @@ export const loadSupportTickets = async () => {
 
 export const loadTicketMessages = async (ticketId: string) => {
   try {
+    const cacheKey = `ticket-messages-${ticketId}`;
+    
+    // Check cache first
+    const cachedData = dataCache.get(cacheKey);
+    if (cachedData && (Date.now() - cachedData.timestamp < DATA_CACHE_EXPIRY)) {
+      console.log("Returning ticket messages from cache");
+      return cachedData.data;
+    }
+    
     const { data, error } = await supabase
       .from('support_messages')
       .select('*')
@@ -188,6 +285,12 @@ export const loadTicketMessages = async (ticketId: string) => {
       .order('created_at', { ascending: true });
     
     if (error) throw error;
+    
+    // Store in cache
+    dataCache.set(cacheKey, {
+      data: data || [],
+      timestamp: Date.now()
+    });
     
     return data || [];
   } catch (error) {
@@ -226,6 +329,9 @@ export const handleShipmentStatusChange = async (shipmentId: number, userId: str
     };
     
     await updateShipmentStatus(shipmentId.toString(), userId, newStatus, event);
+    
+    // Invalidate caches after successful update
+    invalidateAllCaches();
     
     toast({
       title: "Status Updated",
@@ -344,21 +450,40 @@ export const handleSendMessage = async (ticketId: string, userId: string, messag
   }
 };
 
+const statusColorCache = new Map();
+
 export const getStatusBadgeColor = (status: string) => {
-  switch (status) {
-    case 'delivered': return "bg-green-100 text-green-800";
-    case 'in_transit': return "bg-blue-100 text-blue-800";
-    case 'pending': return "bg-yellow-100 text-yellow-800";
-    case 'picked_up': return "bg-purple-100 text-purple-800";
-    case 'exception': return "bg-red-100 text-red-800";
-    case 'scheduled': return "bg-blue-100 text-blue-800";
-    case 'completed': return "bg-green-100 text-green-800";
-    case 'cancelled': return "bg-red-100 text-red-800";
-    default: return "bg-gray-100 text-gray-800";
+  if (statusColorCache.has(status)) {
+    return statusColorCache.get(status);
   }
+  
+  let color;
+  switch (status) {
+    case 'delivered': color = "bg-green-100 text-green-800"; break;
+    case 'in_transit': color = "bg-blue-100 text-blue-800"; break;
+    case 'pending': color = "bg-yellow-100 text-yellow-800"; break;
+    case 'picked_up': color = "bg-purple-100 text-purple-800"; break;
+    case 'exception': color = "bg-red-100 text-red-800"; break;
+    case 'scheduled': color = "bg-blue-100 text-blue-800"; break;
+    case 'completed': color = "bg-green-100 text-green-800"; break;
+    case 'cancelled': color = "bg-red-100 text-red-800"; break;
+    default: color = "bg-gray-100 text-gray-800"; break;
+  }
+  
+  statusColorCache.set(status, color);
+  return color;
 };
+
+const dateFormatCache = new Map();
 
 export const formatDate = (dateString: string) => {
   if (!dateString) return 'N/A';
-  return new Date(dateString).toLocaleString();
+  
+  if (dateFormatCache.has(dateString)) {
+    return dateFormatCache.get(dateString);
+  }
+  
+  const formatted = new Date(dateString).toLocaleString();
+  dateFormatCache.set(dateString, formatted);
+  return formatted;
 };
