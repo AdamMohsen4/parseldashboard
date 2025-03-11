@@ -194,7 +194,7 @@ const NavBar = () => {
                         </DropdownMenu>
                       ) : (
                         // For regular items
-                        <DropdownMenuItem key={item.path} asChild className="hover:bg-gray-100/30 hover:text-primary transition-all duration-200 cursor-pointer">
+                        <DropdownMenuItem key={item.path} asChild className="hover:bg-gray-100/30 hover:text-secondary transition-all duration-200 cursor-pointer">
                           <Link
                             to={item.path}
                             className={`${
