@@ -42,6 +42,7 @@ export type Database = {
       booking: {
         Row: {
           business_name: string | null
+          cancellation_deadline: string | null
           carrier_name: string | null
           carrier_price: number | null
           created_at: string
@@ -66,6 +67,7 @@ export type Database = {
         }
         Insert: {
           business_name?: string | null
+          cancellation_deadline?: string | null
           carrier_name?: string | null
           carrier_price?: number | null
           created_at?: string
@@ -90,6 +92,7 @@ export type Database = {
         }
         Update: {
           business_name?: string | null
+          cancellation_deadline?: string | null
           carrier_name?: string | null
           carrier_price?: number | null
           created_at?: string
