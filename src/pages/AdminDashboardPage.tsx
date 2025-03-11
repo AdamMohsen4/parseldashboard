@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import NavBar from "@/components/layout/NavBar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -28,7 +27,9 @@ import { useUser } from "@clerk/clerk-react";
 
 const AdminDashboardPage = () => {
   const { user } = useUser();
-  const [activeTab, setActiveTab] = useState("shipments");
+  const [mainTab, setMainTab] = useState("shipments");
+  const [shipmentsTab, setShipmentsTab] = useState("all");
+  const [demosTab, setDemosTab] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     totalShipments: 0,
@@ -455,7 +456,7 @@ const AdminDashboardPage = () => {
           
           <Card>
             <CardHeader>
-              <Tabs defaultValue="shipments" onValueChange={setActiveTab}>
+              <Tabs value={mainTab} onValueChange={setMainTab}>
                 <TabsList className="mb-4">
                   <TabsTrigger value="shipments">Shipments</TabsTrigger>
                   <TabsTrigger value="demos">Demo Requests</TabsTrigger>
@@ -463,21 +464,21 @@ const AdminDashboardPage = () => {
                 </TabsList>
                 
                 <CardTitle>
-                  {activeTab === "shipments" && "Shipment Management"}
-                  {activeTab === "demos" && "Demo Requests Management"}
-                  {activeTab === "collaborations" && "Collaborations Management"}
+                  {mainTab === "shipments" && "Shipment Management"}
+                  {mainTab === "demos" && "Demo Requests Management"}
+                  {mainTab === "collaborations" && "Collaborations Management"}
                 </CardTitle>
                 
                 <CardDescription>
-                  {activeTab === "shipments" && "View and manage all shipments across the platform"}
-                  {activeTab === "demos" && "Review and respond to demo requests from potential customers"}
-                  {activeTab === "collaborations" && "Manage business collaboration proposals"}
+                  {mainTab === "shipments" && "View and manage all shipments across the platform"}
+                  {mainTab === "demos" && "Review and respond to demo requests from potential customers"}
+                  {mainTab === "collaborations" && "Manage business collaboration proposals"}
                 </CardDescription>
               </Tabs>
             </CardHeader>
             
             <CardContent>
-              <TabsContent value="shipments" className="mt-0">
+              <TabsContent value="shipments">
                 <div className="mb-4 flex items-center gap-2">
                   <Search className="text-muted-foreground h-5 w-5" />
                   <Input
@@ -488,7 +489,7 @@ const AdminDashboardPage = () => {
                   />
                 </div>
                 
-                <Tabs defaultValue="all">
+                <Tabs value={shipmentsTab} onValueChange={setShipmentsTab}>
                   <TabsList className="mb-4">
                     <TabsTrigger value="all">All Shipments</TabsTrigger>
                     <TabsTrigger value="pending">Pending</TabsTrigger>
@@ -497,7 +498,7 @@ const AdminDashboardPage = () => {
                     <TabsTrigger value="exception">Exceptions</TabsTrigger>
                   </TabsList>
                   
-                  <TabsContent value="all" className="mt-0">
+                  <TabsContent value="all">
                     <ShipmentTable 
                       shipments={filteredShipments} 
                       isLoading={isLoading} 
@@ -507,7 +508,7 @@ const AdminDashboardPage = () => {
                     />
                   </TabsContent>
                   
-                  <TabsContent value="pending" className="mt-0">
+                  <TabsContent value="pending">
                     <ShipmentTable 
                       shipments={filteredShipments.filter(s => s.status === 'pending')} 
                       isLoading={isLoading} 
@@ -517,7 +518,7 @@ const AdminDashboardPage = () => {
                     />
                   </TabsContent>
                   
-                  <TabsContent value="in_transit" className="mt-0">
+                  <TabsContent value="in_transit">
                     <ShipmentTable 
                       shipments={filteredShipments.filter(s => s.status === 'in_transit')} 
                       isLoading={isLoading}
@@ -527,7 +528,7 @@ const AdminDashboardPage = () => {
                     />
                   </TabsContent>
                   
-                  <TabsContent value="delivered" className="mt-0">
+                  <TabsContent value="delivered">
                     <ShipmentTable 
                       shipments={filteredShipments.filter(s => s.status === 'delivered')} 
                       isLoading={isLoading}
@@ -537,7 +538,7 @@ const AdminDashboardPage = () => {
                     />
                   </TabsContent>
                   
-                  <TabsContent value="exception" className="mt-0">
+                  <TabsContent value="exception">
                     <ShipmentTable 
                       shipments={filteredShipments.filter(s => s.status === 'exception')} 
                       isLoading={isLoading}
@@ -549,7 +550,7 @@ const AdminDashboardPage = () => {
                 </Tabs>
               </TabsContent>
               
-              <TabsContent value="demos" className="mt-0">
+              <TabsContent value="demos">
                 <div className="mb-4 flex items-center gap-2">
                   <Search className="text-muted-foreground h-5 w-5" />
                   <Input
@@ -560,7 +561,7 @@ const AdminDashboardPage = () => {
                   />
                 </div>
                 
-                <Tabs defaultValue="all">
+                <Tabs value={demosTab} onValueChange={setDemosTab}>
                   <TabsList className="mb-4">
                     <TabsTrigger value="all">All Requests</TabsTrigger>
                     <TabsTrigger value="pending">Pending</TabsTrigger>
@@ -568,7 +569,7 @@ const AdminDashboardPage = () => {
                     <TabsTrigger value="completed">Completed</TabsTrigger>
                   </TabsList>
                   
-                  <TabsContent value="all" className="mt-0">
+                  <TabsContent value="all">
                     <DemoRequestsTable 
                       demoRequests={filteredDemoRequests} 
                       isLoading={isLoading} 
@@ -578,7 +579,7 @@ const AdminDashboardPage = () => {
                     />
                   </TabsContent>
                   
-                  <TabsContent value="pending" className="mt-0">
+                  <TabsContent value="pending">
                     <DemoRequestsTable 
                       demoRequests={filteredDemoRequests.filter(d => d.status === 'pending')} 
                       isLoading={isLoading} 
@@ -588,7 +589,7 @@ const AdminDashboardPage = () => {
                     />
                   </TabsContent>
                   
-                  <TabsContent value="scheduled" className="mt-0">
+                  <TabsContent value="scheduled">
                     <DemoRequestsTable 
                       demoRequests={filteredDemoRequests.filter(d => d.status === 'scheduled')} 
                       isLoading={isLoading}
@@ -598,7 +599,7 @@ const AdminDashboardPage = () => {
                     />
                   </TabsContent>
                   
-                  <TabsContent value="completed" className="mt-0">
+                  <TabsContent value="completed">
                     <DemoRequestsTable 
                       demoRequests={filteredDemoRequests.filter(d => d.status === 'completed')} 
                       isLoading={isLoading}
@@ -610,7 +611,7 @@ const AdminDashboardPage = () => {
                 </Tabs>
               </TabsContent>
               
-              <TabsContent value="collaborations" className="mt-0">
+              <TabsContent value="collaborations">
                 <div className="mb-4 flex items-center gap-2">
                   <Search className="text-muted-foreground h-5 w-5" />
                   <Input
