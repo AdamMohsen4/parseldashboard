@@ -9,9 +9,63 @@ import { saveBookingToSupabase } from "./bookingDb";
 
 export type { BookingRequest, BookingResponse };
 
+// Input validation function to check required fields
+const validateBookingRequest = (request: BookingRequest): { valid: boolean; message?: string } => {
+  // Check for required fields
+  if (!request.weight || parseFloat(request.weight) <= 0) {
+    return { valid: false, message: "Invalid package weight" };
+  }
+
+  if (!request.dimensions || 
+      !request.dimensions.length || 
+      !request.dimensions.width || 
+      !request.dimensions.height) {
+    return { valid: false, message: "Package dimensions are incomplete" };
+  }
+
+  if (!request.pickup) {
+    return { valid: false, message: "Pickup address is required" };
+  }
+
+  if (!request.delivery) {
+    return { valid: false, message: "Delivery address is required" };
+  }
+
+  if (!request.carrier || !request.carrier.name) {
+    return { valid: false, message: "Carrier information is required" };
+  }
+
+  if (!request.userId) {
+    return { valid: false, message: "User ID is required" };
+  }
+
+  // Additional business logic validation
+  if (request.weight && parseFloat(request.weight) > 100) {
+    return { valid: false, message: "Package weight exceeds maximum allowed (100kg)" };
+  }
+
+  // All validations passed
+  return { valid: true };
+};
+
 export const bookShipment = async (request: BookingRequest): Promise<BookingResponse> => {
   try {
     console.log("Booking shipment with request:", request);
+    
+    // Validate the request
+    const validation = validateBookingRequest(request);
+    if (!validation.valid) {
+      toast({
+        title: "Validation Error",
+        description: validation.message || "Please check your shipment details",
+        variant: "destructive",
+      });
+      
+      return {
+        success: false,
+        message: validation.message || "Invalid booking request"
+      };
+    }
     
     // Generate IDs
     const shipmentId = generateShipmentId();
@@ -31,6 +85,12 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     });
     
     if (!labelResult.success) {
+      toast({
+        title: "Label Generation Failed",
+        description: "Unable to generate shipping label. Please try again or contact support.",
+        variant: "destructive",
+      });
+      
       return {
         success: false,
         message: "Failed to generate shipping label"
@@ -46,6 +106,12 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     });
     
     if (!pickupResult.confirmed) {
+      toast({
+        title: "Pickup Scheduling Failed",
+        description: "Unable to schedule pickup. Please try a different time or contact support.",
+        variant: "destructive",
+      });
+      
       return {
         success: false,
         message: "Failed to schedule pickup"
@@ -73,31 +139,48 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       toast({
         title: "Database Save Warning",
         description: "Could not save to primary database, using backup storage instead.",
-        // Changed from "warning" to "destructive" as that's a valid variant
         variant: "destructive",
       });
       
-      const shipmentData = await saveShipment({
-        userId: request.userId,
-        trackingCode,
-        carrier: request.carrier,
-        weight: request.weight,
-        dimensions: request.dimensions,
-        pickup: request.pickup,
-        delivery: request.delivery,
-        deliverySpeed: request.deliverySpeed,
-        includeCompliance: request.includeCompliance,
-        labelUrl: labelResult.labelUrl,
-        pickupTime: pickupResult.pickupTime,
-        totalPrice,
-        status: 'pending',
-        estimatedDelivery
-      });
-      
-      if (!shipmentData) {
+      try {
+        const shipmentData = await saveShipment({
+          userId: request.userId,
+          trackingCode,
+          carrier: request.carrier,
+          weight: request.weight,
+          dimensions: request.dimensions,
+          pickup: request.pickup,
+          delivery: request.delivery,
+          deliverySpeed: request.deliverySpeed,
+          includeCompliance: request.includeCompliance,
+          labelUrl: labelResult.labelUrl,
+          pickupTime: pickupResult.pickupTime,
+          totalPrice,
+          status: 'pending',
+          estimatedDelivery
+        });
+        
+        if (!shipmentData) {
+          throw new Error("Failed to save shipment data to local storage");
+        }
+      } catch (storageError) {
+        console.error("Local storage save failed:", storageError);
+        toast({
+          title: "Booking Storage Failed",
+          description: "Unable to save your booking. Please take a screenshot of your booking details.",
+          variant: "destructive",
+        });
+        
+        // Still return success since the booking was processed
+        // but with a warning that it might not be retrievable later
         return {
-          success: false,
-          message: "Failed to save shipment data"
+          success: true,
+          shipmentId,
+          trackingCode,
+          labelUrl: labelResult.labelUrl,
+          pickupTime: pickupResult.pickupTime,
+          totalPrice,
+          message: "Booking completed but not saved. Please save your tracking information."
         };
       }
     } else {
@@ -120,14 +203,33 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     
   } catch (error) {
     console.error("Error booking shipment:", error);
+    
+    // Provide more detailed error messaging based on where the error occurred
+    let errorMessage = "An unexpected error occurred";
+    
+    if (error instanceof Error) {
+      // Log the full error for debugging
+      console.error("Error details:", error.message, error.stack);
+      
+      // Tailor the user-facing message based on error content if possible
+      if (error.message.includes("label")) {
+        errorMessage = "Error generating shipping label";
+      } else if (error.message.includes("pickup")) {
+        errorMessage = "Error scheduling pickup";
+      } else if (error.message.includes("save")) {
+        errorMessage = "Error saving shipment data";
+      }
+    }
+    
     toast({
       title: "Booking Failed",
       description: "There was a problem processing your booking. Please try again.",
       variant: "destructive",
     });
+    
     return {
       success: false,
-      message: "An unexpected error occurred"
+      message: errorMessage
     };
   }
 };
