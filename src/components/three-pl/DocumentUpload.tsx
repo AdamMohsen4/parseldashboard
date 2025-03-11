@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { uploadDocument } from "@/services/threePLService";
 import { Check, FileText, Upload, X } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 interface DocumentUploadProps {
   userId: string;
@@ -26,23 +27,52 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ userId, onDocumentUploa
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !userId) return;
+    if (!selectedFile || !userId) {
+      toast({
+        title: "Upload Error",
+        description: "No file selected or user not logged in.",
+        variant: "destructive",
+      });
+      return;
+    }
 
+    console.log("Starting upload for user:", userId);
     setIsUploading(true);
     setUploadError(null);
 
     try {
+      // Check file size (max 10MB)
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        setUploadError("File too large. Maximum size is 10MB.");
+        setIsUploading(false);
+        return;
+      }
+      
       const url = await uploadDocument(selectedFile, userId);
       
       if (url) {
         setUploadComplete(true);
         onDocumentUploaded(url);
+        toast({
+          title: "Upload Successful",
+          description: "Your document has been uploaded successfully.",
+        });
       } else {
         setUploadError("Failed to get document URL after upload");
+        toast({
+          title: "Upload Failed",
+          description: "There was a problem uploading your document.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error in document upload:", error);
       setUploadError("An unexpected error occurred");
+      toast({
+        title: "Upload Error",
+        description: "An unexpected error occurred during upload.",
+        variant: "destructive",
+      });
     } finally {
       setIsUploading(false);
     }

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import DocumentUpload from "./DocumentUpload";
+import { toast } from "@/components/ui/use-toast";
 
 interface SimpleRequestFormProps {
   userId: string;
@@ -33,11 +34,22 @@ const SimpleRequestForm: React.FC<SimpleRequestFormProps> = ({
   const [documentUrl, setDocumentUrl] = useState("");
 
   const handleDocumentUploaded = (url: string) => {
+    console.log("Document uploaded, URL:", url);
     setDocumentUrl(url);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!documentUrl && !requirements) {
+      toast({
+        title: "Submission Error",
+        description: "Please either upload a document or provide brief requirements.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     onSubmit({
       companyName,
       contactName,

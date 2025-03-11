@@ -10,6 +10,23 @@ export const uploadDocument = async (file: File, userId: string): Promise<string
     const fileExt = file.name.split('.').pop();
     const filePath = `${userId}/${timestamp}-${file.name}`;
     
+    console.log("Uploading file to:", filePath);
+    console.log("User ID:", userId);
+    
+    // Check if bucket exists and is accessible
+    const { data: bucketData, error: bucketError } = await supabase.storage
+      .getBucket('three_pl_documents');
+      
+    if (bucketError) {
+      console.error("Error accessing bucket:", bucketError);
+      toast({
+        title: "Upload Failed",
+        description: "Storage bucket not accessible. Please contact support.",
+        variant: "destructive",
+      });
+      return null;
+    }
+    
     // Upload file to Supabase storage
     const { data, error } = await supabase.storage
       .from('three_pl_documents')
@@ -118,4 +135,3 @@ export const submitThreePLRequest = async (request: ThreePLRequest): Promise<Thr
     };
   }
 };
-
