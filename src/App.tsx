@@ -17,6 +17,7 @@ import AdminDashboardPage from "./pages/AdminDashboardPage";
 import CollaboratePage from "./pages/CollaboratePage";
 import SupportPage from "./pages/SupportPage";
 import IntegrationPage from "./pages/IntegrationPage";
+import TransportationPartnersPage from "./pages/TransportationPartnersPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -66,6 +67,11 @@ const App = () => (
             <Route path="/compliance" element={
               <AuthWrapper requireAuth>
                 <CompliancePage />
+              </AuthWrapper>
+            } />
+            <Route path="/transportation-partners" element={
+              <AuthWrapper requireAuth>
+                <TransportationPartnersPage />
               </AuthWrapper>
             } />
             <Route path="/dashboard" element={
