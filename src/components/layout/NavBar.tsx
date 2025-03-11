@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/AuthWrapper";
 import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
-import LanguageSwitcher from "../common/LanguageSwitcher";
 import { 
   Menu, 
   Users, 
@@ -46,8 +45,8 @@ const NavBar = () => {
   // Check if user has admin role
   const isAdmin = isSignedIn && user?.publicMetadata?.role === "admin";
 
-  // Softer hover style for all navbar items
-  const hoverClass = "hover:bg-gray-100/40 hover:text-primary/90 transition-colors rounded-md";
+  // Softer hover style for all navbar items - updated for more seamless effect
+  const hoverClass = "hover:bg-accent/5 hover:text-primary/90 transition-colors rounded-md";
 
   // Organize nav items into categories
   const categories = [
@@ -169,7 +168,7 @@ const NavBar = () => {
                       item.subItems ? (
                         // For items with subcategories
                         <DropdownMenu key={item.path}>
-                          <DropdownMenuTrigger className={`w-full flex items-center justify-between px-2 py-1.5 text-sm ${hoverClass} cursor-default`}>
+                          <DropdownMenuTrigger className={`w-full flex items-center justify-between px-2 py-1.5 text-sm hover:bg-accent/5 hover:text-primary/90 cursor-default`}>
                             <span className="flex items-center gap-2">
                               {item.icon && <item.icon className="h-4 w-4" />}
                               {item.label}
@@ -178,7 +177,7 @@ const NavBar = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="right" className="w-48">
                             {item.subItems.map((subItem) => (
-                              <DropdownMenuItem key={subItem.path} asChild className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer">
+                              <DropdownMenuItem key={subItem.path} asChild className="hover:bg-accent/5 hover:text-primary/90 cursor-pointer">
                                 <Link
                                   to={subItem.path}
                                   className={`${
@@ -194,7 +193,7 @@ const NavBar = () => {
                         </DropdownMenu>
                       ) : (
                         // For regular items
-                        <DropdownMenuItem key={item.path} asChild className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer">
+                        <DropdownMenuItem key={item.path} asChild className="hover:bg-accent/5 hover:text-primary/90 cursor-pointer">
                           <Link
                             to={item.path}
                             className={`${
@@ -257,7 +256,7 @@ const NavBar = () => {
                                 location.pathname === subItem.path
                                   ? "text-primary font-medium"
                                   : "text-foreground"
-                              } block py-1.5 ${hoverClass} flex items-center gap-2 px-2`}
+                              } block py-1.5 hover:bg-accent/5 hover:text-primary/90 flex items-center gap-2 px-2 rounded-md`}
                               onClick={() => setIsMenuOpen(false)}
                             >
                               {subItem.icon && <subItem.icon className="h-4 w-4" />}
@@ -274,7 +273,7 @@ const NavBar = () => {
                           location.pathname === item.path
                             ? "text-primary font-medium"
                             : "text-foreground"
-                        } block py-1.5 ${hoverClass} flex items-center gap-2 px-2`}
+                        } block py-1.5 hover:bg-accent/5 hover:text-primary/90 flex items-center gap-2 px-2 rounded-md`}
                         onClick={() => setIsMenuOpen(false)}
                       >
                         {item.icon && <item.icon className="h-4 w-4" />}

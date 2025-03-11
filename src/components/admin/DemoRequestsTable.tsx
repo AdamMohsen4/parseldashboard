@@ -79,25 +79,25 @@ const DemoRequestsTable: React.FC<DemoRequestsTableProps> = ({
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem 
                       onClick={() => onStatusChange(demo.id, "pending")}
-                      className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
+                      className="hover:bg-accent/5 hover:text-primary/90 cursor-pointer"
                     >
                       Set as Pending
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => onStatusChange(demo.id, "scheduled")}
-                      className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
+                      className="hover:bg-accent/5 hover:text-primary/90 cursor-pointer"
                     >
                       Set as Scheduled
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => onStatusChange(demo.id, "completed")}
-                      className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
+                      className="hover:bg-accent/5 hover:text-primary/90 cursor-pointer"
                     >
                       Set as Completed
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => onStatusChange(demo.id, "cancelled")}
-                      className="hover:bg-gray-100/40 hover:text-primary/90 cursor-pointer"
+                      className="hover:bg-accent/5 hover:text-primary/90 cursor-pointer"
                     >
                       Set as Cancelled
                     </DropdownMenuItem>
