@@ -17,9 +17,9 @@ interface LabelLanguageSelectorProps {
 const LabelLanguageSelector = ({ value, onChange }: LabelLanguageSelectorProps) => {
   return (
     <div className="space-y-2">
-      <Label htmlFor="label-language">Label Language</Label>
+      <Label htmlFor="label-language" className="text-sm font-medium">Label Language</Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger id="label-language" className="w-full">
+        <SelectTrigger id="label-language" className="w-full bg-background border-input">
           <SelectValue placeholder="Select language" />
         </SelectTrigger>
         <SelectContent>

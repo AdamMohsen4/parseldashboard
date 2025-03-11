@@ -20,7 +20,7 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['SF Pro Display', 'system-ui', 'sans-serif'],
+				sans: ['Inter', 'system-ui', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -144,7 +144,7 @@ export default {
 			},
 			backgroundImage: {
 				'glass': 'linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1))',
-				'blue-gradient': 'linear-gradient(135deg, #33C3F0 0%, #0FA0CE 100%)',
+				'blue-gradient': 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)',
 				'light-gradient': 'linear-gradient(135deg, #FFFFFF 0%, #F6F6F7 100%)'
 			},
 			backdropBlur: {
