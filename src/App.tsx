@@ -13,14 +13,15 @@ import ThreePLServicePage from "./pages/ThreePLServicePage";
 import TrackingPage from "./pages/TrackingPage";
 import CompliancePage from "./pages/CompliancePage";
 import DashboardPage from "./pages/DashboardPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
 import CollaboratePage from "./pages/CollaboratePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 // Protected route component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isSignedIn, isLoaded } = useUser();
+const ProtectedRoute = ({ children, requireOwner = false }: { children: React.ReactNode, requireOwner?: boolean }) => {
+  const { isSignedIn, isLoaded, user } = useUser();
   
   if (!isLoaded) {
     return <div>Loading...</div>;
@@ -28,6 +29,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   
   if (!isSignedIn) {
     return <Navigate to="/" />;
+  }
+  
+  // Check if owner role is required and user has it
+  if (requireOwner && user?.publicMetadata?.role !== "owner") {
+    return <Navigate to="/dashboard" />;
   }
   
   return <>{children}</>;
@@ -68,6 +74,11 @@ const App = () => (
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin-dashboard" element={
+              <ProtectedRoute requireOwner={true}>
+                <AdminDashboardPage />
               </ProtectedRoute>
             } />
             <Route path="/collaborate" element={

@@ -5,7 +5,11 @@ import { AuthButtons } from "@/components/auth/AuthWrapper";
 import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../common/LanguageSwitcher";
+<<<<<<< HEAD
 import { Menu, Users, Package, Warehouse, ChevronDown, Truck, FileCheck, LayoutDashboard, Phone } from "lucide-react";
+=======
+import { Menu, Users, Package, Warehouse, ChevronDown, Truck, FileCheck, LayoutDashboard, ShieldCheck } from "lucide-react";
+>>>>>>> e6e25446049a43e0a86ff2584500605dbb939671
 import { useState } from "react";
 import { 
   DropdownMenu, 
@@ -17,10 +21,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const NavBar = () => {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   const location = useLocation();
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Check if user has owner authority
+  const isOwner = isSignedIn && user?.publicMetadata?.role === "owner";
 
   // Organize nav items into categories
   const categories = [
@@ -43,7 +50,13 @@ const NavBar = () => {
         name: t('nav.categories.services', 'Services'),
         items: [
           { path: "/3pl", label: t('nav.3pl', '3PL Services'), icon: Warehouse },
+<<<<<<< HEAD
           { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
+=======
+          { path: "/book", label: t('nav.book'), icon: null },
+          { path: "/dashboard", label: t('nav.dashboard'), icon: LayoutDashboard },
+          ...(isOwner ? [{ path: "/admin-dashboard", label: t('nav.adminDashboard', 'Admin Dashboard'), icon: ShieldCheck }] : []),
+>>>>>>> e6e25446049a43e0a86ff2584500605dbb939671
         ]
       },
       {
