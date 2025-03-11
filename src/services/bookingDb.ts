@@ -122,3 +122,24 @@ export const findBookingByOrderNumber = async (userId: string, orderNumber: stri
     return null;
   }
 };
+
+export const getBookingByTrackingCode = async (trackingCode: string, userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('booking')
+      .select('*')
+      .eq('tracking_code', trackingCode)
+      .eq('user_id', userId)
+      .maybeSingle();
+    
+    if (error) {
+      console.error("Error fetching booking by tracking code:", error);
+      return null;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error("Error in getBookingByTrackingCode:", error);
+    return null;
+  }
+};

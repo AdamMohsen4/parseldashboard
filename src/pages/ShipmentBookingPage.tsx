@@ -13,6 +13,7 @@ import { bookShipment, cancelBooking } from "@/services/bookingService";
 import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Briefcase, ShoppingCart, User } from "lucide-react";
+import { getBookingByTrackingCode } from "@/services/bookingDb";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 
@@ -38,6 +39,41 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [selectedCustomerType, setSelectedCustomerType] = useState<CustomerType>(customerType || null);
   const [businessName, setBusinessName] = useState("");
   const [vatNumber, setVatNumber] = useState("");
+  const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  const [canCancelBooking, setCanCancelBooking] = useState(false);
+  
+  useEffect(() => {
+    const checkSavedBooking = async () => {
+      if (isSignedIn && user) {
+        const savedBookingInfo = localStorage.getItem('lastBooking');
+        
+        if (savedBookingInfo) {
+          const { trackingCode, timestamp } = JSON.parse(savedBookingInfo);
+          
+          const bookingData = await getBookingByTrackingCode(trackingCode, user.id);
+          
+          if (bookingData) {
+            setBookingResult(bookingData);
+            setBookingConfirmed(true);
+            
+            const cancellationDeadline = new Date(bookingData.cancellation_deadline);
+            const now = new Date();
+            
+            if (now < cancellationDeadline) {
+              setCanCancelBooking(true);
+            } else {
+              localStorage.removeItem('lastBooking');
+              setCanCancelBooking(false);
+            }
+          } else {
+            localStorage.removeItem('lastBooking');
+          }
+        }
+      }
+    };
+    
+    checkSavedBooking();
+  }, [isSignedIn, user]);
 
   const showCustomerTypeSelection = !selectedCustomerType && location.pathname === "/shipment";
 
@@ -68,8 +104,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       navigate(`/shipment/${type}`);
     }
   };
-
-  const [bookingConfirmed, setBookingConfirmed] = useState(false);
   
   const handleBookNow = async () => {
     if (!isSignedIn || !user) {
@@ -97,6 +131,13 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       if (result.success) {
         setBookingResult(result);
         setBookingConfirmed(true);
+        setCanCancelBooking(true);
+        
+        localStorage.setItem('lastBooking', JSON.stringify({
+          trackingCode: result.trackingCode,
+          timestamp: new Date().toISOString()
+        }));
+        
         toast({
           title: "Shipment Booked",
           description: `Your shipment has been booked with tracking code: ${result.trackingCode}`,
@@ -121,12 +162,38 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   };
 
   const handleCancelBooking = async () => {
-    if (!bookingResult?.trackingCode || !user?.id) return;
+    if (!bookingResult?.trackingCode && !bookingResult?.tracking_code) return;
     
-    const cancelled = await cancelBooking(bookingResult.trackingCode, user.id);
-    if (cancelled) {
-      setBookingConfirmed(false);
-      setBookingResult(null);
+    const trackingCode = bookingResult.trackingCode || bookingResult.tracking_code;
+    
+    if (!trackingCode || !user?.id) return;
+    
+    try {
+      const cancelled = await cancelBooking(trackingCode, user.id);
+      if (cancelled) {
+        setBookingConfirmed(false);
+        setBookingResult(null);
+        setCanCancelBooking(false);
+        localStorage.removeItem('lastBooking');
+        
+        toast({
+          title: "Booking Cancelled",
+          description: "Your booking has been successfully cancelled.",
+        });
+      } else {
+        toast({
+          title: "Cancellation Failed",
+          description: "Unable to cancel booking. Please try again or contact support.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+      toast({
+        title: "Cancellation Error",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -237,174 +304,205 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                 )}
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {(selectedCustomerType === "business" || selectedCustomerType === "ecommerce") && (
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Business Details</h3>
-                      
-                      <div>
-                        <Label htmlFor="businessName">Business Name</Label>
-                        <Input 
-                          id="businessName" 
-                          type="text" 
-                          placeholder="Enter business name" 
-                          value={businessName}
-                          onChange={(e) => setBusinessName(e.target.value)}
-                          required
-                        />
-                      </div>
-                      
-                      {selectedCustomerType === "business" && (
+                {!bookingConfirmed ? (
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    {(selectedCustomerType === "business" || selectedCustomerType === "ecommerce") && (
+                      <div className="space-y-4">
+                        <h3 className="font-semibold">Business Details</h3>
+                        
                         <div>
-                          <Label htmlFor="vatNumber">VAT Number</Label>
+                          <Label htmlFor="businessName">Business Name</Label>
                           <Input 
-                            id="vatNumber" 
+                            id="businessName" 
                             type="text" 
-                            placeholder="Enter VAT number" 
-                            value={vatNumber}
-                            onChange={(e) => setVatNumber(e.target.value)}
+                            placeholder="Enter business name" 
+                            value={businessName}
+                            onChange={(e) => setBusinessName(e.target.value)}
                             required
                           />
                         </div>
+                        
+                        {selectedCustomerType === "business" && (
+                          <div>
+                            <Label htmlFor="vatNumber">VAT Number</Label>
+                            <Input 
+                              id="vatNumber" 
+                              type="text" 
+                              placeholder="Enter VAT number" 
+                              value={vatNumber}
+                              onChange={(e) => setVatNumber(e.target.value)}
+                              required
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    <div className="space-y-4">
+                      <h3 className="font-semibold">Package Details</h3>
+                      
+                      <div>
+                        <Label htmlFor="weight">Weight (kg)</Label>
+                        <Input 
+                          id="weight" 
+                          type="number" 
+                          placeholder="Enter weight" 
+                          min="0.1" 
+                          max="50"
+                          value={weight}
+                          onChange={(e) => setWeight(e.target.value)}
+                          required
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="length">Length (cm)</Label>
+                          <Input 
+                            id="length" 
+                            type="number" 
+                            placeholder="L" 
+                            value={length}
+                            onChange={(e) => setLength(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="width">Width (cm)</Label>
+                          <Input 
+                            id="width" 
+                            type="number" 
+                            placeholder="W" 
+                            value={width}
+                            onChange={(e) => setWidth(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="height">Height (cm)</Label>
+                          <Input 
+                            id="height" 
+                            type="number" 
+                            placeholder="H" 
+                            value={height}
+                            onChange={(e) => setHeight(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="space-y-4">
+                      <h3 className="font-semibold">Locations</h3>
+                      
+                      <div>
+                        <Label htmlFor="pickup">Pickup Address</Label>
+                        <GooglePlacesAutocomplete
+                          id="pickup"
+                          placeholder="Enter pickup address"
+                          value={pickup}
+                          onChange={(e) => setPickup(e.target.value)}
+                          onPlaceSelect={(address) => setPickup(address)}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="delivery">Delivery Address</Label>
+                        <GooglePlacesAutocomplete
+                          id="delivery"
+                          placeholder="Enter delivery address"
+                          value={delivery}
+                          onChange={(e) => setDelivery(e.target.value)}
+                          onPlaceSelect={(address) => setDelivery(address)}
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="space-y-4">
+                      <h3 className="font-semibold">Delivery Options</h3>
+                      
+                      <RadioGroup 
+                        value={deliverySpeed} 
+                        onValueChange={setDeliverySpeed}
+                        className="space-y-2"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="standard" id="standard" />
+                          <Label htmlFor="standard">Standard (3 days)</Label>
+                        </div>
+                      </RadioGroup>
+                      
+                      <div className="flex items-center space-x-2 pt-2">
+                        <Checkbox 
+                          id="compliance" 
+                          checked={compliance}
+                          onCheckedChange={(checked) => setCompliance(checked === true)}
+                        />
+                        <Label htmlFor="compliance" className="text-sm">
+                          Add Compliance Package (+€2)
+                          <Link to="/compliance" className="ml-1 text-primary text-sm underline">
+                            Learn more
+                          </Link>
+                        </Label>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col space-y-2">
+                      <Button 
+                        type="submit" 
+                        className="w-full" 
+                        disabled={isBooking || bookingConfirmed}
+                      >
+                        {isBooking ? "Processing..." : bookingConfirmed ? "Booked" : "Book Shipment"}
+                      </Button>
+                      {process.env.NODE_ENV === 'development' && (
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="w-full" 
+                          onClick={createTestBooking}
+                        >
+                          Create Test Booking
+                        </Button>
                       )}
                     </div>
-                  )}
-                  
-                  <div className="space-y-4">
-                    <h3 className="font-semibold">Package Details</h3>
-                    
-                    <div>
-                      <Label htmlFor="weight">Weight (kg)</Label>
-                      <Input 
-                        id="weight" 
-                        type="number" 
-                        placeholder="Enter weight" 
-                        min="0.1" 
-                        max="50"
-                        value={weight}
-                        onChange={(e) => setWeight(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <Label htmlFor="length">Length (cm)</Label>
-                        <Input 
-                          id="length" 
-                          type="number" 
-                          placeholder="L" 
-                          value={length}
-                          onChange={(e) => setLength(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="width">Width (cm)</Label>
-                        <Input 
-                          id="width" 
-                          type="number" 
-                          placeholder="W" 
-                          value={width}
-                          onChange={(e) => setWidth(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="height">Height (cm)</Label>
-                        <Input 
-                          id="height" 
-                          type="number" 
-                          placeholder="H" 
-                          value={height}
-                          onChange={(e) => setHeight(e.target.value)}
-                          required
-                        />
+                  </form>
+                ) : (
+                  <div className="bg-green-50 p-4 rounded-lg border border-green-500">
+                    <h4 className="font-medium mb-2 text-green-700">Booking Confirmed!</h4>
+                    <div className="space-y-2 text-sm">
+                      <p><strong>Tracking Code:</strong> {bookingResult?.trackingCode || bookingResult?.tracking_code}</p>
+                      <p><strong>Carrier:</strong> {bookingResult?.carrier_name || carrier.name}</p>
+                      <p><strong>Total Price:</strong> €{bookingResult?.totalPrice || bookingResult?.total_price}</p>
+                      <div className="pt-3 flex gap-2">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          asChild
+                        >
+                          <Link to="/dashboard">View All Shipments</Link>
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="default" 
+                          onClick={() => {
+                            setBookingConfirmed(false);
+                            setBookingResult(null);
+                            localStorage.removeItem('lastBooking');
+                          }}
+                        >
+                          Book Another Shipment
+                        </Button>
                       </div>
                     </div>
                   </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-4">
-                    <h3 className="font-semibold">Locations</h3>
-                    
-                    <div>
-                      <Label htmlFor="pickup">Pickup Address</Label>
-                      <GooglePlacesAutocomplete
-                        id="pickup"
-                        placeholder="Enter pickup address"
-                        value={pickup}
-                        onChange={(e) => setPickup(e.target.value)}
-                        onPlaceSelect={(address) => setPickup(address)}
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="delivery">Delivery Address</Label>
-                      <GooglePlacesAutocomplete
-                        id="delivery"
-                        placeholder="Enter delivery address"
-                        value={delivery}
-                        onChange={(e) => setDelivery(e.target.value)}
-                        onPlaceSelect={(address) => setDelivery(address)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-4">
-                    <h3 className="font-semibold">Delivery Options</h3>
-                    
-                    <RadioGroup 
-                      value={deliverySpeed} 
-                      onValueChange={setDeliverySpeed}
-                      className="space-y-2"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="standard" id="standard" />
-                        <Label htmlFor="standard">Standard (3 days)</Label>
-                      </div>
-                    </RadioGroup>
-                    
-                    <div className="flex items-center space-x-2 pt-2">
-                      <Checkbox 
-                        id="compliance" 
-                        checked={compliance}
-                        onCheckedChange={(checked) => setCompliance(checked === true)}
-                      />
-                      <Label htmlFor="compliance" className="text-sm">
-                        Add Compliance Package (+€2)
-                        <Link to="/compliance" className="ml-1 text-primary text-sm underline">
-                          Learn more
-                        </Link>
-                      </Label>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col space-y-2">
-                    <Button 
-                      type="submit" 
-                      className="w-full" 
-                      disabled={isBooking || bookingConfirmed}
-                    >
-                      {isBooking ? "Processing..." : bookingConfirmed ? "Booked" : "Book Shipment"}
-                    </Button>
-                    {process.env.NODE_ENV === 'development' && (
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        className="w-full" 
-                        onClick={createTestBooking}
-                      >
-                        Create Test Booking
-                      </Button>
-                    )}
-                  </div>
-                </form>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -453,49 +551,42 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     )}
                   </div>
                   
-                  {showBookingConfirmation && (
-                    <div className="mt-8 bg-primary/10 p-4 rounded-lg border border-primary">
-                      <h4 className="font-medium mb-2 text-primary">Shipment Ready to Book</h4>
-                      <p className="text-sm mb-4">
-                        Your shipment from {pickup} to {delivery} is ready to be booked with E-Parsel Nordic.
-                      </p>
-                      <div className="flex justify-between items-center">
-                        <p className="font-semibold">Total: €{carrier.price + (compliance ? 2 : 0)}</p>
-                        <Button onClick={handleBookNow} disabled={isBooking}>
-                          {isBooking ? "Processing..." : isSignedIn ? "Confirm Booking" : "Sign In to Book"}
-                        </Button>
+                  {canCancelBooking && bookingResult && (
+                    <div className="mt-8 bg-amber-50 p-4 rounded-lg border border-amber-500">
+                      <h4 className="font-medium mb-2 text-amber-700">Cancel Booking</h4>
+                      <div className="space-y-2 text-sm">
+                        <p>
+                          You can cancel this booking until:
+                          <br />
+                          <strong>
+                            {new Date(bookingResult.cancellationDeadline || bookingResult.cancellation_deadline).toLocaleString()}
+                          </strong>
+                        </p>
+                        <p className="text-muted-foreground">
+                          After this time, cancellation will not be possible and you will be charged for the shipment.
+                        </p>
+                        <div className="pt-3">
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={handleCancelBooking}
+                          >
+                            Cancel Booking
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   )}
                   
-                  {bookingResult && (
-                    <div className="mt-8 bg-green-50 p-4 rounded-lg border border-green-500">
-                      <h4 className="font-medium mb-2 text-green-700">Booking Confirmed!</h4>
-                      <div className="space-y-2 text-sm">
-                        <p><strong>Tracking Code:</strong> {bookingResult.trackingCode}</p>
-                        <p><strong>Pickup Time:</strong> {bookingResult.pickupTime}</p>
-                        <p><strong>Total Price:</strong> €{bookingResult.totalPrice}</p>
-                        {bookingResult.cancellationDeadline && (
-                          <p className="text-gray-600">
-                            Cancellation available until: {new Date(bookingResult.cancellationDeadline).toLocaleString()}
-                          </p>
-                        )}
-                        <div className="pt-3 flex gap-2">
-                          <Button size="sm" variant="outline" asChild>
-                            <a href={bookingResult.labelUrl} target="_blank" rel="noopener noreferrer">
-                              Download Label
-                            </a>
-                          </Button>
-                          {bookingResult.cancellationDeadline && (
-                            <Button 
-                              size="sm" 
-                              variant="destructive"
-                              onClick={handleCancelBooking}
-                            >
-                              Cancel Booking
-                            </Button>
-                          )}
-                        </div>
+                  {bookingResult && bookingResult.labelUrl && (
+                    <div className="mt-8 bg-blue-50 p-4 rounded-lg border border-blue-500">
+                      <h4 className="font-medium mb-2 text-blue-700">Shipping Label</h4>
+                      <div className="pt-2">
+                        <Button size="sm" variant="outline" asChild>
+                          <a href={bookingResult.labelUrl} target="_blank" rel="noopener noreferrer">
+                            Download Label
+                          </a>
+                        </Button>
                       </div>
                     </div>
                   )}
