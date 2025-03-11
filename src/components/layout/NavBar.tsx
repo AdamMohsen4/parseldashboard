@@ -1,11 +1,10 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/AuthWrapper";
 import { useUser } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../common/LanguageSwitcher";
-import { Menu, Users, Package, Warehouse, ChevronDown, Truck, FileCheck, LayoutDashboard, Phone } from "lucide-react";
+import { Menu, Users, Package, Warehouse, ChevronDown, Truck, FileCheck, LayoutDashboard, Phone, Shield } from "lucide-react";
 import { useState } from "react";
 import { 
   DropdownMenu, 
@@ -17,10 +16,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const NavBar = () => {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   const location = useLocation();
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Check if user has admin role
+  const isAdmin = isSignedIn && user?.publicMetadata?.role === "admin";
 
   // Organize nav items into categories
   const categories = [
@@ -44,14 +46,15 @@ const NavBar = () => {
         items: [
           { path: "/3pl", label: t('nav.3pl', '3PL Services'), icon: Warehouse },
           { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
+          { path: "/book", label: t('nav.book'), icon: Phone },
+          { path: "/dashboard", label: t('nav.dashboard'), icon: LayoutDashboard },
+          ...(isAdmin ? [{ path: "/admin-dashboard", label: t('nav.adminDashboard', 'Admin Dashboard'), icon: Shield }] : []),
         ]
       },
       {
         name: t('nav.categories.workspace', 'Workspace'),
         items: [
           { path: "/collaborate", label: t('nav.collaborate', 'Collaborate'), icon: Users },
-          { path: "/book", label: t('nav.book'), icon: Phone },
-          { path: "/dashboard", label: t('nav.dashboard'), icon: LayoutDashboard },
         ]
       }
     ] : [])

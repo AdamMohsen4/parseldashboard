@@ -6,15 +6,15 @@ import { useNavigate } from "react-router-dom";
 interface AuthWrapperProps {
   children: React.ReactNode;
   requireAuth?: boolean;
-  requireOwner?: boolean;
+  requireAdmin?: boolean;
 }
 
-const AuthWrapper = ({ children, requireAuth = false, requireOwner = false }: AuthWrapperProps) => {
+const AuthWrapper = ({ children, requireAuth = false, requireAdmin = false }: AuthWrapperProps) => {
   const { isSignedIn, isLoaded, user } = useUser();
   const navigate = useNavigate();
   
-  // Check if user has owner role
-  const isOwner = isSignedIn && user?.publicMetadata?.role === "owner";
+  // Check if user has admin role
+  const isAdmin = isSignedIn && user?.publicMetadata?.role === "admin";
 
   // If authentication is required but user is not signed in
   if (requireAuth && isLoaded && !isSignedIn) {
@@ -22,8 +22,8 @@ const AuthWrapper = ({ children, requireAuth = false, requireOwner = false }: Au
     return null;
   }
   
-  // If owner role is required but user doesn't have it
-  if (requireOwner && isLoaded && (!isSignedIn || !isOwner)) {
+  // If admin role is required but user doesn't have it
+  if (requireAdmin && isLoaded && (!isSignedIn || !isAdmin)) {
     navigate("/dashboard");
     return null;
   }

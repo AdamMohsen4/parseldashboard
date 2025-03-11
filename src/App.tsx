@@ -20,7 +20,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 // Protected route component
-const ProtectedRoute = ({ children, requireOwner = false }: { children: React.ReactNode, requireOwner?: boolean }) => {
+const ProtectedRoute = ({ children, requireAdmin = false }: { children: React.ReactNode, requireAdmin?: boolean }) => {
   const { isSignedIn, isLoaded, user } = useUser();
   
   if (!isLoaded) {
@@ -31,8 +31,8 @@ const ProtectedRoute = ({ children, requireOwner = false }: { children: React.Re
     return <Navigate to="/" />;
   }
   
-  // Check if owner role is required and user has it
-  if (requireOwner && user?.publicMetadata?.role !== "owner") {
+  // Check if admin role is required and user has it
+  if (requireAdmin && user?.publicMetadata?.role !== "admin") {
     return <Navigate to="/dashboard" />;
   }
   
@@ -77,7 +77,7 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/admin-dashboard" element={
-              <ProtectedRoute requireOwner={true}>
+              <ProtectedRoute requireAdmin={true}>
                 <AdminDashboardPage />
               </ProtectedRoute>
             } />

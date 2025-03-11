@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import NavBar from "@/components/layout/NavBar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -56,7 +55,6 @@ const AdminDashboardPage = () => {
   const loadShipments = async () => {
     setIsLoading(true);
     try {
-      // Get all shipments from Supabase (for admin view)
       const { data, error } = await supabase
         .from('booking')
         .select('*')
@@ -88,31 +86,26 @@ const AdminDashboardPage = () => {
 
   const loadStats = async () => {
     try {
-      // Get total shipments
       const { count: totalCount, error: totalError } = await supabase
         .from('booking')
         .select('*', { count: 'exact', head: true });
       
-      // Get pending shipments
       const { count: pendingCount, error: pendingError } = await supabase
         .from('booking')
         .select('*', { count: 'exact', head: true })
         .in('status', ['pending', 'picked_up', 'in_transit']);
       
-      // Get completed shipments
       const { count: completedCount, error: completedError } = await supabase
         .from('booking')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'delivered');
       
-      // Get unique user counts
       const { data: userData, error: userError } = await supabase
         .from('booking')
         .select('user_id')
         .limit(1000);
       
       if (!totalError && !pendingError && !completedError && !userError) {
-        // Calculate unique users
         const uniqueUsers = new Set(userData?.map(booking => booking.user_id) || []);
         
         setStats({
@@ -120,7 +113,7 @@ const AdminDashboardPage = () => {
           pendingShipments: pendingCount || 0,
           completedShipments: completedCount || 0,
           totalUsers: uniqueUsers.size,
-          activeUsers: uniqueUsers.size // For simplicity, using same value. In reality, would need active user metric
+          activeUsers: uniqueUsers.size
         });
       } else {
         console.error("Error fetching stats:", { totalError, pendingError, completedError, userError });
@@ -150,7 +143,6 @@ const AdminDashboardPage = () => {
 
   const handleStatusChange = async (shipmentId, userId, newStatus) => {
     try {
-      // Update status in Supabase
       const { error } = await supabase
         .from('booking')
         .update({ status: newStatus })
@@ -166,7 +158,6 @@ const AdminDashboardPage = () => {
         return;
       }
       
-      // Also update in local storage service as backup
       const event = {
         date: new Date().toISOString(),
         location: "Admin Dashboard",
@@ -176,7 +167,6 @@ const AdminDashboardPage = () => {
       
       await updateShipmentStatus(shipmentId, userId, newStatus, event);
       
-      // Update the UI
       setShipments(shipments.map(s => 
         s.id === shipmentId ? { ...s, status: newStatus } : s
       ));
@@ -186,7 +176,6 @@ const AdminDashboardPage = () => {
         description: `Shipment status changed to ${newStatus.replace(/_/g, ' ')}.`,
       });
       
-      // Refresh data
       loadShipments();
       loadStats();
     } catch (error) {
@@ -240,7 +229,6 @@ const AdminDashboardPage = () => {
             </Button>
           </div>
           
-          {/* Analytics Overview */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
               <CardHeader className="pb-2">
@@ -292,7 +280,6 @@ const AdminDashboardPage = () => {
             </Card>
           </div>
           
-          {/* Shipment Management */}
           <Card>
             <CardHeader>
               <CardTitle>Shipment Management</CardTitle>
@@ -376,7 +363,6 @@ const AdminDashboardPage = () => {
   );
 };
 
-// Shipment Table Component
 const ShipmentTable = ({ shipments, isLoading, onStatusChange, getStatusBadgeColor, formatDate }) => {
   if (isLoading) {
     return <div className="text-center py-8">Loading shipments...</div>;
