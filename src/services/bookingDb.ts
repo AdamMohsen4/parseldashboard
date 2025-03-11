@@ -57,8 +57,8 @@ export const saveBookingToSupabase = async (
         estimated_delivery: estimatedDelivery,
         customer_type: request.customerType || 'private',
         business_name: request.businessName,
-        vat_number: request.vatNumber,
-        cancellation_deadline: cancellationDeadline.toISOString()
+        vat_number: request.vatNumber
+        // Remove the cancellation_deadline as it doesn't exist in the database table yet
       })
       .select()
       .maybeSingle();

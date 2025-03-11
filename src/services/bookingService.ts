@@ -5,6 +5,7 @@ import { saveShipment } from "./shipmentService";
 import { BookingRequest, BookingResponse } from "@/types/booking";
 import { calculateTotalPrice, calculateEstimatedDelivery, generateShipmentId, generateTrackingCode } from "./bookingUtils";
 import { saveBookingToSupabase } from "./bookingDb";
+import { supabase } from "@/integrations/supabase/client";
 
 export type { BookingRequest, BookingResponse };
 
@@ -281,4 +282,3 @@ export const cancelBooking = async (trackingCode: string, userId: string): Promi
     return false;
   }
 };
-

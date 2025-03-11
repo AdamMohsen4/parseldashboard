@@ -39,22 +39,19 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [businessName, setBusinessName] = useState("");
   const [vatNumber, setVatNumber] = useState("");
 
-  // If no customer type is selected and we're on the base route, show the selection screen
   const showCustomerTypeSelection = !selectedCustomerType && location.pathname === "/shipment";
 
-  // Update selected customer type when the prop changes
   useEffect(() => {
     if (customerType) {
       setSelectedCustomerType(customerType);
     }
   }, [customerType]);
 
-  // Fixed price carrier - price differs by customer type
   const getCarrierPrice = () => {
     switch (selectedCustomerType) {
-      case "business": return 9; // Business discount
-      case "ecommerce": return 8; // E-commerce special rate
-      default: return 10; // Standard rate for private customers
+      case "business": return 9;
+      case "ecommerce": return 8;
+      default: return 10;
     }
   };
 
@@ -133,7 +130,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     }
   };
 
-  // Remove the calculate rate button and simplify the form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleBookNow();
@@ -159,7 +155,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     handleBookNow();
   };
 
-  // Customer type selection screen
   if (showCustomerTypeSelection) {
     return (
       <div className="min-h-screen bg-background">
@@ -222,7 +217,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     );
   }
 
-  // Main booking form after customer type is selected
   return (
     <div className="min-h-screen bg-background">
       <NavBar />
@@ -244,7 +238,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Business-specific fields */}
                   {(selectedCustomerType === "business" || selectedCustomerType === "ecommerce") && (
                     <div className="space-y-4">
                       <h3 className="font-semibold">Business Details</h3>
@@ -435,9 +428,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold">€{carrier.price}{compliance ? " + €2" : ""}</p>
-                      <Button size="sm" onClick={handleBookNow} disabled={isBooking}>
-                        {isBooking ? "Processing..." : "Book Now"}
-                      </Button>
                     </div>
                   </div>
                   
@@ -463,7 +453,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     )}
                   </div>
                   
-                  {/* Booking confirmation */}
                   {showBookingConfirmation && (
                     <div className="mt-8 bg-primary/10 p-4 rounded-lg border border-primary">
                       <h4 className="font-medium mb-2 text-primary">Shipment Ready to Book</h4>
@@ -479,7 +468,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     </div>
                   )}
                   
-                  {/* Booking result with cancellation */}
                   {bookingResult && (
                     <div className="mt-8 bg-green-50 p-4 rounded-lg border border-green-500">
                       <h4 className="font-medium mb-2 text-green-700">Booking Confirmed!</h4>
