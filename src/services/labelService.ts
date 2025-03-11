@@ -15,6 +15,7 @@ export interface LabelRequest {
     weight: string;
     dimensions: string;
   };
+  language?: string; // Added language option
 }
 
 export interface LabelResponse {
@@ -29,10 +30,13 @@ export const generateLabel = async (request: LabelRequest): Promise<LabelRespons
     console.log("Generating label for shipment:", request);
     await new Promise(resolve => setTimeout(resolve, 1200));
     
+    // Include language in the mock URL if provided
+    const languageParam = request.language ? `&lang=${request.language}` : '';
+    
     // For MVP, we'll just return a mock URL
     // In a real implementation, this would call a backend API that uses PDFKit
     return {
-      labelUrl: `https://example.com/labels/${request.trackingCode}.pdf`,
+      labelUrl: `https://example.com/labels/${request.trackingCode}.pdf?format=shipping${languageParam}`,
       success: true
     };
   } catch (error) {
