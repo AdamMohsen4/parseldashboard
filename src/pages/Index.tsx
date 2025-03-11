@@ -14,96 +14,88 @@ const Index = () => {
   return <div className="min-h-screen bg-background">
       <NavBar />
 
-      {/* Hero section with gradient overlay */}
-      <section className="py-32 px-4 relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-        <div className="absolute inset-0 bg-[url('/uploads/40bf477a-ad0b-486e-9a0d-83c1aff0401a.png')] opacity-10 bg-cover bg-center" />
-        <div className="container mx-auto max-w-6xl relative z-10">
+      {/* Hero section */}
+      <section className="py-24 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 -z-10" />
+        <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8 animate-fade-in">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-medium text-sm">
-                <CheckCircle className="w-4 h-4" />
+            <div className="space-y-6 animate-fade-in">
+              <div className="inline-block bg-primary/10 px-4 py-2 rounded-full text-primary font-medium text-sm mb-2">
                 {t('home.hero.badge')}
-              </span>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-                <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                  {t('home.hero.title')}
-                </span>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+                {t('home.hero.title')}
               </h1>
-              <p className="text-xl text-muted-foreground leading-relaxed max-w-xl">
+              <p className="text-xl text-muted-foreground leading-relaxed">
                 {t('home.hero.description')}
               </p>
-              <div className="flex flex-wrap gap-4">
-                <Button size="lg" className="group text-lg h-14 px-8 animate-slide-in-right shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-shadow" asChild>
-                  <Link to="/book">
+              <div className="pt-6 flex flex-wrap gap-4">
+                <Button size="lg" className="group animate-slide-in-right" asChild>
+                  <Link to="/book" className="mx-0">
                     {t('home.hero.bookButton')}
-                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
-                {isSignedIn ? (
-                  <Button size="lg" variant="outline" className="text-lg h-14 px-8 animate-slide-in-right [animation-delay:100ms]" asChild>
+                {isSignedIn ? <Button size="lg" variant="outline" className="animate-slide-in-right [animation-delay:100ms]" asChild>
                     <Link to="/dashboard">{t('home.hero.viewDashboard')}</Link>
-                  </Button>
-                ) : (
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="text-lg h-14 px-8 animate-slide-in-right [animation-delay:100ms]"
-                    onClick={() => document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click()}
-                  >
+                  </Button> : <Button size="lg" variant="outline" className="animate-slide-in-right [animation-delay:100ms]" onClick={() => document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click()}>
                     {t('common.signIn')}
-                  </Button>
-                )}
+                  </Button>}
               </div>
             </div>
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl animate-fade-in group">
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-transparent" />
+            <div className="relative rounded-lg overflow-hidden shadow-2xl animate-fade-in">
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent" />
               <img 
-                alt="E-Parcel Logistics Facility" 
-                className="w-full h-auto rounded-2xl transform transition-all duration-700 group-hover:scale-105" 
-                src="uploads/40bf477a-ad0b-486e-9a0d-83c1aff0401a.png"
+                alt="E-Parcel Logistics Facility Aerial View" 
+                className="w-full h-auto rounded-lg transform transition-transform hover:scale-105 duration-700" 
+                src="uploads/40bf477a-ad0b-486e-9a0d-83c1aff0401a.png" 
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Benefits section with gradient cards */}
-      <section className="py-24 bg-gradient-to-b from-background via-secondary/5 to-background">
+      {/* Benefits section - NEW */}
+      <section className="py-16 bg-secondary/10">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="group p-6 rounded-2xl bg-gradient-to-br from-white via-white to-secondary/10 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in [animation-delay:100ms]">
-              <div className="bg-primary/10 p-4 rounded-2xl w-fit mb-4 group-hover:scale-110 transition-transform">
-                <CheckCircle className="h-8 w-8 text-primary" />
+            <div className="flex items-center space-x-4 animate-fade-in [animation-delay:100ms]">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <CheckCircle className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{t('home.benefits.reliable.title')}</h3>
-              <p className="text-muted-foreground">{t('home.benefits.reliable.description')}</p>
+              <div>
+                <h3 className="font-medium">{t('home.benefits.reliable.title')}</h3>
+                <p className="text-muted-foreground">{t('home.benefits.reliable.description')}</p>
+              </div>
             </div>
-            <div className="group p-6 rounded-2xl bg-gradient-to-br from-white via-white to-secondary/10 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in [animation-delay:200ms]">
-              <div className="bg-primary/10 p-4 rounded-2xl w-fit mb-4 group-hover:scale-110 transition-transform">
-                <Truck className="h-8 w-8 text-primary" />
+            <div className="flex items-center space-x-4 animate-fade-in [animation-delay:200ms]">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Truck className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{t('home.benefits.fast.title')}</h3>
-              <p className="text-muted-foreground">{t('home.benefits.fast.description')}</p>
+              <div>
+                <h3 className="font-medium">{t('home.benefits.fast.title')}</h3>
+                <p className="text-muted-foreground">{t('home.benefits.fast.description')}</p>
+              </div>
             </div>
-            <div className="group p-6 rounded-2xl bg-gradient-to-br from-white via-white to-secondary/10 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in [animation-delay:300ms]">
-              <div className="bg-primary/10 p-4 rounded-2xl w-fit mb-4 group-hover:scale-110 transition-transform">
-                <Map className="h-8 w-8 text-primary" />
+            <div className="flex items-center space-x-4 animate-fade-in [animation-delay:300ms]">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Map className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{t('home.benefits.coverage.title')}</h3>
-              <p className="text-muted-foreground">{t('home.benefits.coverage.description')}</p>
+              <div>
+                <h3 className="font-medium">{t('home.benefits.coverage.title')}</h3>
+                <p className="text-muted-foreground">{t('home.benefits.coverage.description')}</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features section with improved cards */}
+      {/* Features section */}
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                {t('home.features.title')}
-              </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+              {t('home.features.title')}
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               {t('home.features.description')}
@@ -111,12 +103,10 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="group hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-white to-secondary/5 animate-fade-in [animation-delay:100ms]">
+            <Card className="group hover:shadow-xl transition-all duration-300 border-t-4 border-primary animate-fade-in [animation-delay:100ms] px-0">
               <CardHeader>
-                <div className="bg-primary/10 p-4 rounded-2xl w-fit mb-4 group-hover:scale-110 transition-transform">
-                  <Package className="h-8 w-8 text-primary" />
-                </div>
-                <CardTitle className="text-2xl">{t('home.features.fixedRate.title')}</CardTitle>
+                <Package className="h-10 w-10 text-primary mb-4" />
+                <CardTitle>{t('home.features.fixedRate.title')}</CardTitle>
                 <CardDescription>{t('home.features.fixedRate.subtitle')}</CardDescription>
               </CardHeader>
               <CardContent>
@@ -124,12 +114,10 @@ const Index = () => {
               </CardContent>
             </Card>
             
-            <Card className="group hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-white to-secondary/5 animate-fade-in [animation-delay:200ms]">
+            <Card className="group hover:shadow-xl transition-all duration-300 border-t-4 border-primary animate-fade-in [animation-delay:200ms]">
               <CardHeader>
-                <div className="bg-primary/10 p-4 rounded-2xl w-fit mb-4 group-hover:scale-110 transition-transform">
-                  <Shield className="h-8 w-8 text-primary" />
-                </div>
-                <CardTitle className="text-2xl">{t('home.features.tracking.title')}</CardTitle>
+                <Shield className="h-10 w-10 text-primary mb-4" />
+                <CardTitle>{t('home.features.tracking.title')}</CardTitle>
                 <CardDescription>{t('home.features.tracking.subtitle')}</CardDescription>
               </CardHeader>
               <CardContent>
@@ -137,12 +125,10 @@ const Index = () => {
               </CardContent>
             </Card>
             
-            <Card className="group hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-white to-secondary/5 animate-fade-in [animation-delay:300ms]">
+            <Card className="group hover:shadow-xl transition-all duration-300 border-t-4 border-primary animate-fade-in [animation-delay:300ms]">
               <CardHeader>
-                <div className="bg-primary/10 p-4 rounded-2xl w-fit mb-4 group-hover:scale-110 transition-transform">
-                  <LineChart className="h-8 w-8 text-primary" />
-                </div>
-                <CardTitle className="text-2xl">{t('home.features.dashboard.title')}</CardTitle>
+                <LineChart className="h-10 w-10 text-primary mb-4" />
+                <CardTitle>{t('home.features.dashboard.title')}</CardTitle>
                 <CardDescription>{t('home.features.dashboard.subtitle')}</CardDescription>
               </CardHeader>
               <CardContent>
@@ -153,32 +139,32 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA section with glassmorphism */}
+      {/* CTA section */}
       <section className="py-24 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
         <div className="container mx-auto max-w-4xl text-center relative z-10">
-          <Card className="p-12 shadow-xl animate-fade-in border-none bg-gradient-to-br from-white/80 to-white/40 backdrop-blur-sm">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">{t('home.cta.title')}</h2>
+          <Card className="p-8 shadow-lg animate-fade-in border-none bg-gradient-to-r from-background/90 to-background/70 backdrop-blur-sm">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">{t('home.cta.title')}</h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               {t('home.cta.description')}
             </p>
-            <Button size="lg" className="group text-lg h-14 px-8 animate-scale-in shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-shadow" asChild>
+            <Button size="lg" className="group animate-scale-in" asChild>
               <Link to="/book">
                 {t('home.cta.button')}
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>
           </Card>
         </div>
       </section>
 
-      {/* Partners section */}
-      <section className="py-16 bg-gradient-to-b from-background to-secondary/5">
+      {/* Partners Carousel section */}
+      <section className="py-16">
         <PartnersCarousel speed={45} />
       </section>
 
-      {/* Footer with improved styling */}
-      <footer className="bg-secondary/10 py-16">
+      {/* Footer */}
+      <footer className="bg-muted py-12">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
@@ -222,3 +208,4 @@ const Index = () => {
 };
 
 export default Index;
+
