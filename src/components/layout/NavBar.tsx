@@ -44,12 +44,12 @@ const NavBar = () => {
         items: [
           { path: "/3pl", label: t('nav.3pl', '3PL Services'), icon: Warehouse },
           { path: "/book", label: t('nav.book'), icon: null },
+          { path: "/dashboard", label: t('nav.dashboard'), icon: LayoutDashboard },
         ]
       },
       {
         name: t('nav.categories.workspace', 'Workspace'),
         items: [
-          { path: "/dashboard", label: t('nav.dashboard'), icon: LayoutDashboard },
           { path: "/collaborate", label: t('nav.collaborate', 'Collaborate'), icon: Users },
         ]
       }
