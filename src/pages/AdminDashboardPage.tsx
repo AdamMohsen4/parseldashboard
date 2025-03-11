@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
-import { BarChart, CheckCircle, FileText, Search, Users, Calendar, Building, MessageCircle, HelpCircle, Eye } from "lucide-react";
+import { BarChart, CheckCircle, FileText, Search, Users, Calendar, Building, MessageCircle, HelpCircle, Eye, Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -25,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { updateShipmentStatus } from "@/services/shipmentService";
 import { useUser } from "@clerk/clerk-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 
 const AdminDashboardPage = () => {
   const { user } = useUser();
@@ -61,6 +63,9 @@ const AdminDashboardPage = () => {
 
   const [selectedTicket, setSelectedTicket] = useState<any>(null);
   const [ticketDialogOpen, setTicketDialogOpen] = useState(false);
+  const [ticketMessages, setTicketMessages] = useState<any[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -480,9 +485,73 @@ const AdminDashboardPage = () => {
     }
   };
 
-  const openTicketDetails = (ticket) => {
+  const loadTicketMessages = async (ticketId) => {
+    try {
+      const { data, error } = await supabase
+        .from('support_messages')
+        .select('*')
+        .eq('ticket_id', ticketId)
+        .order('created_at', { ascending: true });
+      
+      if (error) throw error;
+      
+      setTicketMessages(data || []);
+    } catch (error) {
+      console.error("Error loading ticket messages:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load message history",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !selectedTicket || !user) return;
+    
+    setSendingMessage(true);
+    try {
+      const messageData = {
+        ticket_id: selectedTicket.id,
+        user_id: user.id,
+        message: newMessage.trim(),
+        is_admin: true
+      };
+
+      const { error } = await supabase
+        .from('support_messages')
+        .insert(messageData);
+      
+      if (error) throw error;
+      
+      if (selectedTicket.status === 'open') {
+        await handleSupportTicketStatusChange(selectedTicket.id, 'in_progress');
+      }
+      
+      await loadTicketMessages(selectedTicket.id);
+      
+      setNewMessage('');
+      
+      toast({
+        title: "Message Sent",
+        description: "Your response has been sent to the user.",
+      });
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send your response",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  const openTicketDetails = async (ticket) => {
     setSelectedTicket(ticket);
     setTicketDialogOpen(true);
+    await loadTicketMessages(ticket.id);
   };
 
   return (
@@ -854,7 +923,7 @@ const AdminDashboardPage = () => {
       </div>
 
       <Dialog open={ticketDialogOpen} onOpenChange={setTicketDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           {selectedTicket && (
             <>
               <DialogHeader>
@@ -893,12 +962,52 @@ const AdminDashboardPage = () => {
                 </div>
                 
                 <div>
-                  <h4 className="text-sm font-medium">Message</h4>
+                  <h4 className="text-sm font-medium">Original Message</h4>
                   <div className="mt-1 p-3 bg-muted rounded-md text-sm">
                     <p className="whitespace-pre-wrap">{selectedTicket.message}</p>
                   </div>
                 </div>
                 
+                {ticketMessages.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium">Message History</h4>
+                    <div className="space-y-3 mt-2 max-h-[200px] overflow-y-auto">
+                      {ticketMessages.map((msg) => (
+                        <div 
+                          key={msg.id} 
+                          className={`p-3 rounded-md text-sm ${
+                            msg.is_admin 
+                              ? "bg-primary/10 ml-8" 
+                              : "bg-muted mr-8"
+                          }`}
+                        >
+                          <div className="flex justify-between mb-1">
+                            <span className="font-semibold">
+                              {msg.is_admin ? "Support Agent" : "Customer"}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {formatDate(msg.created_at)}
+                            </span>
+                          </div>
+                          <p className="whitespace-pre-wrap">{msg.message}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                <div>
+                  <h4 className="text-sm font-medium">Reply</h4>
+                  <div className="mt-1">
+                    <Textarea
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder="Type your response here..."
+                      rows={3}
+                    />
+                  </div>
+                </div>
+
                 <div className="flex justify-between pt-4">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -922,9 +1031,19 @@ const AdminDashboardPage = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                   
-                  <Button variant="default" onClick={() => setTicketDialogOpen(false)}>
-                    Close
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="default" 
+                      onClick={handleSendMessage}
+                      disabled={!newMessage.trim() || sendingMessage}
+                    >
+                      {sendingMessage ? "Sending..." : "Send Reply"}
+                      <Send className="h-4 w-4 ml-1" />
+                    </Button>
+                    <Button variant="outline" onClick={() => setTicketDialogOpen(false)}>
+                      Close
+                    </Button>
+                  </div>
                 </div>
               </div>
             </>
