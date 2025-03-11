@@ -1,5 +1,4 @@
-
-import { useUser, SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
+import { useUser, SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -14,6 +13,7 @@ interface AuthWrapperProps {
 
 const AuthWrapper = ({ children, requireAuth = false, requireAdmin = false }: AuthWrapperProps) => {
   const { isSignedIn, isLoaded, user } = useUser();
+  const { getToken } = useAuth();
   const navigate = useNavigate();
   
   // Check if user has admin role
@@ -23,7 +23,7 @@ const AuthWrapper = ({ children, requireAuth = false, requireAdmin = false }: Au
   useEffect(() => {
     if (isSignedIn && user) {
       // Get the JWT token from Clerk
-      user.getToken({ template: "supabase" }).then((token) => {
+      getToken({ template: "supabase" }).then((token) => {
         // Set the auth token in Supabase
         supabase.auth.setSession({ 
           access_token: token as string, 
@@ -35,7 +35,7 @@ const AuthWrapper = ({ children, requireAuth = false, requireAdmin = false }: Au
       // Clear the Supabase session when not signed in
       supabase.auth.signOut();
     }
-  }, [isSignedIn, user]);
+  }, [isSignedIn, user, getToken]);
 
   // Log auth status for debugging
   useEffect(() => {
