@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import NavBar from "@/components/layout/NavBar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -10,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUser } from "@clerk/clerk-react";
 
-// Import refactored components
 import ShipmentTable from "@/components/admin/ShipmentTable";
 import DemoRequestsTable from "@/components/admin/DemoRequestsTable";
 import CollaborationsTable from "@/components/admin/CollaborationsTable";
@@ -18,7 +16,6 @@ import SupportTicketsTable from "@/components/admin/SupportTicketsTable";
 import TicketDetailsDialog from "@/components/admin/TicketDetailsDialog";
 import AdminStatsCards from "@/components/admin/AdminStatsCards";
 
-// Import refactored data services
 import * as AdminDataService from "@/components/admin/AdminDataService";
 
 const AdminDashboardPage = () => {
@@ -352,6 +349,7 @@ const AdminDashboardPage = () => {
                       <TabsTrigger value="in_transit">In Transit</TabsTrigger>
                       <TabsTrigger value="delivered">Delivered</TabsTrigger>
                       <TabsTrigger value="exception">Exceptions</TabsTrigger>
+                      <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="all">
@@ -397,6 +395,16 @@ const AdminDashboardPage = () => {
                     <TabsContent value="exception">
                       <ShipmentTable 
                         shipments={filteredShipments.filter(s => s.status === 'exception')} 
+                        isLoading={isLoading}
+                        onStatusChange={handleStatusChange}
+                        getStatusBadgeColor={AdminDataService.getStatusBadgeColor}
+                        formatDate={AdminDataService.formatDate}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="cancelled">
+                      <ShipmentTable 
+                        shipments={filteredShipments.filter(s => s.status === 'cancelled')} 
                         isLoading={isLoading}
                         onStatusChange={handleStatusChange}
                         getStatusBadgeColor={AdminDataService.getStatusBadgeColor}
