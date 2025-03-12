@@ -24,7 +24,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { X, Info } from "lucide-react";
+import { X, Info, Download } from "lucide-react";
+import { toast } from "sonner";
 
 interface ShipmentTableProps {
   shipments: any[];
@@ -57,11 +58,24 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
     setDetailsOpen(true);
   };
 
+  const downloadShipmentInfo = (shipment: any) => {
+    const blob = new Blob([JSON.stringify(shipment, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href
+    a.download = `shipment-${shipment.tracking_code}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    toast.success("Shipment info downloaded successfully");
+  }
+
   return (
     <>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
+            
             <TableRow>
               <TableHead>Tracking Code</TableHead>
               <TableHead>User ID</TableHead>
@@ -71,12 +85,15 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
               <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
+            
           </TableHeader>
+          
           <TableBody>
             {shipments.map((shipment) => (
               <TableRow key={shipment.id}>
                 <TableCell className="font-medium">{shipment.tracking_code || "N/A"}</TableCell>
                 <TableCell>
+                  
                   {shipment.user_id ? shipment.user_id.substring(0, 8) + "..." : "N/A"}
                 </TableCell>
                 <TableCell>{shipment.pickup_address || "N/A"}</TableCell>
@@ -89,6 +106,18 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
+
+                
+                    <Button 
+                    size="sm" 
+                    variant="outline"
+                    className="bg-green-200"
+                    onClick={() => downloadShipmentInfo(shipment)}
+                    >
+                    <Download className="h-4 w-4 mr-1" />
+                    Download
+                    </Button>
+
                     <Button 
                       size="sm" 
                       variant="outline"
