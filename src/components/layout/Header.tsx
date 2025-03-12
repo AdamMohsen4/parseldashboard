@@ -59,7 +59,7 @@ const Header: React.FC = () => {
           className="flex items-center space-x-2 text-foreground"
         >
           <Package className="h-8 w-8 text-nordic-blue" strokeWidth={2} />
-          <span className="text-xl font-semibold tracking-tight">ParcelNordic</span>
+          <span className="text-xl font-semibold tracking-tight">E-Parsel</span>
         </Link>
         
         {/* Desktop Navigation */}
