@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
@@ -34,7 +33,6 @@ const ShipmentsPage = () => {
       const bookings = await fetchBookingsFromSupabase(user.id);
       
       if (bookings && bookings.length > 0) {
-        // Map Supabase bookings to the Shipment format
         const mappedShipments = bookings.map(booking => ({
           id: booking.id.toString(),
           userId: booking.user_id,
@@ -63,7 +61,6 @@ const ShipmentsPage = () => {
         }));
         setShipments(mappedShipments);
       } else {
-        // If no Supabase bookings, fall back to mock data
         const mockData = await getLocalShipments(user.id);
         setShipments(mockData);
       }
@@ -79,7 +76,6 @@ const ShipmentsPage = () => {
     }
   };
 
-  // Get shipments from localStorage (as a fallback)
   const getLocalShipments = async (userId: string) => {
     try {
       const data = await import('@/services/shipmentService').then(m => m.getShipments(userId));
@@ -93,8 +89,7 @@ const ShipmentsPage = () => {
   const handleRefresh = () => {
     loadShipments();
   };
-  
-  // Function to get status badge color
+
   const getStatusColor = (status: Shipment["status"]) => {
     switch (status) {
       case 'pending':
@@ -106,6 +101,8 @@ const ShipmentsPage = () => {
       case 'delivered':
         return "bg-green-100 text-green-800";
       case 'exception':
+        return "bg-red-100 text-red-800";
+      case 'cancelled':
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -123,6 +120,8 @@ const ShipmentsPage = () => {
           return shipment.status === 'delivered';
         case "exception":
           return shipment.status === 'exception';
+        case "cancelled":
+          return shipment.status === 'cancelled';
         default:
           return true;
       }
@@ -247,6 +246,7 @@ const ShipmentsPage = () => {
                   <TabsTrigger value="active">Active</TabsTrigger>
                   <TabsTrigger value="delivered">Delivered</TabsTrigger>
                   <TabsTrigger value="exception">Exceptions</TabsTrigger>
+                  <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value={activeTab} className="mt-0">
@@ -312,6 +312,7 @@ const ShipmentsPage = () => {
                                   {shipment.status === 'in_transit' && 'In Transit'} 
                                   {shipment.status === 'delivered' && 'Delivered'}
                                   {shipment.status === 'exception' && 'Exception'}
+                                  {shipment.status === 'cancelled' && 'Cancelled'}
                                 </span>
                               </td>
                               <td className="py-3 px-4 whitespace-nowrap">
@@ -364,7 +365,7 @@ const ShipmentsPage = () => {
           
           <div className="bg-muted/50 rounded-lg p-4 mt-4">
             <h3 className="font-medium mb-2">About Shipment Statuses</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs">Pending</span>
@@ -388,6 +389,12 @@ const ShipmentsPage = () => {
                   <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs">Delivered</span>
                 </div>
                 <p className="text-muted-foreground">Package has been delivered successfully.</p>
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="bg-red-100 text-red-800 px-2 py-0.5 rounded-full text-xs">Cancelled</span>
+                </div>
+                <p className="text-muted-foreground">Shipment has been cancelled.</p>
               </div>
             </div>
           </div>

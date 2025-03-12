@@ -464,9 +464,9 @@ export const getStatusBadgeColor = (status: string) => {
     case 'pending': color = "bg-yellow-100 text-yellow-800"; break;
     case 'picked_up': color = "bg-purple-100 text-purple-800"; break;
     case 'exception': color = "bg-red-100 text-red-800"; break;
+    case 'cancelled': color = "bg-red-100 text-red-800"; break;
     case 'scheduled': color = "bg-blue-100 text-blue-800"; break;
     case 'completed': color = "bg-green-100 text-green-800"; break;
-    case 'cancelled': color = "bg-red-100 text-red-800"; break;
     default: color = "bg-gray-100 text-gray-800"; break;
   }
   

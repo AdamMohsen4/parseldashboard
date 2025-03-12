@@ -19,7 +19,7 @@ export interface Shipment {
   delivery: string;
   deliverySpeed: string;
   includeCompliance: boolean;
-  status: 'pending' | 'picked_up' | 'in_transit' | 'delivered' | 'exception';
+  status: 'pending' | 'picked_up' | 'in_transit' | 'delivered' | 'exception' | 'cancelled';
   createdAt: string;
   labelUrl?: string;
   pickupTime?: string;
@@ -117,6 +117,9 @@ class MockShipmentDatabase {
           break;
         case 'Exception':
           shipment.status = 'exception';
+          break;
+        case 'Cancelled':
+          shipment.status = 'cancelled';
           break;
         default:
           // Keep existing status if event doesn't match known statuses
