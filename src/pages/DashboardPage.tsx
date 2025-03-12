@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import NavBar from "@/components/layout/NavBar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -32,28 +31,24 @@ const DashboardPage = () => {
     
     setIsLoading(true);
     try {
-      // Get active shipments (pending, picked_up, in_transit)
       const { data: activeData, error: activeError } = await supabase
         .from('booking')
         .select('id')
         .eq('user_id', user.id)
         .in('status', ['pending', 'picked_up', 'in_transit']);
       
-      // Get completed shipments
       const { data: completedData, error: completedError } = await supabase
         .from('booking')
         .select('id')
         .eq('user_id', user.id)
         .eq('status', 'delivered');
       
-      // Get sum of total spent
       const { data: spentData, error: spentError } = await supabase
         .from('booking')
         .select('total_price')
         .eq('user_id', user.id);
       
       if (!activeError && !completedError && !spentError) {
-        // Calculate total spent
         const totalSpent = spentData?.reduce((sum, booking) => 
           sum + (Number(booking.total_price) || 0), 0) || 0;
         
@@ -76,7 +71,6 @@ const DashboardPage = () => {
     if (!user) return;
     
     try {
-      // Get the 5 most recent bookings
       const { data, error } = await supabase
         .from('booking')
         .select('*')
@@ -115,7 +109,6 @@ const DashboardPage = () => {
     }
   };
 
-  // Helper function to get status color
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'delivered': return 'bg-green-100 text-green-800';
@@ -126,7 +119,6 @@ const DashboardPage = () => {
     }
   };
   
-  // Helper function to format date
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
     try {
@@ -172,7 +164,6 @@ const DashboardPage = () => {
             </div>
           </div>
           
-          {/* Summary Card */}
           <Card className="bg-primary/5 border-primary/20">
             <CardHeader className="pb-2">
               <CardTitle>Shipping Summary</CardTitle>
@@ -276,7 +267,6 @@ const DashboardPage = () => {
             </Card>
           </div>
           
-          {/* Recent Activity */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-1">
               <CardHeader>
@@ -312,7 +302,7 @@ const DashboardPage = () => {
                     ))}
                     <div className="pt-2">
                       <Button variant="link" className="p-0 h-auto text-primary" asChild>
-                        <Link to="/tracking" className="flex items-center">
+                        <Link to="/shipments" className="flex items-center">
                           View all shipments <ArrowRight className="ml-1 h-3 w-3" />
                         </Link>
                       </Button>
@@ -329,7 +319,6 @@ const DashboardPage = () => {
               </CardContent>
             </Card>
             
-            {/* Quick Actions */}
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className="text-xl">Shipment List</CardTitle>

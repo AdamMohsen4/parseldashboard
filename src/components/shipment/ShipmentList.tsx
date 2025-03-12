@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,12 +31,10 @@ const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
     try {
       console.log("Loading shipments for user:", user.id, "with limit:", limit);
       
-      // Use the fetchBookingsFromSupabase function with the optional limit
       const bookings = await fetchBookingsFromSupabase(user.id, limit);
       console.log("Loaded bookings:", bookings);
       
       if (bookings && bookings.length > 0) {
-        // Map Supabase bookings to the Shipment format
         const mappedShipments = bookings.map(booking => ({
           id: booking.id.toString(),
           userId: booking.user_id,
@@ -67,7 +64,6 @@ const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
         setShipments(mappedShipments);
       } else {
         console.log("No bookings found, falling back to mock data");
-        // If no Supabase bookings, fall back to mock data
         const mockData = await getLocalShipments(user.id, limit);
         setShipments(mockData);
       }
@@ -83,11 +79,9 @@ const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
     }
   };
 
-  // Function to get shipments from localStorage (as a fallback)
   const getLocalShipments = async (userId: string, limit?: number) => {
     try {
       const data = await import('@/services/shipmentService').then(m => m.getShipments(userId));
-      // Apply limit if provided
       return limit ? data.slice(0, limit) : data;
     } catch (error) {
       console.error("Error fetching local shipments:", error);
@@ -98,8 +92,7 @@ const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
   const handleRefresh = () => {
     loadShipments();
   };
-  
-  // Function to get status badge color
+
   const getStatusColor = (status: Shipment["status"]) => {
     switch (status) {
       case 'pending':
@@ -193,7 +186,7 @@ const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
             {showViewAll && shipments.length > 0 && (
               <div className="pt-4">
                 <Button variant="link" className="p-0 h-auto text-primary" asChild>
-                  <Link to="/tracking" className="flex items-center">
+                  <Link to="/shipments" className="flex items-center">
                     View all shipments <ArrowRight className="ml-1 h-3 w-3" />
                   </Link>
                 </Button>
