@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import NavBar from "@/components/layout/NavBar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -10,9 +9,10 @@ import { Link } from "react-router-dom";
 import { Activity, ArrowRight, AlertCircle, TrendingUp, Package, CalendarCheck, Truck, BarChart, Bookmark, PiggyBank } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
 const DashboardPage = () => {
-  const { user } = useUser();
+  const {
+    user
+  } = useUser();
   const [stats, setStats] = useState({
     activeShipments: 0,
     completedShipments: 0,
@@ -21,41 +21,32 @@ const DashboardPage = () => {
   });
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
   useEffect(() => {
     if (user) {
       loadStats();
       loadRecentActivities();
     }
   }, [user]);
-  
   const loadStats = async () => {
     if (!user) return;
-    
     setIsLoading(true);
     try {
-      const { data: activeData, error: activeError } = await supabase
-        .from('booking')
-        .select('id')
-        .eq('user_id', user.id)
-        .in('status', ['pending', 'picked_up', 'in_transit']);
-      
-      const { data: completedData, error: completedError } = await supabase
-        .from('booking')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('status', 'delivered');
-      
-      const { data: bookingData, error: bookingError } = await supabase
-        .from('booking')
-        .select('total_price, carrier_price')
-        .eq('user_id', user.id);
-      
+      const {
+        data: activeData,
+        error: activeError
+      } = await supabase.from('booking').select('id').eq('user_id', user.id).in('status', ['pending', 'picked_up', 'in_transit']);
+      const {
+        data: completedData,
+        error: completedError
+      } = await supabase.from('booking').select('id').eq('user_id', user.id).eq('status', 'delivered');
+      const {
+        data: bookingData,
+        error: bookingError
+      } = await supabase.from('booking').select('total_price, carrier_price').eq('user_id', user.id);
       if (!activeError && !completedError && !bookingError) {
         // Calculate total spent
-        const totalSpent = bookingData?.reduce((sum, booking) => 
-          sum + (Number(booking.total_price) || 0), 0) || 0;
-        
+        const totalSpent = bookingData?.reduce((sum, booking) => sum + (Number(booking.total_price) || 0), 0) || 0;
+
         // Calculate total saved compared to direct carrier prices
         // Adding €1.50 to each carrier price to reflect the standard markup
         const totalSaved = bookingData?.reduce((sum, booking) => {
@@ -64,7 +55,6 @@ const DashboardPage = () => {
           const carrierPrice = (Number(booking.carrier_price) || 0) + 1.50;
           return sum + Math.max(0, carrierPrice - totalPrice);
         }, 0) || 0;
-        
         setStats({
           activeShipments: activeData?.length || 0,
           completedShipments: completedData?.length || 0,
@@ -72,7 +62,11 @@ const DashboardPage = () => {
           totalSaved
         });
       } else {
-        console.error("Error fetching stats:", { activeError, completedError, bookingError });
+        console.error("Error fetching stats:", {
+          activeError,
+          completedError,
+          bookingError
+        });
       }
     } catch (error) {
       console.error("Error loading dashboard stats:", error);
@@ -80,59 +74,57 @@ const DashboardPage = () => {
       setIsLoading(false);
     }
   };
-  
   const loadRecentActivities = async () => {
     if (!user) return;
-    
     try {
-      const { data, error } = await supabase
-        .from('booking')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
-      
+      const {
+        data,
+        error
+      } = await supabase.from('booking').select('*').eq('user_id', user.id).order('created_at', {
+        ascending: false
+      }).limit(5);
       if (error) {
         console.error("Error loading recent activities:", error);
         return;
       }
-      
       setRecentActivities(data || []);
     } catch (error) {
       console.error("Error loading recent activities:", error);
     }
   };
-
   const handleRefreshData = async () => {
     setIsLoading(true);
     try {
       await Promise.all([loadStats(), loadRecentActivities()]);
       toast({
         title: "Dashboard Refreshed",
-        description: "Your dashboard data has been updated.",
+        description: "Your dashboard data has been updated."
       });
     } catch (error) {
       console.error("Error refreshing dashboard:", error);
       toast({
         title: "Refresh Failed",
         description: "Could not refresh dashboard data. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
     }
   };
-
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
-      case 'delivered': return 'bg-green-100 text-green-800';
-      case 'in_transit': return 'bg-blue-100 text-blue-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'picked_up': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'delivered':
+        return 'bg-green-100 text-green-800';
+      case 'in_transit':
+        return 'bg-blue-100 text-blue-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'picked_up':
+        return 'bg-purple-100 text-purple-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
-  
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
     try {
@@ -147,9 +139,7 @@ const DashboardPage = () => {
       return dateString;
     }
   };
-  
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <NavBar />
       
       <div className="container mx-auto px-4 py-8">
@@ -162,11 +152,7 @@ const DashboardPage = () => {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <Button 
-                variant="outline" 
-                onClick={handleRefreshData}
-                disabled={isLoading}
-              >
+              <Button variant="outline" onClick={handleRefreshData} disabled={isLoading}>
                 Refresh Data
               </Button>
               <Button asChild>
@@ -203,10 +189,7 @@ const DashboardPage = () => {
                   <div>
                     <p className="text-sm text-muted-foreground">Completion Rate</p>
                     <p className="text-xl font-semibold">
-                      {isLoading ? "..." : 
-                        (stats.activeShipments + stats.completedShipments > 0) 
-                          ? `${Math.round((stats.completedShipments / (stats.activeShipments + stats.completedShipments)) * 100)}%` 
-                          : "0%"}
+                      {isLoading ? "..." : stats.activeShipments + stats.completedShipments > 0 ? `${Math.round(stats.completedShipments / (stats.activeShipments + stats.completedShipments) * 100)}%` : "0%"}
                     </p>
                   </div>
                 </div>
@@ -217,24 +200,14 @@ const DashboardPage = () => {
                   <div>
                     <p className="text-sm text-muted-foreground">Avg. Cost Per Shipment</p>
                     <p className="text-xl font-semibold">
-                      {isLoading ? "..." : 
-                        (stats.activeShipments + stats.completedShipments > 0) 
-                          ? `€${(stats.totalSpent / (stats.activeShipments + stats.completedShipments)).toFixed(2)}` 
-                          : "€0.00"}
+                      {isLoading ? "..." : stats.activeShipments + stats.completedShipments > 0 ? `€${(stats.totalSpent / (stats.activeShipments + stats.completedShipments)).toFixed(2)}` : "€0.00"}
                     </p>
                   </div>
                 </div>
               </div>
               
               {/* Add Total Savings Display */}
-              {stats.totalSaved > 0 && (
-                <div className="mt-4 bg-green-50 p-3 rounded-md border border-green-100 flex items-center gap-2">
-                  <PiggyBank className="h-5 w-5 text-green-600" />
-                  <p className="text-green-700 font-medium">
-                    You've saved <span className="font-bold">€{stats.totalSaved.toFixed(2)}</span> compared to direct carrier prices!
-                  </p>
-                </div>
-              )}
+              {stats.totalSaved > 0}
             </CardContent>
           </Card>
           
@@ -312,12 +285,8 @@ const DashboardPage = () => {
                 <CardTitle className="text-xl">Recent Activity</CardTitle>
               </CardHeader>
               <CardContent>
-                {isLoading ? (
-                  <div className="text-center py-6">Loading...</div>
-                ) : recentActivities.length > 0 ? (
-                  <div className="space-y-4">
-                    {recentActivities.map((activity) => (
-                      <div key={activity.id} className="flex items-start gap-2 pb-4 border-b border-border last:border-0 last:pb-0">
+                {isLoading ? <div className="text-center py-6">Loading...</div> : recentActivities.length > 0 ? <div className="space-y-4">
+                    {recentActivities.map(activity => <div key={activity.id} className="flex items-start gap-2 pb-4 border-b border-border last:border-0 last:pb-0">
                         <div className="bg-primary/10 p-2 rounded-full">
                           <Activity className="h-4 w-4 text-primary" />
                         </div>
@@ -337,8 +306,7 @@ const DashboardPage = () => {
                             {formatDate(activity.created_at)}
                           </p>
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                     <div className="pt-2">
                       <Button variant="link" className="p-0 h-auto text-primary" asChild>
                         <Link to="/shipments" className="flex items-center">
@@ -346,15 +314,12 @@ const DashboardPage = () => {
                         </Link>
                       </Button>
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-6 text-muted-foreground">
+                  </div> : <div className="text-center py-6 text-muted-foreground">
                     <p>No recent activities found</p>
                     <Button variant="link" className="mt-2" asChild>
                       <Link to="/shipment">Create your first shipment</Link>
                     </Button>
-                  </div>
-                )}
+                  </div>}
               </CardContent>
             </Card>
             
@@ -369,8 +334,6 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default DashboardPage;
