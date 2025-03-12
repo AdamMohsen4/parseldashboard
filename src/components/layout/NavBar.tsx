@@ -18,7 +18,7 @@ import NavBarMobile from "./NavBarMobile";
 import useNavCategories from "./NavBarCategories";
 
 const NavBar = () => {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   const location = useLocation();
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,6 +26,7 @@ const NavBar = () => {
   // Get navigation categories
   const { categories, isAdmin } = useNavCategories();
 
+  // Updated for sleeker hover style with a subtle background and smooth transition
   const hoverClass = "hover:bg-gray-100/30 transition-all duration-200 rounded-md";
 
   return (
@@ -53,11 +54,11 @@ const NavBar = () => {
                     } px-3 py-1.5 rounded-md font-medium transition-all duration-200`}
                   >
                     <Shield className="h-4 w-4" />
-                    {t('nav.adminDashboard')}
+                    {t('nav.adminDashboard', 'Admin Dashboard')}
                   </Link>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{t('nav.adminTooltip', 'Access administrative controls')}</p>
+                  <p>Access administrative controls</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -74,7 +75,7 @@ const NavBar = () => {
           {/* Desktop navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             {categories.map((category) => (
-              category.name === t('nav.categories.general') ? (
+              category.name === t('nav.categories.general', 'General') ? (
                 // Display General links directly in the navbar
                 category.items.map((item) => (
                   <NavBarItem 

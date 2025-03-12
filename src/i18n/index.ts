@@ -1,9 +1,5 @@
-
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-
-// Load saved language preference
-const savedLanguage = localStorage.getItem('preferredLanguage') || 'en';
 
 export const resources = {
   en: {
@@ -11,31 +7,16 @@ export const resources = {
       nav: {
         home: 'Home',
         book: 'Book Demo',
-        shipment: {
-          title: 'Book Shipment',
-          business: 'Business',
-          private: 'Private Customer',
-          ecommerce: 'E-commerce Business',
-        },
+        shipment: 'Book Shipment',
         tracking: 'Tracking',
         compliance: 'Compliance',
         dashboard: 'Dashboard',
         collaborate: 'Collaborate',
-        transportationPartners: 'Transportation Partners',
-        adminDashboard: 'Administratörspanel',
-        '3pl': '3PL-tjänster',
-        support: 'Kundtjänst',
-        categories: {
-          general: 'Allmänt',
-          shipping: 'Frakt',
-          services: 'Tjänster',
-          workspace: 'Arbetsyta'
-        }
+        transportationPartners: 'Transportation Partners'
       },
       common: {
         signIn: 'Sign In',
         signUp: 'Sign Up',
-        search: 'Sök',
       },
       home: {
         hero: {
@@ -252,50 +233,6 @@ export const resources = {
           },
         },
       },
-      collaborate: {
-        title: 'Samarbeta om frakt',
-        description: 'Hitta andra företag som fraktar till samma destination för att dela kostnader',
-        searchPlaceholder: 'Sök efter företag eller destination',
-        benefits: {
-          community: {
-            title: 'Gemensam frakt',
-            description: 'Anslut med andra SMF för delad frakt',
-            text: 'Minska dina fraktkostnader genom att samarbeta med andra företag som skickar till samma destination.'
-          },
-          combine: {
-            title: 'Kombinera volymer',
-            description: 'Nå volymrabattgränser tillsammans',
-            text: 'Samla era försändelser för att kvalificera för bättre priser och tjänster som endast är tillgängliga för större volymavsändare.'
-          },
-          sustainable: {
-            title: 'Mer hållbart',
-            description: 'Minska koldioxidavtrycket genom konsolidering',
-            text: 'Hjälp miljön genom att optimera leveransrutter och minska antalet fordon som behövs.'
-          }
-        },
-        createListing: {
-          title: 'Skapa din samarbetsannons',
-          description: 'Dela dina fraktbehov och hitta partners'
-        },
-        form: {
-          destination: 'Destination',
-          volume: 'Ungefärlig volym',
-          frequency: 'Fraktfrekvens',
-          date: 'Nästa fraktdatum',
-          email: 'Kontakt e-post',
-          phone: 'Kontakttelefon',
-          notes: 'Ytterligare anteckningar',
-          submit: 'Skapa samarbetsannons'
-        },
-        availableCollaborations: 'Tillgängliga samarbetsmöjligheter',
-        noResults: 'Inga samarbetsmöjligheter hittades som matchar dina kriterier.',
-        tryAgain: 'Försök justera din sökning eller skapa din egen annons ovan.',
-        destination: 'Destination',
-        volume: 'Volym',
-        nextDate: 'Nästa försändelse',
-        contactBusiness: 'Kontakta företag',
-        hideContact: 'Dölj kontaktinformation'
-      },
       footer: {
         description: 'Simplified logistics solutions for SMEs.',
         services: 'Services',
@@ -317,31 +254,16 @@ export const resources = {
       nav: {
         home: 'Hem',
         book: 'Boka Demo',
-        shipment: {
-          title: 'Boka Frakt',
-          business: 'Företag',
-          private: 'Privatperson',
-          ecommerce: 'E-handelsföretag',
-        },
+        shipment: 'Boka Frakt',
         tracking: 'Spårning',
         compliance: 'Efterlevnad',
         dashboard: 'Översikt',
         collaborate: 'Samarbeta',
-        transportationPartners: 'Transportpartners',
-        adminDashboard: 'Administratörspanel',
-        '3pl': '3PL-tjänster',
-        support: 'Kundtjänst',
-        categories: {
-          general: 'Allmänt',
-          shipping: 'Frakt',
-          services: 'Tjänster',
-          workspace: 'Arbetsyta'
-        }
+        transportationPartners: 'Transportpartners'
       },
       common: {
         signIn: 'Logga In',
         signUp: 'Registrera',
-        search: 'Sök',
       },
       home: {
         hero: {
@@ -467,7 +389,7 @@ export const resources = {
         },
         regulatory: {
           title: 'Regelefterlevnad',
-          description: 'Verifiering att försändelser uppfyller alla relevanta forordningar',
+          description: 'Verifiering att försändelser uppfyller alla relevanta förordningar',
         },
         pricing: 'Prissättning',
         package: 'Efterlevnadspaket',
@@ -558,50 +480,6 @@ export const resources = {
           },
         },
       },
-      collaborate: {
-        title: 'Samarbeta om frakt',
-        description: 'Hitta andra företag som fraktar till samma destination för att dela kostnader',
-        searchPlaceholder: 'Sök efter företag eller destination',
-        benefits: {
-          community: {
-            title: 'Gemensam frakt',
-            description: 'Anslut med andra SMF för delad frakt',
-            text: 'Minska dina fraktkostnader genom att samarbeta med andra företag som skickar till samma destination.'
-          },
-          combine: {
-            title: 'Kombinera volymer',
-            description: 'Nå volymrabattgränser tillsammans',
-            text: 'Samla era försändelser för att kvalificera för bättre priser och tjänster som endast är tillgängliga för större volymavsändare.'
-          },
-          sustainable: {
-            title: 'Mer hållbart',
-            description: 'Minska koldioxidavtrycket genom konsolidering',
-            text: 'Hjälp miljön genom att optimera leveransrutter och minska antalet fordon som behövs.'
-          }
-        },
-        createListing: {
-          title: 'Skapa din samarbetsannons',
-          description: 'Dela dina fraktbehov och hitta partners'
-        },
-        form: {
-          destination: 'Destination',
-          volume: 'Ungefärlig volym',
-          frequency: 'Fraktfrekvens',
-          date: 'Nästa fraktdatum',
-          email: 'Kontakt e-post',
-          phone: 'Kontakttelefon',
-          notes: 'Ytterligare anteckningar',
-          submit: 'Skapa samarbetsannons'
-        },
-        availableCollaborations: 'Tillgängliga samarbetsmöjligheter',
-        noResults: 'Inga samarbetsmöjligheter hittades som matchar dina kriterier.',
-        tryAgain: 'Försök justera din sökning eller skapa din egen annons ovan.',
-        destination: 'Destination',
-        volume: 'Volym',
-        nextDate: 'Nästa försändelse',
-        contactBusiness: 'Kontakta företag',
-        hideContact: 'Dölj kontaktinformation'
-      },
       footer: {
         description: 'Förenklade logistiklösningar för små och medelstora företag.',
         services: 'Tjänster',
@@ -623,31 +501,16 @@ export const resources = {
       nav: {
         home: 'Etusivu',
         book: 'Varaa Demo',
-        shipment: {
-          title: 'Varaa Lähetys',
-          business: 'Yritys',
-          private: 'Yksityisasiakas',
-          ecommerce: 'Verkkokauppayritys',
-        },
+        shipment: 'Varaa Lähetys',
         tracking: 'Seuranta',
         compliance: 'Vaatimustenmukaisuus',
         dashboard: 'Hallintapaneeli',
         collaborate: 'Yhteistyö',
-        transportationPartners: 'Kuljetuskumppanit',
-        adminDashboard: 'Järjestelmänvalvojan paneeli',
-        '3pl': '3PL-palvelut',
-        support: 'Asiakastuki',
-        categories: {
-          general: 'Yleinen',
-          shipping: 'Lähetys',
-          services: 'Palvelut',
-          workspace: 'Työtila'
-        }
+        transportationPartners: 'Kuljetuskumppanit'
       },
       common: {
         signIn: 'Kirjaudu Sisään',
         signUp: 'Rekisteröidy',
-        search: 'Haku',
       },
       home: {
         hero: {
@@ -864,50 +727,6 @@ export const resources = {
           },
         },
       },
-      collaborate: {
-        title: 'Yhteistyö lähetyksissä',
-        description: 'Löydä muita yrityksiä, jotka lähettävät samaan kohteeseen kustannusten jakamiseksi',
-        searchPlaceholder: 'Hae yrityksen tai kohteen mukaan',
-        benefits: {
-          community: {
-            title: 'Yhteisölähetys',
-            description: 'Yhdistä muihin pk-yrityksiin jaettuja lähetyksiä varten',
-            text: 'Vähennä lähetyskustannuksiasi tekemällä yhteistyötä muiden yritysten kanssa, jotka lähettävät samaan kohteeseen.'
-          },
-          combine: {
-            title: 'Yhdistä volyymit',
-            description: 'Saavuta volyymialennukset yhdessä',
-            text: 'Yhdistä lähetyksesi saadaksesi parempia hintoja ja palveluita, jotka ovat saatavilla vain suuremmille volyymilähettäjille.'
-          },
-          sustainable: {
-            title: 'Ympäristöystävällisempi',
-            description: 'Vähennä hiilijalanjälkeä yhdistämisen avulla',
-            text: 'Auta ympäristöä optimoimalla toimitusreittejä ja vähentämällä tarvittavien ajoneuvojen määrää.'
-          }
-        },
-        createListing: {
-          title: 'Luo yhteistyöilmoituksesi',
-          description: 'Jaa lähetystarpeesi ja löydä kumppaneita'
-        },
-        form: {
-          destination: 'Kohde',
-          volume: 'Arvioitu tilavuus',
-          frequency: 'Lähetystiheys',
-          date: 'Seuraava lähetyspäivä',
-          email: 'Yhteyshenkilön sähköposti',
-          phone: 'Yhteyshenkilön puhelin',
-          notes: 'Lisätiedot',
-          submit: 'Luo yhteistyöilmoitus'
-        },
-        availableCollaborations: 'Saatavilla oleva yhteistyömahdollisuudet',
-        noResults: 'Kriteereihisi sopivia yhteistyömahdollisuuksia ei löytynyt.',
-        tryAgain: 'Kokeile muokata hakuasi tai luo oma ilmoituksesi yllä.',
-        destination: 'Kohde',
-        volume: 'Tilavuus',
-        nextDate: 'Seuraava lähetys',
-        contactBusiness: 'Ota yhteyttä yritykseen',
-        hideContact: 'Piilota yhteystiedot'
-      },
       footer: {
         description: 'Yksinkertaistettuja logistiikkaratkaisuja pk-yrityksille.',
         services: 'Palvelut',
@@ -930,7 +749,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: savedLanguage, // Use saved language or default to 'en'
+    lng: 'en',
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false,

@@ -1,32 +1,25 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+import { 
+  DropdownMenu, 
+  DropdownMenuTrigger, 
+  DropdownMenuContent, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator,
+  DropdownMenuItem
 } from "@/components/ui/dropdown-menu";
-import React from "react";
 
-type NavItemProps = {
+interface NavItemProps {
   item: {
     path: string;
     label: string;
     icon: React.ComponentType<any> | null;
-    subItems?: {
-      path: string;
-      label: string;
-      icon: React.ComponentType<any>;
-    }[];
   };
   hoverClass: string;
-};
+}
 
-type NavCategoryProps = {
+interface NavCategoryProps {
   category: {
     name: string;
     items: {
@@ -41,76 +34,100 @@ type NavCategoryProps = {
     }[];
   };
   hoverClass: string;
-};
+}
 
-// Individual navbar item component
 export const NavBarItem = ({ item, hoverClass }: NavItemProps) => {
   const location = useLocation();
-  const isActive = location.pathname === item.path;
-  const { t } = useTranslation();
-
-  // Check if this item has subitems
-  if (item.subItems && item.subItems.length > 0) {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button 
-            variant="ghost" 
-            className={`flex items-center gap-1 px-2 ${isActive ? 'text-primary font-medium' : ''} ${hoverClass}`}
-          >
-            {item.icon && <item.icon className="h-4 w-4 mr-1" />}
-            {item.label}
-            <ChevronDown className="h-3 w-3" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {item.subItems.map((subItem) => (
-            <DropdownMenuItem key={subItem.path} asChild>
-              <Link to={subItem.path} className="flex items-center gap-2 w-full">
-                {subItem.icon && <subItem.icon className="h-4 w-4" />}
-                {subItem.label}
-              </Link>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  }
-
-  // Regular link with no subitems
+  
   return (
     <Link
       to={item.path}
-      className={`px-2 py-1.5 ${isActive ? 'text-primary font-medium' : ''} ${hoverClass} flex items-center`}
+      className={`${
+        location.pathname === item.path
+          ? "text-primary font-medium"
+          : "text-foreground"
+      } ${hoverClass} px-2 py-1 flex items-center gap-1`}
     >
-      {item.icon && <item.icon className="h-4 w-4 mr-1" />}
+      {item.icon && <item.icon className="h-4 w-4" />}
       {item.label}
     </Link>
   );
 };
 
-// Category section with a dropdown of multiple items
 export const NavBarCategory = ({ category, hoverClass }: NavCategoryProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { t } = useTranslation();
-
+  const location = useLocation();
+  
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          className={`flex items-center gap-1 px-2 ${hoverClass}`}
-        >
-          {category.name}
-          <ChevronDown className="h-3 w-3" />
-        </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger className={`flex items-center gap-1 ${hoverClass} px-2 py-1`}>
+        {category.name} <ChevronDown className="h-4 w-4" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent>
+        <DropdownMenuLabel>{category.name}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
         {category.items.map((item) => (
-          <DropdownMenuItem key={item.path} asChild>
-            <Link to={item.path} className="flex items-center gap-2 w-full">
-              {item.icon && <item.icon className="h-4 w-4" />}
-              {item.label}
+          item.subItems ? (
+            <SubItemDropdown 
+              key={item.path} 
+              item={item} 
+              hoverClass={hoverClass} 
+              location={location} 
+            />
+          ) : (
+            <DropdownMenuItem key={item.path} asChild className="hover:bg-gray-100/30 cursor-pointer">
+              <Link
+                to={item.path}
+                className={`${
+                  location.pathname === item.path ? "text-primary font-medium" : ""
+                } w-full flex items-center gap-2 px-2 py-1`}
+              >
+                {item.icon && <item.icon className="h-4 w-4" />}
+                {item.label}
+              </Link>
+            </DropdownMenuItem>
+          )
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+interface SubItemDropdownProps {
+  item: {
+    path: string;
+    label: string;
+    icon: React.ComponentType<any> | null;
+    subItems: {
+      path: string;
+      label: string;
+      icon: React.ComponentType<any>;
+    }[];
+  };
+  hoverClass: string;
+  location: ReturnType<typeof useLocation>;
+}
+
+const SubItemDropdown = ({ item, hoverClass, location }: SubItemDropdownProps) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className={`w-full flex items-center justify-between px-2 py-1.5 text-sm hover:bg-gray-100/30 transition-all duration-200 cursor-default`}>
+        <span className="flex items-center gap-2">
+          {item.icon && <item.icon className="h-4 w-4" />}
+          {item.label}
+        </span>
+        <ChevronDown className="h-4 w-4" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="right" className="w-48">
+        {item.subItems.map((subItem) => (
+          <DropdownMenuItem key={subItem.path} asChild className="hover:bg-gray-100/30 cursor-pointer">
+            <Link
+              to={subItem.path}
+              className={`${
+                location.pathname === subItem.path ? "text-primary font-medium" : ""
+              } w-full flex items-center gap-2 px-2 py-1`}
+            >
+              {subItem.icon && <subItem.icon className="h-4 w-4" />}
+              {subItem.label}
             </Link>
           </DropdownMenuItem>
         ))}
@@ -118,3 +135,5 @@ export const NavBarCategory = ({ category, hoverClass }: NavCategoryProps) => {
     </DropdownMenu>
   );
 };
+
+export default NavBarItem;
