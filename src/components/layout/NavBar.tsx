@@ -45,7 +45,7 @@ const NavBar = () => {
   // Check if user has admin role
   const isAdmin = isSignedIn && user?.publicMetadata?.role === "admin";
 
-  // Removed hover color change, keeping only subtle transition for smoothness
+  // Only keeping subtle transition, no color change on hover
   const hoverClass = "transition-all duration-200 rounded-md";
 
   // Organize nav items into categories
