@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import NavBar from "@/components/layout/NavBar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -6,15 +7,17 @@ import { useUser } from "@clerk/clerk-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Activity, ArrowRight, AlertCircle, TrendingUp, Package, CalendarCheck, Truck, BarChart, Bookmark } from "lucide-react";
+import { Activity, ArrowRight, AlertCircle, TrendingUp, Package, CalendarCheck, Truck, BarChart, Bookmark, PiggyBank } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const DashboardPage = () => {
   const { user } = useUser();
   const [stats, setStats] = useState({
     activeShipments: 0,
     completedShipments: 0,
-    totalSpent: 0
+    totalSpent: 0,
+    totalSaved: 0
   });
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,22 +46,32 @@ const DashboardPage = () => {
         .eq('user_id', user.id)
         .eq('status', 'delivered');
       
-      const { data: spentData, error: spentError } = await supabase
+      const { data: bookingData, error: bookingError } = await supabase
         .from('booking')
-        .select('total_price')
+        .select('total_price, carrier_price')
         .eq('user_id', user.id);
       
-      if (!activeError && !completedError && !spentError) {
-        const totalSpent = spentData?.reduce((sum, booking) => 
+      if (!activeError && !completedError && !bookingError) {
+        // Calculate total spent
+        const totalSpent = bookingData?.reduce((sum, booking) => 
           sum + (Number(booking.total_price) || 0), 0) || 0;
+        
+        // Calculate total saved compared to direct carrier prices
+        const totalSaved = bookingData?.reduce((sum, booking) => {
+          const carrierPrice = Number(booking.carrier_price) || 0;
+          const totalPrice = Number(booking.total_price) || 0;
+          // If carrier price is higher than what they paid, they saved money
+          return sum + Math.max(0, carrierPrice - totalPrice);
+        }, 0) || 0;
         
         setStats({
           activeShipments: activeData?.length || 0,
           completedShipments: completedData?.length || 0,
-          totalSpent
+          totalSpent,
+          totalSaved
         });
       } else {
-        console.error("Error fetching stats:", { activeError, completedError, spentError });
+        console.error("Error fetching stats:", { activeError, completedError, bookingError });
       }
     } catch (error) {
       console.error("Error loading dashboard stats:", error);
@@ -211,6 +224,16 @@ const DashboardPage = () => {
                   </div>
                 </div>
               </div>
+              
+              {/* Add Total Savings Display */}
+              {stats.totalSaved > 0 && (
+                <div className="mt-4 bg-green-50 p-3 rounded-md border border-green-100 flex items-center gap-2">
+                  <PiggyBank className="h-5 w-5 text-green-600" />
+                  <p className="text-green-700 font-medium">
+                    You've saved <span className="font-bold">€{stats.totalSaved.toFixed(2)}</span> compared to direct carrier prices!
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
           
@@ -256,8 +279,23 @@ const DashboardPage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  €{isLoading ? "..." : stats.totalSpent.toFixed(2)}
+                <div className="flex items-center gap-2">
+                  <div className="text-2xl font-bold">
+                    €{isLoading ? "..." : stats.totalSpent.toFixed(2)}
+                  </div>
+                  
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full p-0">
+                          <AlertCircle className="h-4 w-4 text-primary" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[200px]">
+                        <p>You've saved €{stats.totalSaved.toFixed(2)} compared to booking directly with carriers.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
                 <div className="mt-1 flex items-center text-sm text-muted-foreground">
                   <AlertCircle className="mr-1 h-4 w-4 text-primary" />
