@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { Loader2, Package, RefreshCw, ArrowRight } from "lucide-react";
 import { fetchBookingsFromSupabase } from "@/services/bookingDb";
+import { Badge } from "@/components/ui/badge";
 
 interface ShipmentListProps {
   limit?: number;
@@ -106,7 +107,7 @@ const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
       case 'exception':
         return "bg-red-100 text-red-800";
       case 'cancelled':
-        return "bg-red-100 text-red-800";
+        return "";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -155,14 +156,17 @@ const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
                       <h3 className="font-medium">
                         {shipment.pickup} → {shipment.delivery}
                       </h3>
-                      <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(shipment.status)}`}>
-                        {shipment.status === 'pending' && 'Pending'}
-                        {shipment.status === 'picked_up' && 'Picked Up'}
-                        {shipment.status === 'in_transit' && 'In Transit'} 
-                        {shipment.status === 'delivered' && 'Delivered'}
-                        {shipment.status === 'exception' && 'Exception'}
-                        {shipment.status === 'cancelled' && 'Cancelled'}
-                      </span>
+                      {shipment.status === 'cancelled' ? (
+                        <Badge variant="cancel">Cancelled</Badge>
+                      ) : (
+                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(shipment.status)}`}>
+                          {shipment.status === 'pending' && 'Pending'}
+                          {shipment.status === 'picked_up' && 'Picked Up'}
+                          {shipment.status === 'in_transit' && 'In Transit'} 
+                          {shipment.status === 'delivered' && 'Delivered'}
+                          {shipment.status === 'exception' && 'Exception'}
+                        </span>
+                      )}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       <span>Tracking: {shipment.trackingCode}</span>
@@ -203,4 +207,3 @@ const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
 };
 
 export default ShipmentList;
-
