@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Table,
@@ -84,10 +83,7 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
                 <TableCell>{shipment.delivery_address || "N/A"}</TableCell>
                 <TableCell>{formatDate(shipment.created_at)}</TableCell>
                 <TableCell>
-                  <Badge 
-                    variant={shipment.status === "cancelled" ? "cancel" : undefined}
-                    className={shipment.status !== "cancelled" ? getStatusBadgeColor(shipment.status) : undefined}
-                  >
+                  <Badge className={getStatusBadgeColor(shipment.status)}>
                     {shipment.status?.replace(/_/g, " ") || "Unknown"}
                   </Badge>
                 </TableCell>
@@ -172,10 +168,7 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
             <div className="space-y-4 mt-4">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">Tracking Code: {selectedShipment.tracking_code || "N/A"}</h3>
-                <Badge 
-                  variant={selectedShipment.status === "cancelled" ? "cancel" : undefined}
-                  className={selectedShipment.status !== "cancelled" ? getStatusBadgeColor(selectedShipment.status) : undefined}
-                >
+                <Badge className={getStatusBadgeColor(selectedShipment.status)}>
                   {selectedShipment.status?.replace(/_/g, " ") || "Unknown"}
                 </Badge>
               </div>
