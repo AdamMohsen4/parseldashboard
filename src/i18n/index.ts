@@ -2,6 +2,9 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+// Load saved language preference
+const savedLanguage = localStorage.getItem('preferredLanguage') || 'en';
+
 export const resources = {
   en: {
     translation: {
@@ -927,7 +930,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'en',
+    lng: savedLanguage, // Use saved language or default to 'en'
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false,

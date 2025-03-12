@@ -8,12 +8,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Languages } from "lucide-react";
+import { useEffect } from "react";
 
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
 
+  // Load saved language on component mount
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage) {
+      i18n.changeLanguage(savedLanguage);
+    }
+  }, [i18n]);
+
   const changeLanguage = (language: string) => {
     i18n.changeLanguage(language);
+    localStorage.setItem('preferredLanguage', language);
   };
 
   const getLanguageName = (code: string) => {
@@ -30,7 +40,7 @@ const LanguageSwitcher = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="px-2 flex items-center gap-1">
           <Languages className="h-4 w-4" />
-          <span>{i18n.language.toUpperCase()}</span>
+          <span>{getLanguageName(i18n.language)}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
