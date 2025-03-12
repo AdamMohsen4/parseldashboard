@@ -57,10 +57,11 @@ const DashboardPage = () => {
           sum + (Number(booking.total_price) || 0), 0) || 0;
         
         // Calculate total saved compared to direct carrier prices
+        // Adding €1.50 to each carrier price to reflect the standard markup
         const totalSaved = bookingData?.reduce((sum, booking) => {
-          const carrierPrice = Number(booking.carrier_price) || 0;
           const totalPrice = Number(booking.total_price) || 0;
-          // If carrier price is higher than what they paid, they saved money
+          // Add €1.50 to carrier price
+          const carrierPrice = (Number(booking.carrier_price) || 0) + 1.50;
           return sum + Math.max(0, carrierPrice - totalPrice);
         }, 0) || 0;
         
