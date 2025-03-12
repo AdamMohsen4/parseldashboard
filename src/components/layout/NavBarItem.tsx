@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { 
@@ -10,30 +9,36 @@ import {
   DropdownMenuItem
 } from "@/components/ui/dropdown-menu";
 
+interface SubItemType {
+  path: string;
+  label: string;
+  icon: React.ComponentType<any>;
+}
+
+interface NavItemType {
+  path: string;
+  label: string;
+  icon: React.ComponentType<any> | null;
+  subItems?: SubItemType[];
+}
+
 interface NavItemProps {
-  item: {
-    path: string;
-    label: string;
-    icon: React.ComponentType<any> | null;
-  };
+  item: NavItemType;
   hoverClass: string;
 }
 
 interface NavCategoryProps {
   category: {
     name: string;
-    items: {
-      path: string;
-      label: string;
-      icon: React.ComponentType<any> | null;
-      subItems?: {
-        path: string;
-        label: string;
-        icon: React.ComponentType<any>;
-      }[];
-    }[];
+    items: NavItemType[];
   };
   hoverClass: string;
+}
+
+interface SubItemDropdownProps {
+  item: NavItemType & { subItems: SubItemType[] };
+  hoverClass: string;
+  location: ReturnType<typeof useLocation>;
 }
 
 export const NavBarItem = ({ item, hoverClass }: NavItemProps) => {
@@ -69,7 +74,7 @@ export const NavBarCategory = ({ category, hoverClass }: NavCategoryProps) => {
           item.subItems ? (
             <SubItemDropdown 
               key={item.path} 
-              item={item} 
+              item={{ ...item, subItems: item.subItems }}
               hoverClass={hoverClass} 
               location={location} 
             />
@@ -91,21 +96,6 @@ export const NavBarCategory = ({ category, hoverClass }: NavCategoryProps) => {
     </DropdownMenu>
   );
 };
-
-interface SubItemDropdownProps {
-  item: {
-    path: string;
-    label: string;
-    icon: React.ComponentType<any> | null;
-    subItems: {
-      path: string;
-      label: string;
-      icon: React.ComponentType<any>;
-    }[];
-  };
-  hoverClass: string;
-  location: ReturnType<typeof useLocation>;
-}
 
 const SubItemDropdown = ({ item, hoverClass, location }: SubItemDropdownProps) => {
   return (
