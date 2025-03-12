@@ -66,12 +66,16 @@ const NavBar = () => {
             label: t('nav.shipment', 'Ship Package'), 
             icon: Package,
             subItems: [
+          
               { path: "/shipment/business", label: t('nav.shipment.business', 'Business'), icon: Briefcase},
               { path: "/shipment/private", label: t('nav.shipment.private', 'Private Customer'), icon: User, },
               { path: "/shipment/ecommerce", label: t('nav.shipment.ecommerce', 'E-commerce Business'), icon: ShoppingCart },
+            
             ]
           },
+          //update with no hover effect
           { path: "/tracking", label: t('nav.tracking'), icon: Truck},
+
         ]
       },
       {
@@ -100,7 +104,7 @@ const NavBar = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Link to="/">
-              <h1 className="text-2xl font-bold text-primary">E-Parsel</h1>
+              <h1 className="text-2xl font-bold text-primary">E-Parcel</h1>
             </Link>
             <span className="ml-2 text-sm bg-accent/10 text-accent px-2 py-0.5 rounded-full">SME Portal</span>
           </div>

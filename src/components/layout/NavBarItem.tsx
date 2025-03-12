@@ -101,7 +101,7 @@ export const NavBarCategory = ({ category, hoverClass }: NavCategoryProps) => {
 const SubItemDropdown = ({ item, hoverClass, location }: SubItemDropdownProps) => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={`w-full flex items-center justify-between px-2 py-1.5 text-sm hover:bg-gray-100/30 transition-all duration-200 cursor-default`}>
+      <DropdownMenuTrigger className={`w-full flex items-center justify-between px-2 py-1.5 text-sm hover:bg-gray-100/30 transition-all duration-200 cursor-`}>
         <span className="flex items-center gap-2">
           {item.icon && <item.icon className="h-4 w-4" />}
           {item.label}

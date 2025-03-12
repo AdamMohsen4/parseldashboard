@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Package className="h-6 w-6 text-primary" />
-              <span className="text-xl font-semibold tracking-tight">E-Parsel</span>
+              <span className="text-xl font-semibold tracking-tight">E-Parcel</span>
             </div>
             <p className="text-muted-foreground text-sm max-w-xs">
               Simplified parcel shipping for businesses across the Nordic region. Book, track, and manage your shipments with confidence.
@@ -93,8 +93,8 @@ const Footer: React.FC = () => {
             <ul className="space-y-3">
               <li className="flex items-start space-x-3">
                 <Mail className="h-5 w-5 text-primary mt-0.5" />
-                <a href="mailto:support@e-parsel.com" className="text-muted-foreground hover:text-primary transition-colors">
-                  support@e-parsel.com
+                <a href="mailto:support@e-parcel.com" className="text-muted-foreground hover:text-primary transition-colors">
+                  support@e-parcel.com
                 </a>
               </li>
               <li className="flex items-start space-x-3">
@@ -109,7 +109,7 @@ const Footer: React.FC = () => {
         
         <div className="border-t border-border mt-10 pt-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} E-Parsel. All rights reserved.
+            © {new Date().getFullYear()} E-Parcel. All rights reserved.
           </p>
           
           <div className="flex space-x-6">

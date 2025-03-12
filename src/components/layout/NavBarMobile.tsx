@@ -67,7 +67,7 @@ const NavBarMobile = ({
           {t('nav.adminDashboard', 'Admin Dashboard')}
         </Link>
       )}
-      
+   
       {categories.map((category) => (
         <div key={category.name} className="space-y-2">
           <h3 className="text-sm font-medium text-muted-foreground">{category.name}</h3>

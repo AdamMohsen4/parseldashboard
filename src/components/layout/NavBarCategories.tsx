@@ -71,7 +71,7 @@ const useNavCategories = () => {
           { path: "/warehouse", label: t('nav.warehouse', 'Warehouse Marketplace'), icon: Warehouse },
           { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
           { path: "/transportation-partners", label: t('nav.transportationPartners', 'Transportation Partners'), icon: Truck },
-          { path: "/book", label: t('nav.book'), icon: Phone },
+          { path: "/book", label: t('nav.book'), icon: Phone,  },
         ]
       },
       {
