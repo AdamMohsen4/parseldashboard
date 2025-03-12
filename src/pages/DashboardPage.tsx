@@ -6,7 +6,8 @@ import { useUser } from "@clerk/clerk-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Activity, ArrowRight, AlertCircle, TrendingUp, Package, CalendarCheck, Truck, BarChart, Bookmark } from "lucide-react";
+import { Activity, ArrowRight, AlertCircle, TrendingUp, Package, CalendarCheck, Truck, BarChart, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/use-toast";
 
 const DashboardPage = () => {
@@ -14,7 +15,8 @@ const DashboardPage = () => {
   const [stats, setStats] = useState({
     activeShipments: 0,
     completedShipments: 0,
-    totalSpent: 0
+    totalSpent: 0,
+    totalSaved: 0
   });
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,17 +47,21 @@ const DashboardPage = () => {
       
       const { data: spentData, error: spentError } = await supabase
         .from('booking')
-        .select('total_price')
+        .select('total_price, carrier_price')
         .eq('user_id', user.id);
       
       if (!activeError && !completedError && !spentError) {
         const totalSpent = spentData?.reduce((sum, booking) => 
           sum + (Number(booking.total_price) || 0), 0) || 0;
         
+        const totalSaved = spentData?.reduce((sum, booking) => 
+          sum + ((Number(booking.carrier_price) || 0) - (Number(booking.total_price) || 0)), 0) || 0;
+
         setStats({
           activeShipments: activeData?.length || 0,
           completedShipments: completedData?.length || 0,
-          totalSpent
+          totalSpent,
+          totalSaved
         });
       } else {
         console.error("Error fetching stats:", { activeError, completedError, spentError });
@@ -263,6 +269,18 @@ const DashboardPage = () => {
                   <AlertCircle className="mr-1 h-4 w-4 text-primary" />
                   <span>Across all shipments</span>
                 </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button className="ml-2 inline-flex items-center text-muted-foreground hover:text-primary">
+                        <Info className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-[200px]">
+                      <p>You've saved €{stats.totalSaved.toFixed(2)} compared to direct carrier pricing!</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </CardContent>
             </Card>
           </div>
