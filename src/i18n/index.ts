@@ -1,3 +1,4 @@
+
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
@@ -7,7 +8,12 @@ export const resources = {
       nav: {
         home: 'Home',
         book: 'Book Demo',
-        shipment: 'Book Shipment',
+        shipment: {
+          title: 'Book Shipment',
+          business: 'Business',
+          private: 'Private Customer',
+          ecommerce: 'E-commerce Business',
+        },
         tracking: 'Tracking',
         compliance: 'Compliance',
         dashboard: 'Dashboard',
@@ -15,11 +21,6 @@ export const resources = {
         transportationPartners: 'Transportation Partners',
         adminDashboard: 'Administratörspanel',
         '3pl': '3PL-tjänster',
-        shipment: {
-          business: 'Företag',
-          private: 'Privatperson',
-          ecommerce: 'E-handelsföretag',
-        },
         support: 'Kundtjänst',
         categories: {
           general: 'Allmänt',
@@ -313,7 +314,12 @@ export const resources = {
       nav: {
         home: 'Hem',
         book: 'Boka Demo',
-        shipment: 'Boka Frakt',
+        shipment: {
+          title: 'Boka Frakt',
+          business: 'Företag',
+          private: 'Privatperson',
+          ecommerce: 'E-handelsföretag',
+        },
         tracking: 'Spårning',
         compliance: 'Efterlevnad',
         dashboard: 'Översikt',
@@ -321,11 +327,6 @@ export const resources = {
         transportationPartners: 'Transportpartners',
         adminDashboard: 'Administratörspanel',
         '3pl': '3PL-tjänster',
-        shipment: {
-          business: 'Företag',
-          private: 'Privatperson',
-          ecommerce: 'E-handelsföretag',
-        },
         support: 'Kundtjänst',
         categories: {
           general: 'Allmänt',
@@ -619,7 +620,12 @@ export const resources = {
       nav: {
         home: 'Etusivu',
         book: 'Varaa Demo',
-        shipment: 'Varaa Lähetys',
+        shipment: {
+          title: 'Varaa Lähetys',
+          business: 'Yritys',
+          private: 'Yksityisasiakas',
+          ecommerce: 'Verkkokauppayritys',
+        },
         tracking: 'Seuranta',
         compliance: 'Vaatimustenmukaisuus',
         dashboard: 'Hallintapaneeli',
@@ -627,11 +633,6 @@ export const resources = {
         transportationPartners: 'Kuljetuskumppanit',
         adminDashboard: 'Järjestelmänvalvojan paneeli',
         '3pl': '3PL-palvelut',
-        shipment: {
-          business: 'Yritys',
-          private: 'Yksityisasiakas',
-          ecommerce: 'Verkkokauppayritys',
-        },
         support: 'Asiakastuki',
         categories: {
           general: 'Yleinen',
