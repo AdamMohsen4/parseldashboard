@@ -1,4 +1,3 @@
-
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -23,6 +22,7 @@ const SupportPage = lazy(() => import("./pages/SupportPage"));
 const IntegrationPage = lazy(() => import("./pages/IntegrationPage"));
 const TransportationPartnersPage = lazy(() => import("./pages/TransportationPartnersPage"));
 const ShipmentsPage = lazy(() => import("./pages/ShipmentsPage"));
+const WarehousePage = lazy(() => import("./pages/WarehousePage"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -91,6 +91,11 @@ const App = () => (
               <Route path="/transportation-partners" element={
                 <AuthWrapper requireAuth>
                   <TransportationPartnersPage />
+                </AuthWrapper>
+              } />
+              <Route path="/warehouse" element={
+                <AuthWrapper requireAuth>
+                  <WarehousePage />
                 </AuthWrapper>
               } />
               <Route path="/dashboard" element={

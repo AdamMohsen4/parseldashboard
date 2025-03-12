@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { 
@@ -74,7 +75,7 @@ export const NavBarCategory = ({ category, hoverClass }: NavCategoryProps) => {
           item.subItems ? (
             <SubItemDropdown 
               key={item.path} 
-              item={{ ...item, subItems: item.subItems }}
+              item={{ ...item, subItems: item.subItems } as NavItemType & { subItems: SubItemType[] }}
               hoverClass={hoverClass} 
               location={location} 
             />
