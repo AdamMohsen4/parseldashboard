@@ -22,7 +22,7 @@ const DropdownNavItem = ({
   const location = useLocation();
   
   return (
-    <DropdownMenuItem asChild className={dropdownItemClass}>
+    <DropdownMenuItem asChild className={`${dropdownItemClass} hover:bg-transparent`}>
       <Link
         to={path}
         className={`${
