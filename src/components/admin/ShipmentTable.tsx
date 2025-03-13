@@ -95,16 +95,7 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
                 <TableCell>
                   <div className="flex gap-2">
 
-                
-                    <Button 
-                    size="sm" 
-                    variant="outline"
-                    className="bg-green-200"
-                    onClick={() => downloadShipmentInfo(shipment)}
-                    >
-                    <Download className="h-4 w-4 mr-1" />
-                    Download
-                    </Button>
+              
 
                     <Button 
                       size="sm" 
