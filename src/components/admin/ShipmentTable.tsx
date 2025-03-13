@@ -58,18 +58,6 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
     setDetailsOpen(true);
   };
 
-  const downloadShipmentInfo = (shipment: any) => {
-    const blob = new Blob([JSON.stringify(shipment, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href
-    a.download = `shipment-${shipment.tracking_code}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    toast.success("Shipment info downloaded successfully");
-  }
-
   return (
     <>
       <div className="overflow-x-auto">
