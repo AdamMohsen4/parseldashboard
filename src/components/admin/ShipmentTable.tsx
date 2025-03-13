@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Table,
@@ -27,7 +26,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { X, Info, Download } from "lucide-react";
 import { toast } from "sonner";
-import * as XLSX from 'xlsx';
 
 interface ShipmentTableProps {
   shipments: any[];
@@ -58,56 +56,6 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
   const handleViewDetails = (shipment: any) => {
     setSelectedShipment(shipment);
     setDetailsOpen(true);
-  };
-
-  // Add the downloadShipmentInfo function
-  const downloadShipmentInfo = (shipment: any) => {
-    try {
-      // Create a workbook with a single sheet
-      const workbook = XLSX.utils.book_new();
-      
-      // Format the shipment data for Excel
-      const shipmentData = {
-        "Tracking Code": shipment.tracking_code || "N/A",
-        "User ID": shipment.user_id || "N/A",
-        "Status": shipment.status?.replace(/_/g, " ") || "Unknown",
-        "Origin": shipment.pickup_address || "N/A",
-        "Destination": shipment.delivery_address || "N/A",
-        "Created": formatDate(shipment.created_at),
-        "Carrier": shipment.carrier_name || "E-Parsel Nordic",
-        "Customer Type": shipment.customer_type || "Private",
-        "Pickup Time": shipment.pickup_time || "N/A",
-        "Estimated Delivery": shipment.estimated_delivery ? new Date(shipment.estimated_delivery).toLocaleDateString() : "N/A",
-        "Delivery Speed": shipment.delivery_speed || "Standard",
-        "Weight": shipment.weight || "N/A",
-        "Dimensions": `${shipment.dimension_length || "N/A"} × ${shipment.dimension_width || "N/A"} × ${shipment.dimension_height || "N/A"}`,
-        "Carrier Price": shipment.carrier_price ? `€${parseFloat(shipment.carrier_price).toFixed(2)}` : "N/A",
-        "Total Price": shipment.total_price ? `€${parseFloat(shipment.total_price).toFixed(2)}` : "N/A",
-        "Business Name": shipment.business_name || "N/A",
-        "VAT Number": shipment.vat_number || "N/A",
-        "Compliance Service": shipment.include_compliance ? "Yes" : "No"
-      };
-
-      // Convert the data to a worksheet
-      const worksheet = XLSX.utils.json_to_sheet([shipmentData]);
-      
-      // Add the worksheet to the workbook
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Shipment Details");
-      
-      // Generate the file name
-      const fileName = `shipment_${shipment.tracking_code || shipment.id}_${new Date().toISOString().split('T')[0]}.xlsx`;
-      
-      // Write the workbook and trigger download
-      XLSX.writeFile(workbook, fileName);
-      
-      toast("Shipment details downloaded successfully");
-    } catch (error) {
-      console.error("Error downloading shipment info:", error);
-      toast("Failed to download shipment information", {
-        description: "Please try again or contact support",
-        style: { backgroundColor: "#FEE2E2", color: "#DC2626" }
-      });
-    }
   };
 
   return (
