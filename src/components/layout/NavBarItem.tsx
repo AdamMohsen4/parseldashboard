@@ -25,8 +25,7 @@ interface NavItemType {
 
 interface NavItemProps {
   item: NavItemType;
-  navItemClass: string;
-  isDropdownItem?: boolean;
+  hoverClass: string;
 }
 
 interface NavCategoryProps {
@@ -34,18 +33,16 @@ interface NavCategoryProps {
     name: string;
     items: NavItemType[];
   };
-  navItemClass: string;
-  dropdownItemClass: string;
+  hoverClass: string;
 }
 
 interface SubItemDropdownProps {
   item: NavItemType & { subItems: SubItemType[] };
-  navItemClass: string;
-  dropdownItemClass: string;
+  hoverClass: string;
   location: ReturnType<typeof useLocation>;
 }
 
-export const NavBarItem = ({ item, navItemClass, isDropdownItem = false }: NavItemProps) => {
+export const NavBarItem = ({ item, hoverClass }: NavItemProps) => {
   const location = useLocation();
   
   return (
@@ -55,7 +52,7 @@ export const NavBarItem = ({ item, navItemClass, isDropdownItem = false }: NavIt
         location.pathname === item.path
           ? "text-primary font-medium"
           : "text-foreground"
-      } ${navItemClass} px-2 py-1 flex items-center gap-1`}
+      } ${hoverClass} px-2 py-1 flex items-center gap-1`}
     >
       {item.icon && <item.icon className="h-4 w-4" />}
       {item.label}
@@ -63,12 +60,12 @@ export const NavBarItem = ({ item, navItemClass, isDropdownItem = false }: NavIt
   );
 };
 
-export const NavBarCategory = ({ category, navItemClass, dropdownItemClass }: NavCategoryProps) => {
+export const NavBarCategory = ({ category, hoverClass }: NavCategoryProps) => {
   const location = useLocation();
   
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={`flex items-center gap-1 ${navItemClass} px-2 py-1`}>
+      <DropdownMenuTrigger className={`flex items-center gap-1 ${hoverClass} px-2 py-1`}>
         {category.name} <ChevronDown className="h-4 w-4" />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
@@ -79,12 +76,11 @@ export const NavBarCategory = ({ category, navItemClass, dropdownItemClass }: Na
             <SubItemDropdown 
               key={item.path} 
               item={{ ...item, subItems: item.subItems } as NavItemType & { subItems: SubItemType[] }}
-              navItemClass={navItemClass}
-              dropdownItemClass={dropdownItemClass}
+              hoverClass={hoverClass} 
               location={location} 
             />
           ) : (
-            <DropdownMenuItem key={item.path} asChild className={dropdownItemClass}>
+            <DropdownMenuItem key={item.path} asChild className="hover:bg-gray-100/30 cursor-pointer">
               <Link
                 to={item.path}
                 className={`${
@@ -102,10 +98,10 @@ export const NavBarCategory = ({ category, navItemClass, dropdownItemClass }: Na
   );
 };
 
-const SubItemDropdown = ({ item, navItemClass, dropdownItemClass, location }: SubItemDropdownProps) => {
+const SubItemDropdown = ({ item, hoverClass, location }: SubItemDropdownProps) => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={`w-full flex items-center justify-between px-2 py-1.5 text-sm transition-all duration-200 cursor-pointer`}>
+      <DropdownMenuTrigger className={`w-full flex items-center justify-between px-2 py-1.5 text-sm hover:bg-gray-100/30 transition-all duration-200 cursor-`}>
         <span className="flex items-center gap-2">
           {item.icon && <item.icon className="h-4 w-4" />}
           {item.label}
@@ -114,7 +110,7 @@ const SubItemDropdown = ({ item, navItemClass, dropdownItemClass, location }: Su
       </DropdownMenuTrigger>
       <DropdownMenuContent side="right" className="w-48">
         {item.subItems.map((subItem) => (
-          <DropdownMenuItem key={subItem.path} asChild className={dropdownItemClass}>
+          <DropdownMenuItem key={subItem.path} asChild className="hover:bg-gray-100/30 cursor-pointer">
             <Link
               to={subItem.path}
               className={`${

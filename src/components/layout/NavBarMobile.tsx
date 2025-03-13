@@ -1,6 +1,19 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Shield } from "lucide-react";
+import { 
+  Shield,
+  Package, 
+  Warehouse, 
+  Truck, 
+  FileCheck, 
+  LayoutDashboard, 
+  Phone, 
+  User,
+  Briefcase,
+  ShoppingCart,
+  HelpCircle,
+  Users
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { AuthButtons } from "@/components/auth/AuthWrapper";
 import LanguageSwitcher from "../common/LanguageSwitcher";
@@ -35,9 +48,6 @@ const NavBarMobile = ({
   const location = useLocation();
   const { t } = useTranslation();
 
-  // Mobile menu specific style
-  const mobileItemClass = "hover:bg-gray-100/30"; // Optional hover effect just for mobile
-
   if (!isMenuOpen) return null;
 
   return (
@@ -50,14 +60,14 @@ const NavBarMobile = ({
             location.pathname === "/admin-dashboard" 
               ? "text-primary font-medium" 
               : "text-foreground"
-          } px-2 py-1.5 ${hoverClass} ${mobileItemClass}`}
+          } px-2 py-1.5 ${hoverClass}`}
           onClick={() => setIsMenuOpen(false)}
         >
           <Shield className="h-4 w-4" />
           {t('nav.adminDashboard', 'Admin Dashboard')}
         </Link>
       )}
-      
+   
       {categories.map((category) => (
         <div key={category.name} className="space-y-2">
           <h3 className="text-sm font-medium text-muted-foreground">{category.name}</h3>
@@ -78,7 +88,7 @@ const NavBarMobile = ({
                           location.pathname === subItem.path
                             ? "text-primary font-medium"
                             : "text-foreground"
-                        } block py-1.5 ${hoverClass} ${mobileItemClass} flex items-center gap-2 px-2`}
+                        } block py-1.5 ${hoverClass} flex items-center gap-2 px-2`}
                         onClick={() => setIsMenuOpen(false)}
                       >
                         {subItem.icon && <subItem.icon className="h-4 w-4" />}
@@ -95,7 +105,7 @@ const NavBarMobile = ({
                     location.pathname === item.path
                       ? "text-primary font-medium"
                       : "text-foreground"
-                  } block py-1.5 ${hoverClass} ${mobileItemClass} flex items-center gap-2 px-2`}
+                  } block py-1.5 ${hoverClass} flex items-center gap-2 px-2`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.icon && <item.icon className="h-4 w-4" />}
