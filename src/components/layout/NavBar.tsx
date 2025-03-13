@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/AuthWrapper";
@@ -46,8 +45,8 @@ const NavBar = () => {
   // Check if user has admin role
   const isAdmin = isSignedIn && user?.publicMetadata?.role === "admin";
 
-  // Updated for sleeker hover style with a subtle background and smooth transition
-  const hoverClass = "hover:bg-gray-100/30 hover:text-primary transition-all duration-200 rounded-md";
+  // Updated to remove hover effects, keeping only transition and rounded corners
+  const hoverClass = "transition-all duration-200 rounded-md";
 
   // Organize nav items into categories
   const categories = [
@@ -120,7 +119,7 @@ const NavBar = () => {
                     className={`hidden md:flex items-center gap-2 ${
                       location.pathname === "/admin-dashboard" 
                         ? "bg-primary text-primary-foreground" 
-                        : "bg-accent/10 hover:bg-accent/20"
+                        : "bg-accent/10"
                     } px-3 py-1.5 rounded-md font-medium transition-all duration-200`}
                   >
                     <Shield className="h-4 w-4" />
@@ -174,7 +173,7 @@ const NavBar = () => {
                       item.subItems ? (
                         // For items with subcategories
                         <DropdownMenu key={item.path}>
-                          <DropdownMenuTrigger className={`w-full flex items-center justify-between px-2 py-1.5 text-sm hover:bg-gray-100/30 hover:text-primary transition-all duration-200 cursor-default`}>
+                          <DropdownMenuTrigger className={`w-full flex items-center justify-between px-2 py-1.5 text-sm transition-all duration-200 cursor-default`}>
                             <span className="flex items-center gap-2">
                               {item.icon && <item.icon className="h-4 w-4" />}
                               {item.label}
@@ -183,7 +182,7 @@ const NavBar = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="right" className="w-48">
                             {item.subItems.map((subItem) => (
-                              <DropdownMenuItem key={subItem.path} asChild className="hover:bg-gray-100/30 hover:text-primary transition-all duration-200 cursor-pointer">
+                              <DropdownMenuItem key={subItem.path} asChild className="transition-all duration-200 cursor-pointer">
                                 <Link
                                   to={subItem.path}
                                   className={`${
@@ -199,7 +198,7 @@ const NavBar = () => {
                         </DropdownMenu>
                       ) : (
                         // For regular items
-                        <DropdownMenuItem key={item.path} asChild className="hover:bg-gray-100/30 hover:text-secondary transition-all duration-200 cursor-pointer">
+                        <DropdownMenuItem key={item.path} asChild className="transition-all duration-200 cursor-pointer">
                           <Link
                             to={item.path}
                             className={`${
