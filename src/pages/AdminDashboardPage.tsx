@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
-import { Search } from "lucide-react";
+import { Search, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUser } from "@clerk/clerk-react";
@@ -15,6 +15,7 @@ import CollaborationsTable from "@/components/admin/CollaborationsTable";
 import SupportTicketsTable from "@/components/admin/SupportTicketsTable";
 import TicketDetailsDialog from "@/components/admin/TicketDetailsDialog";
 import AdminStatsCards from "@/components/admin/AdminStatsCards";
+import DateRangeSelector from "@/components/admin/DateRangeSelector";
 
 import * as AdminDataService from "@/components/admin/AdminDataService";
 
@@ -25,6 +26,7 @@ const AdminDashboardPage = () => {
   const [demosTab, setDemosTab] = useState("all");
   const [supportTab, setSupportTab] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
   const [stats, setStats] = useState({
     totalShipments: 0,
     pendingShipments: 0,
@@ -219,6 +221,22 @@ const AdminDashboardPage = () => {
     });
   };
 
+  const handleExportShipments = async (startDate: string, endDate: string) => {
+    try {
+      setIsExporting(true);
+      await AdminDataService.exportShipmentsToExcel(startDate, endDate);
+    } catch (error) {
+      console.error("Error exporting shipments:", error);
+      toast({
+        title: "Export Failed",
+        description: "An unexpected error occurred during export.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const loadShipments = async () => {
     const data = await AdminDataService.loadShipments();
     setShipments(data);
@@ -332,13 +350,20 @@ const AdminDashboardPage = () => {
             <CardContent>
               <Tabs value={mainTab}>
                 <TabsContent value="shipments">
-                  <div className="mb-4 flex items-center gap-2">
-                    <Search className="text-muted-foreground h-5 w-5" />
-                    <Input
-                      placeholder="Search by tracking code, user, address..."
-                      value={shipmentSearchQuery}
-                      onChange={(e) => setShipmentSearchQuery(e.target.value)}
-                      className="max-w-sm"
+                  <div className="flex flex-col md:flex-row justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Search className="text-muted-foreground h-5 w-5" />
+                      <Input
+                        placeholder="Search by tracking code, user, address..."
+                        value={shipmentSearchQuery}
+                        onChange={(e) => setShipmentSearchQuery(e.target.value)}
+                        className="max-w-sm"
+                      />
+                    </div>
+                    
+                    <DateRangeSelector 
+                      onExport={handleExportShipments}
+                      isLoading={isExporting}
                     />
                   </div>
                   
@@ -350,7 +375,6 @@ const AdminDashboardPage = () => {
                       <TabsTrigger value="delivered">Delivered</TabsTrigger>
                       <TabsTrigger value="exception">Exceptions</TabsTrigger>
                       <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
-                      
                     </TabsList>
                     
                     <TabsContent value="all">
@@ -594,3 +618,4 @@ const AdminDashboardPage = () => {
 };
 
 export default AdminDashboardPage;
+

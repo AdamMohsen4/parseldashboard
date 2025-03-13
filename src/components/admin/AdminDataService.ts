@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { updateShipmentStatus } from "@/services/shipmentService";
+import * as XLSX from 'xlsx';
 
 // Cache for admin stats
 let statsCache = null;
@@ -111,6 +112,106 @@ const invalidateAllCaches = () => {
   statsCache = null;
   statsCacheTimestamp = 0;
   dataCache.clear();
+};
+
+export const loadShipmentsWithDateRange = async (startDate: string, endDate: string) => {
+  try {
+    console.log(`Loading shipments from ${startDate} to ${endDate}`);
+    
+    // Convert provided dates to ISO format for Supabase query
+    const fromDate = new Date(startDate);
+    const toDate = new Date(endDate);
+    
+    // Add one day to end date to include the entire day
+    toDate.setDate(toDate.getDate() + 1);
+    
+    const { data, error } = await supabase
+      .from('booking')
+      .select('*')
+      .gte('created_at', fromDate.toISOString())
+      .lt('created_at', toDate.toISOString())
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error("Error loading shipments with date range:", error);
+      toast({
+        title: "Error Loading Shipments",
+        description: error.message,
+        variant: "destructive",
+      });
+      return [];
+    }
+    
+    console.log(`Shipments loaded with date range: ${data?.length || 0}`);
+    return data || [];
+  } catch (error) {
+    console.error("Error in loadShipmentsWithDateRange:", error);
+    return [];
+  }
+};
+
+export const exportShipmentsToExcel = async (startDate: string, endDate: string): Promise<boolean> => {
+  try {
+    const shipments = await loadShipmentsWithDateRange(startDate, endDate);
+    
+    if (shipments.length === 0) {
+      toast({
+        title: "No Data to Export",
+        description: "There are no shipments in the selected date range.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    // Format the data for Excel export
+    const formattedData = shipments.map(shipment => ({
+      "Tracking Code": shipment.tracking_code,
+      "User ID": shipment.user_id,
+      "Customer Type": shipment.customer_type,
+      "Business Name": shipment.business_name || 'N/A',
+      "VAT Number": shipment.vat_number || 'N/A',
+      "Weight (kg)": shipment.weight,
+      "Dimensions (cm)": `${shipment.dimension_length}x${shipment.dimension_width}x${shipment.dimension_height}`,
+      "Pickup Address": shipment.pickup_address,
+      "Delivery Address": shipment.delivery_address,
+      "Carrier": shipment.carrier_name,
+      "Carrier Price": shipment.carrier_price,
+      "Total Price": shipment.total_price,
+      "Pickup Time": shipment.pickup_time,
+      "Status": shipment.status,
+      "Created At": formatDate(shipment.created_at),
+      "Estimated Delivery": shipment.estimated_delivery,
+      "Delivery Speed": shipment.delivery_speed
+    }));
+    
+    // Create a worksheet from the data
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    
+    // Create a workbook and add the worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Shipments");
+    
+    // Generate filename with date range
+    const fileName = `shipments_${startDate.replace(/-/g, '')}_to_${endDate.replace(/-/g, '')}.xlsx`;
+    
+    // Export the file
+    XLSX.writeFile(workbook, fileName);
+    
+    toast({
+      title: "Export Successful",
+      description: `Shipments exported to ${fileName}`,
+    });
+    
+    return true;
+  } catch (error) {
+    console.error("Error exporting shipments to Excel:", error);
+    toast({
+      title: "Export Failed",
+      description: "Failed to export shipments. Please try again.",
+      variant: "destructive",
+    });
+    return false;
+  }
 };
 
 export const loadShipments = async () => {
