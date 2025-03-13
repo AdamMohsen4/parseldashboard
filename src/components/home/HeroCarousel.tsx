@@ -4,11 +4,11 @@ import { cn } from "@/lib/utils";
 
 const images = [
   {
-    src: "uploads/40bf477a-ad0b-486e-9a0d-83c1aff0401a.png",
+    src: "/lovable-uploads/336788e8-5b45-42aa-bb86-bb8a79d66846.png",
     alt: ""
   },
   {
-    src: "/lovable-uploads/336788e8-5b45-42aa-bb86-bb8a79d66846.png",
+    src: "uploads/40bf477a-ad0b-486e-9a0d-83c1aff0401a.png",
     alt: ""
   },
   {
