@@ -41,7 +41,7 @@ export const resources = {
           }
         },
         features: {
-          title: 'Why Choose E-Parsel?',
+          title: 'Why Choose E-Parcel?',
           description: 'We simplify logistics for small and medium enterprises across the Nordic region.',
           fixedRate: {
             title: 'Fixed €10 Rate',
@@ -61,7 +61,7 @@ export const resources = {
         },
         cta: {
           title: 'Ready to Simplify Your Shipping?',
-          description: 'Join hundreds of SMEs across the Nordic region who trust E-Parsel for their shipping needs.',
+          description: 'Join hundreds of SMEs across the Nordic region who trust E-Parcel for their shipping needs.',
           button: 'Book Your Demo',
         },
       },
@@ -76,7 +76,7 @@ export const resources = {
         estimatedDelivery: 'Estimated Delivery',
         trackingHistory: 'Tracking History',
         needHelp: 'Need Help?',
-        helpText: 'If you have any questions about your shipment, please contact our customer service at support@e-parsel.com or call +46 123 456 789.',
+        helpText: 'If you have any questions about your shipment, please contact our customer service at support@e-parcel.com or call +46 123 456 789.',
         status: {
           inTransit: 'In Transit',
           delivered: 'Delivered',
@@ -111,7 +111,7 @@ export const resources = {
         learnMore: 'Learn more',
         calculateRate: 'Calculate Rate',
         fixedRate: 'Fixed Rate Shipping',
-        carrier: 'E-Parsel Nordic',
+        carrier: 'E-Parcel Nordic',
         eta: 'Estimated delivery: 3 days',
         bookNow: 'Book Now',
         aboutRates: 'About our rates',
@@ -119,7 +119,7 @@ export const resources = {
         shipmentReady: 'Shipment Ready to Book',
         shipmentFrom: 'Your shipment from',
         shipmentTo: 'to',
-        shipmentReady2: 'is ready to be booked with E-Parsel Nordic.',
+        shipmentReady2: 'is ready to be booked with E-Parcel Nordic.',
         total: 'Total:',
         confirmBooking: 'Confirm Booking',
         signInToBook: 'Sign In to Book',
@@ -288,7 +288,7 @@ export const resources = {
           }
         },
         features: {
-          title: 'Varför Välja E-Parsel?',
+          title: 'Varför Välja E-Parcel?',
           description: 'Vi förenklar logistik för små och medelstora företag i hela Norden.',
           fixedRate: {
             title: 'Fast Taxa 10 €',
@@ -308,7 +308,7 @@ export const resources = {
         },
         cta: {
           title: 'Redo att Förenkla din Frakt?',
-          description: 'Gå med hundratals små och medelstora företag i Norden som litar på E-Parsel för sina fraktbehov.',
+          description: 'Gå med hundratals små och medelstora företag i Norden som litar på E-Parcel för sina fraktbehov.',
           button: 'Boka Din Demo',
         },
       },
@@ -323,7 +323,7 @@ export const resources = {
         estimatedDelivery: 'Beräknad Leverans',
         trackingHistory: 'Spårningshistorik',
         needHelp: 'Behöver du Hjälp?',
-        helpText: 'Om du har några frågor om din försändelse, kontakta vår kundtjänst på support@e-parsel.com eller ring +46 123 456 789.',
+        helpText: 'Om du har några frågor om din försändelse, kontakta vår kundtjänst på support@e-parcel.com eller ring +46 123 456 789.',
         status: {
           inTransit: 'Under Transport',
           delivered: 'Levererad',
@@ -358,7 +358,7 @@ export const resources = {
         learnMore: 'Läs mer',
         calculateRate: 'Beräkna Taxa',
         fixedRate: 'Fast Taxa Frakt',
-        carrier: 'E-Parsel Nordic',
+        carrier: 'E-Parcel Nordic',
         eta: 'Beräknad leverans: 3 dagar',
         bookNow: 'Boka Nu',
         aboutRates: 'Om våra taxor',
@@ -366,7 +366,7 @@ export const resources = {
         shipmentReady: 'Försändelse Redo att Bokas',
         shipmentFrom: 'Din försändelse från',
         shipmentTo: 'till',
-        shipmentReady2: 'är redo att bokas med E-Parsel Nordic.',
+        shipmentReady2: 'är redo att bokas med E-Parcel Nordic.',
         total: 'Totalt:',
         confirmBooking: 'Bekräfta Bokning',
         signInToBook: 'Logga In för att Boka',
@@ -535,7 +535,7 @@ export const resources = {
           }
         },
         features: {
-          title: 'Miksi Valita E-Parsel?',
+          title: 'Miksi Valita E-Parcel?',
           description: 'Yksinkertaistamme logistiikkaa pienille ja keskisuurille yrityksille Pohjoismaissa.',
           fixedRate: {
             title: 'Kiinteä 10 € Hinta',
@@ -555,7 +555,7 @@ export const resources = {
         },
         cta: {
           title: 'Valmis Yksinkertaistamaan Lähetyksiäsi?',
-          description: 'Liity satoihin pohjoismaisiin pk-yrityksiin, jotka luottavat E-Parsel-palveluun lähetystarpeissaan.',
+          description: 'Liity satoihin pohjoismaisiin pk-yrityksiin, jotka luottavat E-Parcel-palveluun lähetystarpeissaan.',
           button: 'Varaa Ensimmäinen Lähetyksesi',
         },
       },
@@ -570,7 +570,7 @@ export const resources = {
         estimatedDelivery: 'Arvioitu Toimitus',
         trackingHistory: 'Seurantahistoria',
         needHelp: 'Tarvitsetko Apua?',
-        helpText: 'Jos sinulla on kysyttävää lähetyksestäsi, ota yhteyttä asiakaspalveluumme osoitteessa support@e-parsel.com tai soita +46 123 456 789.',
+        helpText: 'Jos sinulla on kysyttävää lähetyksestäsi, ota yhteyttä asiakaspalveluumme osoitteessa support@e-parcel.com tai soita +46 123 456 789.',
         status: {
           inTransit: 'Kuljetuksessa',
           delivered: 'Toimitettu',
@@ -605,7 +605,7 @@ export const resources = {
         learnMore: 'Lue lisää',
         calculateRate: 'Laske Hinta',
         fixedRate: 'Kiinteä Hinta Lähetyksille',
-        carrier: 'E-Parsel Nordic',
+        carrier: 'E-Parcel Nordic',
         eta: 'Arvioitu toimitus: 3 päivää',
         bookNow: 'Varaa Nyt',
         aboutRates: 'Tietoa hinnoistamme',
@@ -613,7 +613,7 @@ export const resources = {
         shipmentReady: 'Lähetys Valmis Varattavaksi',
         shipmentFrom: 'Lähetyksesi kohteesta',
         shipmentTo: 'kohteeseen',
-        shipmentReady2: 'on valmis varattavaksi E-Parsel Nordic -palvelulla.',
+        shipmentReady2: 'on valmis varattavaksi E-Parcel Nordic -palvelulla.',
         total: 'Yhteensä:',
         confirmBooking: 'Vahvista Varaus',
         signInToBook: 'Kirjaudu Sisään Varataksesi',

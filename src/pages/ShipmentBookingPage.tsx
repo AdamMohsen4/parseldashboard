@@ -97,7 +97,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 
   const carrier = {
     id: 1,
-    name: "E-Parsel Nordic",
+    name: "E-Parcel Nordic",
     price: getCarrierPrice(),
     eta: "3 days",
     icon: "📦"
@@ -247,7 +247,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       const dimensions = `${length}x${width}x${height} cm`;
       const result = await generateLabel({
         shipmentId,
-        carrierName: bookingResult.carrier_name || "E-Parsel Nordic",
+        carrierName: bookingResult.carrier_name || "E-Parcel Nordic",
         trackingCode,
         senderAddress: pickup,
         recipientAddress: delivery,

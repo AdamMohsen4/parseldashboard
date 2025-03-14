@@ -15,6 +15,7 @@ const Index = () => {
   return <div className="min-h-screen bg-background">
       <NavBar />
 
+
       {/* Hero section */}
       <section className="px-4 relative overflow-hidden py-16">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 -z-10" />
@@ -24,9 +25,11 @@ const Index = () => {
               <div className="inline-block bg-primary/10 px-4 py-2 rounded-full text-primary font-medium text-sm mb-2">
                 {t('home.hero.badge')}
               </div>
-              <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80 mx-0 my-0">
-                {t('home.hero.title')}
-              </h1>
+              {/* make typewriter effect for home.hero.title */}
+                <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80 mx-0 my-0 typewriter">
+                  {t('home.hero.title')}
+                </h1>
+
               <p className="text-xl text-muted-foreground leading-relaxed">
                 {t('home.hero.description')}
               </p>
@@ -164,7 +167,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h3 className="font-bold text-lg mb-4">E-Parsel</h3>
+              <h3 className="font-bold text-lg mb-4">E-Parcel</h3>
               <p className="text-muted-foreground">{t('footer.description')}</p>
             </div>
             <div>
@@ -189,14 +192,14 @@ const Index = () => {
             <div>
               <h4 className="font-bold mb-4">{t('footer.contact')}</h4>
               <address className="not-italic text-muted-foreground">
-                <p>{t('footer.contactInfo.email')} info@e-parsel.com</p>
+                <p>{t('footer.contactInfo.email')} info@e-parcel.com</p>
                 <p>{t('footer.contactInfo.phone')} +46 123 456 789</p>
-                <p>{t('footer.contactInfo.address')} Malmö, Sweden</p>
+                <p>{t('footer.contactInfo.address')} Stockholm, Sweden</p>
               </address>
             </div>
           </div>
           <div className="border-t border-border mt-12 pt-6 text-center text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} E-Parsel. {t('footer.rights')}</p>
+            <p>&copy; {new Date().getFullYear()} E-Parcel. {t('footer.rights')}</p>
           </div>
         </div>
       </footer>

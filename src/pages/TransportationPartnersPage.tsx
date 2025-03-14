@@ -21,7 +21,7 @@ const TransportationPartnersPage = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-4">{t('transportation.title', 'Our Transportation Partners')}</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            {t('transportation.description', 'E-Parsel collaborates with industry-leading transportation companies to ensure reliable and efficient delivery services for all your shipments.')}
+            {t('transportation.description', 'E-Parcel collaborates with industry-leading transportation companies to ensure reliable and efficient delivery services for all your shipments.')}
           </p>
         </div>
 

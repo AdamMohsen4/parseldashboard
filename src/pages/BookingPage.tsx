@@ -83,7 +83,7 @@ const BookingPage = () => {
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-3xl mx-auto text-center mb-12">
           <h1 className="text-4xl font-bold tracking-tight mb-4">
-            Book a Demo with E-Parsel
+            Book a Demo with E-Parcel
           </h1>
           <p className="text-xl text-muted-foreground">
             Experience how our platform can simplify your shipping process
@@ -93,7 +93,7 @@ const BookingPage = () => {
         <div className="grid gap-10 md:grid-cols-2">
           <Card className="p-6">
             <CardHeader className="pb-2">
-              <CardTitle>Why Choose E-Parsel</CardTitle>
+              <CardTitle>Why Choose E-Parcel</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-3">

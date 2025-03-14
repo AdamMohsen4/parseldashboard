@@ -38,7 +38,7 @@ const ShipmentsPage = () => {
           userId: booking.user_id,
           trackingCode: booking.tracking_code || '',
           carrier: {
-            name: booking.carrier_name || 'E-Parsel Nordic',
+            name: booking.carrier_name || 'E-Parcel Nordic',
             price: Number(booking.carrier_price) || 10
           },
           weight: booking.weight || '',
