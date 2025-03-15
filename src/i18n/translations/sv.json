@@ -1,0 +1,39 @@
+
+{
+  "common": {
+    "loading": "Laddar...",
+    "error": "Fel",
+    "success": "Framgång",
+    "cancel": "Avbryt",
+    "save": "Spara",
+    "delete": "Radera",
+    "edit": "Redigera",
+    "submit": "Skicka",
+    "close": "Stäng"
+  },
+  "shipment": {
+    "senderDetails": "Avsändarens uppgifter",
+    "recipientDetails": "Mottagarens uppgifter",
+    "additionalDetails": "Ytterligare uppgifter",
+    "name": "Namn",
+    "email": "E-postadress",
+    "address": "Gatuadress",
+    "address2": "Gatuadress 2",
+    "postcode": "Postnummer",
+    "city": "Ort",
+    "country": "Land",
+    "selectCountry": "Välj land",
+    "countryCode": "Landskod",
+    "phoneNumber": "Telefonnummer",
+    "withoutFirstZero": "Fyll i utan första nollan",
+    "recipientEmailInfo": "Mottagaren får information om beställningen om detta fält är ifyllt",
+    "additionalInstructions": "Tilläggsuppgifter/transportanvisningar",
+    "reference": "Referens (referens visas också på fakturan)",
+    "referenceRequired": "Referensen är obligatorisk vid import leveranser",
+    "packageValue": "Försändelsens värde min 1 (€)",
+    "packageValueInfo": "Försändelsens värde ska meddelas för eventuella tullåtgärder, värdet ska överensstämma med handelsfakturan",
+    "packageContents": "Försändelsens innehåll",
+    "englishRequired": "Fyll i informationen på engelska om du skickar paketet utomlands",
+    "continueToShipping": "Fortsätt till Frakt"
+  }
+}

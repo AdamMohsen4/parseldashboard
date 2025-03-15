@@ -16,6 +16,7 @@ import { Briefcase, Download, ShoppingCart, User } from "lucide-react";
 import { getBookingByTrackingCode } from "@/services/bookingDb";
 import LabelLanguageSelector from "@/components/labels/LabelLanguageSelector";
 import { generateLabel } from "@/services/labelService";
+import ShipmentDetailsForm, { ShipmentDetailsData } from "@/components/shipment/ShipmentDetailsForm";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 
@@ -45,7 +46,9 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [canCancelBooking, setCanCancelBooking] = useState(false);
   const [labelLanguage, setLabelLanguage] = useState("en");
   const [isGeneratingLabel, setIsGeneratingLabel] = useState(false);
-  
+  const [showDetailsForm, setShowDetailsForm] = useState(false);
+  const [shipmentDetails, setShipmentDetails] = useState<ShipmentDetailsData | null>(null);
+
   useEffect(() => {
     const checkSavedBooking = async () => {
       if (isSignedIn && user) {
@@ -109,20 +112,51 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     }
   };
   
+  const handlePackageInfoSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!weight || !length || !width || !height || !pickup || !delivery) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all package details before proceeding.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setShowDetailsForm(true);
+  };
+  
+  const handleDetailsSubmit = (data: ShipmentDetailsData) => {
+    setShipmentDetails(data);
+    setShowBookingConfirmation(true);
+  };
+  
   const handleBookNow = async () => {
     if (!isSignedIn || !user) {
       document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click();
       return;
     }
 
+    if (!shipmentDetails) {
+      toast({
+        title: "Missing Information",
+        description: "Please complete the shipment details form before booking.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsBooking(true);
     
     try {
+      const formattedPickup = `${shipmentDetails.senderName}, ${shipmentDetails.senderAddress}, ${shipmentDetails.senderPostcode} ${shipmentDetails.senderCity}, ${shipmentDetails.senderCountry}`;
+      const formattedDelivery = `${shipmentDetails.recipientName}, ${shipmentDetails.recipientAddress}${shipmentDetails.recipientAddress2 ? `, ${shipmentDetails.recipientAddress2}` : ''}, ${shipmentDetails.recipientPostcode} ${shipmentDetails.recipientCity}, ${shipmentDetails.recipientCountry}`;
+      
       const result = await bookShipment({
         weight,
         dimensions: { length, width, height },
-        pickup,
-        delivery,
+        pickup: formattedPickup,
+        delivery: formattedDelivery,
         carrier: { name: carrier.name, price: carrier.price },
         deliverySpeed,
         includeCompliance: compliance,
@@ -377,174 +411,172 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
               </CardHeader>
               <CardContent>
                 {!bookingConfirmed ? (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    {(selectedCustomerType === "business" || selectedCustomerType === "ecommerce") && (
-                      <div className="space-y-4">
-                        <h3 className="font-semibold">Business Details</h3>
+                  <>
+                    {!showDetailsForm ? (
+                      <form onSubmit={handlePackageInfoSubmit} className="space-y-6">
+                        {(selectedCustomerType === "business" || selectedCustomerType === "ecommerce") && (
+                          <div className="space-y-4">
+                            <h3 className="font-semibold">Business Details</h3>
+                            
+                            <div>
+                              <Label htmlFor="businessName">Business Name</Label>
+                              <Input 
+                                id="businessName" 
+                                type="text" 
+                                placeholder="Enter business name" 
+                                value={businessName}
+                                onChange={(e) => setBusinessName(e.target.value)}
+                                required
+                              />
+                            </div>
+                            
+                            {selectedCustomerType === "business" && (
+                              <div>
+                                <Label htmlFor="vatNumber">VAT Number</Label>
+                                <Input 
+                                  id="vatNumber" 
+                                  type="text" 
+                                  placeholder="Enter VAT number" 
+                                  value={vatNumber}
+                                  onChange={(e) => setVatNumber(e.target.value)}
+                                  required
+                                />
+                              </div>
+                            )}
+                          </div>
+                        )}
                         
-                        <div>
-                          <Label htmlFor="businessName">Business Name</Label>
-                          <Input 
-                            id="businessName" 
-                            type="text" 
-                            placeholder="Enter business name" 
-                            value={businessName}
-                            onChange={(e) => setBusinessName(e.target.value)}
-                            required
-                          />
-                        </div>
-                        
-                        {selectedCustomerType === "business" && (
+                        <div className="space-y-4">
+                          <h3 className="font-semibold">Package Details</h3>
+                          
                           <div>
-                            <Label htmlFor="vatNumber">VAT Number</Label>
+                            <Label htmlFor="weight">Weight (kg)</Label>
                             <Input 
-                              id="vatNumber" 
-                              type="text" 
-                              placeholder="Enter VAT number" 
-                              value={vatNumber}
-                              onChange={(e) => setVatNumber(e.target.value)}
+                              id="weight" 
+                              type="number" 
+                              placeholder="Enter weight" 
+                              min="0.1" 
+                              max="50"
+                              value={weight}
+                              onChange={(e) => setWeight(e.target.value)}
                               required
                             />
                           </div>
-                        )}
-                      </div>
+                          
+                          <div className="grid grid-cols-3 gap-4">
+                            <div>
+                              <Label htmlFor="length">Length (cm)</Label>
+                              <Input 
+                                id="length" 
+                                type="number" 
+                                placeholder="L" 
+                                value={length}
+                                onChange={(e) => setLength(e.target.value)}
+                                required
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="width">Width (cm)</Label>
+                              <Input 
+                                id="width" 
+                                type="number" 
+                                placeholder="W" 
+                                value={width}
+                                onChange={(e) => setWidth(e.target.value)}
+                                required
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="height">Height (cm)</Label>
+                              <Input 
+                                id="height" 
+                                type="number" 
+                                placeholder="H" 
+                                value={height}
+                                onChange={(e) => setHeight(e.target.value)}
+                                required
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <Separator />
+                        
+                        <div className="space-y-4">
+                          <h3 className="font-semibold">Locations</h3>
+                          
+                          <div>
+                            <Label htmlFor="pickup">Pickup Address</Label>
+                            <GooglePlacesAutocomplete
+                              id="pickup"
+                              placeholder="Enter pickup address"
+                              value={pickup}
+                              onChange={(e) => setPickup(e.target.value)}
+                              onPlaceSelect={(address) => setPickup(address)}
+                              required
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="delivery">Delivery Address</Label>
+                            <GooglePlacesAutocomplete
+                              id="delivery"
+                              placeholder="Enter delivery address"
+                              value={delivery}
+                              onChange={(e) => setDelivery(e.target.value)}
+                              onPlaceSelect={(address) => setDelivery(address)}
+                              required
+                            />
+                          </div>
+                        </div>
+                        
+                        <Separator />
+                        
+                        <div className="space-y-4">
+                          <h3 className="font-semibold">Delivery Options</h3>
+                          
+                          <RadioGroup 
+                            value={deliverySpeed} 
+                            onValueChange={setDeliverySpeed}
+                            className="space-y-2"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="standard" id="standard" />
+                              <Label htmlFor="standard">Standard (3 days)</Label>
+                            </div>
+                          </RadioGroup>
+                          
+                          <div className="flex items-center space-x-2 pt-2">
+                            <Checkbox 
+                              id="compliance" 
+                              checked={compliance}
+                              onCheckedChange={(checked) => setCompliance(checked === true)}
+                            />
+                            <Label htmlFor="compliance" className="text-sm">
+                              Add Compliance Package (+€2)
+                              <Link to="/compliance" className="ml-1 text-primary text-sm underline">
+                                Learn more
+                              </Link>
+                            </Label>
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-col space-y-2">
+                          <Button 
+                            type="submit" 
+                            className="w-full"
+                          >
+                            Continue to Shipment Details
+                          </Button>
+                        </div>
+                      </form>
+                    ) : (
+                      <ShipmentDetailsForm 
+                        isVisible={showDetailsForm}
+                        onComplete={handleDetailsSubmit}
+                      />
                     )}
-                    
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Package Details</h3>
-                      
-                      <div>
-                        <Label htmlFor="weight">Weight (kg)</Label>
-                        <Input 
-                          id="weight" 
-                          type="number" 
-                          placeholder="Enter weight" 
-                          min="0.1" 
-                          max="50"
-                          value={weight}
-                          onChange={(e) => setWeight(e.target.value)}
-                          required
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <Label htmlFor="length">Length (cm)</Label>
-                          <Input 
-                            id="length" 
-                            type="number" 
-                            placeholder="L" 
-                            value={length}
-                            onChange={(e) => setLength(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="width">Width (cm)</Label>
-                          <Input 
-                            id="width" 
-                            type="number" 
-                            placeholder="W" 
-                            value={width}
-                            onChange={(e) => setWidth(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="height">Height (cm)</Label>
-                          <Input 
-                            id="height" 
-                            type="number" 
-                            placeholder="H" 
-                            value={height}
-                            onChange={(e) => setHeight(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Locations</h3>
-                      
-                      <div>
-                        <Label htmlFor="pickup">Pickup Address</Label>
-                        <GooglePlacesAutocomplete
-                          id="pickup"
-                          placeholder="Enter pickup address"
-                          value={pickup}
-                          onChange={(e) => setPickup(e.target.value)}
-                          onPlaceSelect={(address) => setPickup(address)}
-                          required
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="delivery">Delivery Address</Label>
-                        <GooglePlacesAutocomplete
-                          id="delivery"
-                          placeholder="Enter delivery address"
-                          value={delivery}
-                          onChange={(e) => setDelivery(e.target.value)}
-                          onPlaceSelect={(address) => setDelivery(address)}
-                          required
-                        />
-                      </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Delivery Options</h3>
-                      
-                      <RadioGroup 
-                        value={deliverySpeed} 
-                        onValueChange={setDeliverySpeed}
-                        className="space-y-2"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="standard" id="standard" />
-                          <Label htmlFor="standard">Standard (3 days)</Label>
-                        </div>
-                      </RadioGroup>
-                      
-                      <div className="flex items-center space-x-2 pt-2">
-                        <Checkbox 
-                          id="compliance" 
-                          checked={compliance}
-                          onCheckedChange={(checked) => setCompliance(checked === true)}
-                        />
-                        <Label htmlFor="compliance" className="text-sm">
-                          Add Compliance Package (+€2)
-                          <Link to="/compliance" className="ml-1 text-primary text-sm underline">
-                            Learn more
-                          </Link>
-                        </Label>
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col space-y-2">
-                      <Button 
-                        type="submit" 
-                        className="w-full" 
-                        disabled={isBooking || bookingConfirmed}
-                      >
-                        {isBooking ? "Processing..." : bookingConfirmed ? "Booked" : "Book Shipment"}
-                      </Button>
-                      {process.env.NODE_ENV === 'development' && (
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          className="w-full" 
-                          onClick={createTestBooking}
-                        >
-                          Create Test Booking
-                        </Button>
-                      )}
-                    </div>
-                  </form>
+                  </>
                 ) : (
                   <div className="bg-green-50 p-4 rounded-lg border border-green-500">
                     <h4 className="font-medium mb-2 text-green-700">Booking Confirmed!</h4>
@@ -566,6 +598,8 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                           onClick={() => {
                             setBookingConfirmed(false);
                             setBookingResult(null);
+                            setShowDetailsForm(false);
+                            setShipmentDetails(null);
                             localStorage.removeItem('lastBooking');
                           }}
                         >
