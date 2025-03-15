@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Table,
@@ -24,7 +25,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { X, Info, Download } from "lucide-react";
+import { X, Info, Download, Loader } from "lucide-react";
 import { toast } from "sonner";
 import { generateLabel } from "@/services/labelService";
 
@@ -157,7 +158,7 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
                       disabled={generatingLabel === shipment.id}
                     >
                       {generatingLabel === shipment.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Loader className="h-4 w-4 animate-spin" />
                       ) : (
                         <Download className="h-4 w-4 mr-1" />
                       )}
@@ -370,7 +371,7 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
               disabled={generatingLabel === selectedShipment.id}
             >
               {generatingLabel === selectedShipment.id ? (
-                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                <Loader className="h-4 w-4 mr-1 animate-spin" />
               ) : (
                 <Download className="h-4 w-4 mr-1" />
               )}

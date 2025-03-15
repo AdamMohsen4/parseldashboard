@@ -27,7 +27,7 @@ const LabelGenerator: React.FC<LabelGeneratorProps> = ({ shipment }) => {
         senderAddress: shipment.pickupLocation.address,
         recipientAddress: shipment.deliveryLocation.address,
         packageDetails: {
-          weight: shipment.dimensions.weight,
+          weight: String(shipment.dimensions.weight),
           dimensions: dimensions
         }
       });
@@ -63,7 +63,7 @@ const LabelGenerator: React.FC<LabelGeneratorProps> = ({ shipment }) => {
         senderAddress: shipment.pickupLocation.address,
         recipientAddress: shipment.deliveryLocation.address,
         packageDetails: {
-          weight: shipment.dimensions.weight,
+          weight: String(shipment.dimensions.weight),
           dimensions: dimensions
         }
       });
