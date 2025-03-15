@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,8 +6,9 @@ import { Shipment } from "@/services/shipmentService";
 import { useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
-import { Loader2, Package, RefreshCw, ArrowRight } from "lucide-react";
+import { Loader2, Package, RefreshCw, ArrowRight, Download } from "lucide-react";
 import { fetchBookingsFromSupabase } from "@/services/bookingDb";
+import { generateLabel } from "@/services/labelService";
 
 interface ShipmentListProps {
   limit?: number;
@@ -16,6 +18,7 @@ interface ShipmentListProps {
 const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGeneratingLabel, setIsGeneratingLabel] = useState<string | null>(null);
   const { user, isSignedIn } = useUser();
 
   useEffect(() => {
@@ -112,6 +115,71 @@ const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
     }
   };
 
+  // New function to handle label generation
+  const handleGenerateLabel = async (shipment: Shipment) => {
+    const trackingCode = shipment.trackingCode;
+    const shipmentId = shipment.id || "SHIP-" + Math.floor(Math.random() * 1000000);
+    
+    if (!trackingCode) {
+      toast({
+        title: "Error",
+        description: "Unable to generate label: missing tracking code",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsGeneratingLabel(shipment.id);
+    
+    try {
+      // Prepare shipment dimensions
+      const dimensions = `${shipment.dimensions.length || '30'}x${shipment.dimensions.width || '20'}x${shipment.dimensions.height || '10'} cm`;
+      
+      // Create address strings
+      const pickupAddress = shipment.pickup || 'Unknown pickup location';
+      const deliveryAddress = shipment.delivery || 'Unknown delivery location';
+      
+      // Generate the label
+      const result = await generateLabel({
+        shipmentId,
+        carrierName: shipment.carrier.name,
+        trackingCode,
+        senderAddress: pickupAddress,
+        recipientAddress: deliveryAddress,
+        packageDetails: {
+          weight: String(shipment.weight) || '1',
+          dimensions: dimensions
+        },
+        language: 'en'
+      });
+      
+      if (result.success) {
+        // Open the label in a new tab
+        window.open(result.labelUrl, '_blank');
+        
+        toast({
+          title: "Label Generated",
+          description: "Your shipping label has been generated successfully",
+        });
+      } else {
+        toast({
+          title: "Label Generation Failed",
+          description: result.message || "Unable to generate shipping label",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error generating label:", error);
+      toast({
+        title: "Label Generation Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingLabel(null);
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -171,10 +239,18 @@ const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={shipment.labelUrl} target="_blank" rel="noopener noreferrer">
-                        Label
-                      </a>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => handleGenerateLabel(shipment)}
+                      disabled={isGeneratingLabel === shipment.id}
+                    >
+                      {isGeneratingLabel === shipment.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Download className="h-4 w-4 mr-1" />
+                      )}
+                      Label
                     </Button>
                     <Button size="sm" variant="outline" asChild>
                       <Link to={`/tracking?code=${shipment.trackingCode}`}>
