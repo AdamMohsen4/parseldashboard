@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 const images = [
   {
-    src: "/lovable-uploads/336788e8-5b45-42aa-bb86-bb8a79d66846.png",
+    src: "uploads/336788e8-5b45-42aa-bb86-bb8a79d66846.png",
     alt: ""
   },
   {
@@ -12,11 +12,11 @@ const images = [
     alt: ""
   },
   {
-    src: "/lovable-uploads/57d84551-41c3-4a7c-a7f0-c1ec0ec17b02.png",
+    src: "uploads/57d84551-41c3-4a7c-a7f0-c1ec0ec17b02.png",
     alt: ""
   },
   {
-    src: "/lovable-uploads/da01aba6-9a3e-4988-bf5a-adaa6a9e94bf.png",
+    src: "uploads/da01aba6-9a3e-4988-bf5a-adaa6a9e94bf.png",
     alt: ""
   }
 ];
