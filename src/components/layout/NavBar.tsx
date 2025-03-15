@@ -183,7 +183,7 @@ const NavBar = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="right" className="w-48">
                             {item.subItems.map((subItem) => (
-                              <DropdownMenuItem key={subItem.path} asChild className="hover:bg-gray-100/30 hover:text-primary transition-all duration-200 cursor-pointer">
+                              <DropdownMenuItem key={subItem.path} asChild className="hover:bg-gray-100/30 hover:text-primary transition-all duration-200 cursor-pointer">  
                                 <Link
                                   to={subItem.path}
                                   className={`${
