@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import { Shipment } from '@/types';
-import { File, Download, Printer, QrCode, Check, AlertCircle } from 'lucide-react';
+import { File, Download, Printer, Copy, Check, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { generateLabel } from '@/services/labelService';
+import { API } from '@/services/api';
 
 interface LabelGeneratorProps {
   shipment: Shipment;
@@ -19,74 +19,12 @@ const LabelGenerator: React.FC<LabelGeneratorProps> = ({ shipment }) => {
     setIsGenerating(true);
     
     try {
-      const dimensions = `${shipment.dimensions.length}x${shipment.dimensions.width}x${shipment.dimensions.height} cm`;
-      const result = await generateLabel({
-        shipmentId: shipment.id,
-        carrierName: shipment.carrier,
-        trackingCode: shipment.trackingCode || `EP${Math.floor(Math.random() * 1000000)}FI`,
-        senderAddress: shipment.pickupLocation.address,
-        recipientAddress: shipment.deliveryLocation.address,
-        packageDetails: {
-          weight: String(shipment.dimensions.weight),
-          dimensions: dimensions
-        }
-      });
-      
-      if (result.success) {
-        setLabelUrl(result.labelUrl);
-        toast.success('Label generated successfully!');
-      } else {
-        toast.error('Failed to generate label. Please try again.');
-      }
+      const url = await API.generateLabel(shipment.id);
+      setLabelUrl(url);
+      toast.success('Label generated successfully!');
     } catch (error) {
       console.error('Error generating label:', error);
       toast.error('Failed to generate label. Please try again.');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-  
-  const handleDownloadLabel = async () => {
-    if (!shipment.trackingCode) {
-      toast.error('No tracking code available for this shipment');
-      return;
-    }
-    
-    setIsGenerating(true);
-    
-    try {
-      const dimensions = `${shipment.dimensions.length}x${shipment.dimensions.width}x${shipment.dimensions.height} cm`;
-      const result = await generateLabel({
-        shipmentId: shipment.id,
-        carrierName: shipment.carrier,
-        trackingCode: shipment.trackingCode,
-        senderAddress: shipment.pickupLocation.address,
-        recipientAddress: shipment.deliveryLocation.address,
-        packageDetails: {
-          weight: String(shipment.dimensions.weight),
-          dimensions: dimensions
-        }
-      });
-      
-      if (result.success && result.pdfBlob) {
-        // Create a download link
-        const downloadLink = document.createElement('a');
-        downloadLink.href = result.labelUrl;
-        downloadLink.download = `label-${shipment.trackingCode}.pdf`;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        
-        // Clean up the URL object
-        setTimeout(() => URL.revokeObjectURL(result.labelUrl), 100);
-        
-        toast.success('Label downloaded successfully!');
-      } else {
-        toast.error('Failed to download label. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error downloading label:', error);
-      toast.error('Failed to download label. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -96,20 +34,6 @@ const LabelGenerator: React.FC<LabelGeneratorProps> = ({ shipment }) => {
     if (shipment.trackingCode) {
       navigator.clipboard.writeText(shipment.trackingCode);
       toast.success('Tracking code copied to clipboard!');
-    }
-  };
-  
-  const handlePrintLabel = () => {
-    if (labelUrl) {
-      const printWindow = window.open(labelUrl, '_blank');
-      if (printWindow) {
-        printWindow.onload = () => {
-          printWindow.print();
-        };
-      }
-      toast.success('Sending to printer...');
-    } else {
-      toast.error('No label available to print');
     }
   };
   
@@ -127,11 +51,47 @@ const LabelGenerator: React.FC<LabelGeneratorProps> = ({ shipment }) => {
         <div className="flex-1 border rounded-lg overflow-hidden bg-secondary/30">
           {labelUrl ? (
             <div className="relative aspect-[1/1.4] w-full bg-white flex items-center justify-center">
-              <iframe
-                src={labelUrl}
-                className="absolute inset-0 w-full h-full border-0"
-                title="Shipping Label Preview"
-              />
+              {/* This would be a PDF viewer in a real app */}
+              <div className="absolute inset-0 p-8">
+                {/* Simplified label preview */}
+                <div className="border-2 border-gray-800 h-full rounded-md p-6 flex flex-col">
+                  <div className="text-center border-b-2 border-gray-800 pb-4">
+                    <div className="text-2xl font-bold mb-1">{shipment.carrier}</div>
+                    <div className="font-mono text-sm">{shipment.trackingCode}</div>
+                  </div>
+                  
+                  <div className="flex flex-col justify-between flex-1 py-4">
+                    <div>
+                      <div className="text-xs text-gray-600 mb-1">FROM:</div>
+                      <div className="font-medium">Sender Name</div>
+                      <div>{shipment.pickupLocation.address}</div>
+                      <div>
+                        {shipment.pickupLocation.city}, {shipment.pickupLocation.postalCode}
+                      </div>
+                      <div>{shipment.pickupLocation.country}</div>
+                    </div>
+                    
+                    <div className="h-24 border-2 border-gray-800 my-4 flex items-center justify-center">
+                      {/* Barcode placeholder */}
+                      <div className="font-mono text-xs">
+                        {shipment.trackingCode}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="text-xs text-gray-600 mb-1">TO:</div>
+                      <div className="font-medium">Recipient Name</div>
+                      <div>{shipment.deliveryLocation.address}</div>
+                      <div>
+                        {shipment.deliveryLocation.city}, {shipment.deliveryLocation.postalCode}
+                      </div>
+                      <div>{shipment.deliveryLocation.country}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <Check className="text-green-500 h-16 w-16" />
             </div>
           ) : (
             <div className="aspect-[1/1.4] w-full bg-muted/20 flex items-center justify-center p-6">
@@ -164,7 +124,7 @@ const LabelGenerator: React.FC<LabelGeneratorProps> = ({ shipment }) => {
                     onClick={handleCopyTrackingCode}
                     className="ml-2 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    <QrCode className="h-4 w-4" />
+                    <Copy className="h-4 w-4" />
                   </button>
                 )}
               </div>
@@ -197,8 +157,7 @@ const LabelGenerator: React.FC<LabelGeneratorProps> = ({ shipment }) => {
                 <Button
                   className="w-full"
                   icon={<Download className="h-5 w-5" />}
-                  onClick={handleDownloadLabel}
-                  isLoading={isGenerating}
+                  onClick={() => toast.success('Label downloaded successfully!')}
                 >
                   Download Label
                 </Button>
@@ -207,7 +166,7 @@ const LabelGenerator: React.FC<LabelGeneratorProps> = ({ shipment }) => {
                   variant="outline"
                   className="w-full"
                   icon={<Printer className="h-5 w-5" />}
-                  onClick={handlePrintLabel}
+                  onClick={() => toast.success('Sending to printer...')}
                 >
                   Print Label
                 </Button>

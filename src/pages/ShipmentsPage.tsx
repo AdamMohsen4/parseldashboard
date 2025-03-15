@@ -130,7 +130,7 @@ const ShipmentsPage = () => {
 
   const handleGenerateLabel = async (shipment: Shipment) => {
     const trackingCode = shipment.trackingCode;
-    const shipmentId = shipment.id;
+    const shipmentId = "SHIP-" + Math.floor(Math.random() * 1000000);
     
     if (!trackingCode) {
       toast({
@@ -158,19 +158,12 @@ const ShipmentsPage = () => {
         language: 'en'
       });
       
-      if (result.success && result.pdfBlob) {
-        const downloadLink = document.createElement('a');
-        downloadLink.href = result.labelUrl;
-        downloadLink.download = `label-${trackingCode}.pdf`;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        
-        setTimeout(() => URL.revokeObjectURL(result.labelUrl), 100);
+      if (result.success) {
+        window.open(result.labelUrl, '_blank');
         
         toast({
-          title: "Label Downloaded",
-          description: "Your shipping label has been downloaded successfully",
+          title: "Label Generated",
+          description: "Your shipping label has been generated successfully",
         });
       } else {
         toast({

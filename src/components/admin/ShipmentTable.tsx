@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Table,
@@ -25,9 +24,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { X, Info, Download, Loader } from "lucide-react";
+import { X, Info, Download } from "lucide-react";
 import { toast } from "sonner";
-import { generateLabel } from "@/services/labelService";
 
 interface ShipmentTableProps {
   shipments: any[];
@@ -46,7 +44,6 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
 }) => {
   const [selectedShipment, setSelectedShipment] = useState<any>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [generatingLabel, setGeneratingLabel] = useState<string | null>(null);
 
   if (isLoading) {
     return <div className="text-center py-8">Loading shipments...</div>;
@@ -59,52 +56,6 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
   const handleViewDetails = (shipment: any) => {
     setSelectedShipment(shipment);
     setDetailsOpen(true);
-  };
-
-  const handleGenerateLabel = async (shipment: any) => {
-    if (!shipment.tracking_code) {
-      toast.error("No tracking code available for this shipment");
-      return;
-    }
-
-    setGeneratingLabel(shipment.id);
-    
-    try {
-      const dimensions = `${shipment.dimension_length || ""}x${shipment.dimension_width || ""}x${shipment.dimension_height || ""} cm`;
-      const result = await generateLabel({
-        shipmentId: shipment.id.toString(),
-        carrierName: shipment.carrier_name || "E-Parsel Nordic",
-        trackingCode: shipment.tracking_code,
-        senderAddress: shipment.pickup_address || "",
-        recipientAddress: shipment.delivery_address || "",
-        packageDetails: {
-          weight: shipment.weight || "",
-          dimensions: dimensions
-        }
-      });
-      
-      if (result.success && result.pdfBlob) {
-        // Create a download link
-        const downloadLink = document.createElement('a');
-        downloadLink.href = result.labelUrl;
-        downloadLink.download = `label-${shipment.tracking_code}.pdf`;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        
-        // Clean up the URL object
-        setTimeout(() => URL.revokeObjectURL(result.labelUrl), 100);
-        
-        toast.success('Label downloaded successfully!');
-      } else {
-        toast.error('Failed to download label. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error downloading label:', error);
-      toast.error('Failed to download label. Please try again.');
-    } finally {
-      setGeneratingLabel(null);
-    }
   };
 
   return (
@@ -143,6 +94,9 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
+
+              
+
                     <Button 
                       size="sm" 
                       variant="outline"
@@ -150,19 +104,6 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
                     >
                       <Info className="h-4 w-4 mr-1" />
                       Details
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleGenerateLabel(shipment)}
-                      disabled={generatingLabel === shipment.id}
-                    >
-                      {generatingLabel === shipment.id ? (
-                        <Loader className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Download className="h-4 w-4 mr-1" />
-                      )}
-                      Label
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -365,18 +306,13 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
           )}
 
           <DialogFooter className="mt-6">
-            <Button 
-              variant="outline"
-              onClick={() => handleGenerateLabel(selectedShipment)}
-              disabled={generatingLabel === selectedShipment.id}
-            >
-              {generatingLabel === selectedShipment.id ? (
-                <Loader className="h-4 w-4 mr-1 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4 mr-1" />
-              )}
-              Download Label
-            </Button>
+            {selectedShipment?.label_url && (
+              <Button asChild variant="outline">
+                <a href={selectedShipment.label_url} target="_blank" rel="noopener noreferrer">
+                  Open Shipping Label
+                </a>
+              </Button>
+            )}
             <Button onClick={() => setDetailsOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
