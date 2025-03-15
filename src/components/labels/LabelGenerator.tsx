@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import { Shipment } from '@/types';
-import { File, Download, Printer, Copy, Check, QrCode } from 'lucide-react';
+import { File, Download, Printer, Copy, Check, QrCode, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateLabel, downloadLabel, LabelResponse } from '@/services/labelService';
 
@@ -31,13 +31,22 @@ const LabelGenerator: React.FC<LabelGeneratorProps> = ({ shipment }) => {
       // Generate a mock shipment ID if needed
       const shipmentId = shipment.id || `SHIP-${Math.floor(Math.random() * 1000000)}`;
       
+      // Use pickupLocation and deliveryLocation properties from shipment
+      const pickupAddress = shipment.pickupLocation ? 
+        `${shipment.pickupLocation.address}, ${shipment.pickupLocation.city}, ${shipment.pickupLocation.country}` :
+        'Sender Address, Helsinki, Finland';
+        
+      const deliveryAddress = shipment.deliveryLocation ? 
+        `${shipment.deliveryLocation.address}, ${shipment.deliveryLocation.city}, ${shipment.deliveryLocation.country}` :
+        'Recipient Address, Stockholm, Sweden';
+      
       // Generate the label
       const response = await generateLabel({
         shipmentId,
         carrierName: shipment.carrier || 'E-Parcel Nordic',
         trackingCode: shipment.trackingCode || `EP${Math.floor(Math.random() * 10000000)}`,
-        senderAddress: shipment.pickup || 'Sender Address, Helsinki, Finland',
-        recipientAddress: shipment.delivery || 'Recipient Address, Stockholm, Sweden',
+        senderAddress: pickupAddress,
+        recipientAddress: deliveryAddress,
         packageDetails: {
           weight: weight || '2',
           dimensions: dimensions
