@@ -8,7 +8,7 @@ interface AdminStatsProps {
     pendingShipments: number;
     completedShipments: number;
     totalDemoRequests: number;
-    totalCollaborations: number;
+    // totalCollaborations: number;
     totalSupportTickets: number;
     openSupportTickets: number;
   };
@@ -65,7 +65,7 @@ const AdminStatsCards: React.FC<AdminStatsProps> = ({ stats }) => {
           <div className="text-2xl font-bold">{stats.totalDemoRequests}</div>
         </CardContent>
       </Card>
-
+{/* 
       <Card className="md:col-span-1">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -75,7 +75,7 @@ const AdminStatsCards: React.FC<AdminStatsProps> = ({ stats }) => {
         <CardContent>
           <div className="text-2xl font-bold">{stats.totalCollaborations}</div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       <Card className="md:col-span-1">
         <CardHeader className="pb-2">

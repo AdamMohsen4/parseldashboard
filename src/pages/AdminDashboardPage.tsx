@@ -11,7 +11,7 @@ import { useUser } from "@clerk/clerk-react";
 
 import ShipmentTable from "@/components/admin/ShipmentTable";
 import DemoRequestsTable from "@/components/admin/DemoRequestsTable";
-import CollaborationsTable from "@/components/admin/CollaborationsTable";
+// import CollaborationsTable from "@/components/admin/CollaborationsTable";
 import SupportTicketsTable from "@/components/admin/SupportTicketsTable";
 import TicketDetailsDialog from "@/components/admin/TicketDetailsDialog";
 import AdminStatsCards from "@/components/admin/AdminStatsCards";
@@ -32,7 +32,7 @@ const AdminDashboardPage = () => {
     pendingShipments: 0,
     completedShipments: 0,
     totalDemoRequests: 0,
-    totalCollaborations: 0,
+    // totalCollaborations: 0,
     totalSupportTickets: 0,
     openSupportTickets: 0
   });
@@ -45,9 +45,9 @@ const AdminDashboardPage = () => {
   const [filteredDemoRequests, setFilteredDemoRequests] = useState([]);
   const [demoSearchQuery, setDemoSearchQuery] = useState("");
 
-  const [collaborations, setCollaborations] = useState([]);
-  const [filteredCollaborations, setFilteredCollaborations] = useState([]);
-  const [collaborationSearchQuery, setCollaborationSearchQuery] = useState("");
+  // const [collaborations, setCollaborations] = useState([]);
+  // const [filteredCollaborations, setFilteredCollaborations] = useState([]);
+  // const [collaborationSearchQuery, setCollaborationSearchQuery] = useState("");
 
   const [supportTickets, setSupportTickets] = useState([]);
   const [filteredSupportTickets, setFilteredSupportTickets] = useState([]);
@@ -77,11 +77,11 @@ const AdminDashboardPage = () => {
     }
   }, [demoSearchQuery, demoRequests]);
 
-  useEffect(() => {
-    if (collaborations.length > 0) {
-      filterCollaborations();
-    }
-  }, [collaborationSearchQuery, collaborations]);
+  // useEffect(() => {
+  //   if (collaborations.length > 0) {
+  //     filterCollaborations();
+  //   }
+  // }, [collaborationSearchQuery, collaborations]);
 
   useEffect(() => {
     if (supportTickets.length > 0) {
@@ -95,7 +95,7 @@ const AdminDashboardPage = () => {
       await Promise.all([
         loadShipments(),
         loadDemoRequests(),
-        loadCollaborations(),
+        // loadCollaborations(),
         loadSupportTickets(),
         loadStats()
       ]);
@@ -147,23 +147,23 @@ const AdminDashboardPage = () => {
     setFilteredDemoRequests(filtered);
   };
 
-  const filterCollaborations = () => {
-    if (!collaborationSearchQuery.trim()) {
-      setFilteredCollaborations(collaborations);
-      return;
-    }
+  // const filterCollaborations = () => {
+  //   if (!collaborationSearchQuery.trim()) {
+  //     setFilteredCollaborations(collaborations);
+  //     return;
+  //   }
     
-    const lowerCaseQuery = collaborationSearchQuery.toLowerCase();
-    const filtered = collaborations.filter(collab => 
-      collab.business_name?.toLowerCase().includes(lowerCaseQuery) ||
-      collab.destination?.toLowerCase().includes(lowerCaseQuery) ||
-      collab.contact_email?.toLowerCase().includes(lowerCaseQuery) ||
-      collab.volume?.toLowerCase().includes(lowerCaseQuery) ||
-      collab.frequency?.toLowerCase().includes(lowerCaseQuery)
-    );
+  //   const lowerCaseQuery = collaborationSearchQuery.toLowerCase();
+  //   const filtered = collaborations.filter(collab => 
+  //     collab.business_name?.toLowerCase().includes(lowerCaseQuery) ||
+  //     collab.destination?.toLowerCase().includes(lowerCaseQuery) ||
+  //     collab.contact_email?.toLowerCase().includes(lowerCaseQuery) ||
+  //     collab.volume?.toLowerCase().includes(lowerCaseQuery) ||
+  //     collab.frequency?.toLowerCase().includes(lowerCaseQuery)
+  //   );
     
-    setFilteredCollaborations(filtered);
-  };
+  //   setFilteredCollaborations(filtered);
+  // };
 
   const filterSupportTickets = () => {
     if (!supportSearchQuery.trim()) {
@@ -249,11 +249,11 @@ const AdminDashboardPage = () => {
     setFilteredDemoRequests(data);
   };
 
-  const loadCollaborations = async () => {
-    const data = await AdminDataService.loadCollaborations();
-    setCollaborations(data);
-    setFilteredCollaborations(data);
-  };
+  // const loadCollaborations = async () => {
+  //   const data = await AdminDataService.loadCollaborations();
+  //   setCollaborations(data);
+  //   setFilteredCollaborations(data);
+  // };
 
   const loadSupportTickets = async () => {
     const data = await AdminDataService.loadSupportTickets();
@@ -311,7 +311,7 @@ const AdminDashboardPage = () => {
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
               <p className="text-muted-foreground">
-                Manage shipments, demo requests, collaborations and support tickets
+                Manage shipments, demo requests and support tickets
               </p>
             </div>
             <Button onClick={handleRefreshData}>
@@ -327,21 +327,19 @@ const AdminDashboardPage = () => {
                 <TabsList className="mb-4">
                   <TabsTrigger value="shipments">Shipments</TabsTrigger>
                   <TabsTrigger value="demos">Demo Requests</TabsTrigger>
-                  <TabsTrigger value="collaborations">Collaborations</TabsTrigger>
+                  {/* <TabsTrigger value="collaborations">Collaborations</TabsTrigger> */}
                   <TabsTrigger value="support">Support Tickets</TabsTrigger>
                 </TabsList>
                 
                 <CardTitle>
                   {mainTab === "shipments" && "Shipment Management"}
                   {mainTab === "demos" && "Demo Requests Management"}
-                  {mainTab === "collaborations" && "Collaborations Management"}
                   {mainTab === "support" && "Support Tickets Management"}
                 </CardTitle>
                 
                 <CardDescription>
                   {mainTab === "shipments" && "View and manage all shipments across the platform"}
                   {mainTab === "demos" && "Review and respond to demo requests from potential customers"}
-                  {mainTab === "collaborations" && "Manage business collaboration proposals"}
                   {mainTab === "support" && "Respond to customer support inquiries and issues"}
                 </CardDescription>
               </Tabs>
@@ -499,7 +497,7 @@ const AdminDashboardPage = () => {
                     </TabsContent>
                   </Tabs>
                 </TabsContent>
-                
+{/*                 
                 <TabsContent value="collaborations">
                   <div className="mb-4 flex items-center gap-2">
                     <Search className="text-muted-foreground h-5 w-5" />
@@ -509,14 +507,14 @@ const AdminDashboardPage = () => {
                       onChange={(e) => setCollaborationSearchQuery(e.target.value)}
                       className="max-w-sm"
                     />
-                  </div>
-                  
+                  </div> */}
+{/*                   
                   <CollaborationsTable 
                     collaborations={filteredCollaborations} 
                     isLoading={isLoading} 
                     formatDate={AdminDataService.formatDate}
                   />
-                </TabsContent>
+                </TabsContent> */}
                 
                 <TabsContent value="support">
                   <div className="mb-4 flex items-center gap-2">
