@@ -17,7 +17,7 @@ export interface AdminStats {
   pendingShipments: number;
   completedShipments: number;
   totalDemoRequests: number;
-  totalCollaborations: number;
+  // totalCollaborations: number;
   totalSupportTickets: number;
   openSupportTickets: number;
 }
@@ -48,9 +48,9 @@ export const loadStats = async (): Promise<AdminStats> => {
       .from('demo_requests')
       .select('*', { count: 'exact', head: true });
       
-    const { count: collabCount, error: collabError } = await supabase
-      .from('collaborations')
-      .select('*', { count: 'exact', head: true });
+    // const { count: collabCount, error: collabError } = await supabase
+    //   .from('collaborations')
+    //   .select('*', { count: 'exact', head: true });
     
     const { count: supportCount, error: supportError } = await supabase
       .from('support_tickets')
@@ -61,15 +61,14 @@ export const loadStats = async (): Promise<AdminStats> => {
       .select('*', { count: 'exact', head: true })
       .eq('status', 'open');
     
-    if (!totalError && !pendingError && !completedError && !demoError && 
-        !collabError && !supportError && !openSupportError) {
+    if (!totalError && !pendingError && !completedError && !demoError && !supportError && !openSupportError) {
       
       const stats = {
         totalShipments: totalCount || 0,
         pendingShipments: pendingCount || 0,
         completedShipments: completedCount || 0,
         totalDemoRequests: demoCount || 0,
-        totalCollaborations: collabCount || 0,
+        // totalCollaborations: collabCount || 0,
         totalSupportTickets: supportCount || 0,
         openSupportTickets: openSupportCount || 0
       };
@@ -81,14 +80,14 @@ export const loadStats = async (): Promise<AdminStats> => {
       return stats;
     } else {
       console.error("Error fetching stats:", { 
-        totalError, pendingError, completedError, demoError, collabError, supportError, openSupportError
+        totalError, pendingError, completedError, demoError, supportError, openSupportError
       });
       return {
         totalShipments: 0,
         pendingShipments: 0,
         completedShipments: 0,
         totalDemoRequests: 0,
-        totalCollaborations: 0,
+        // totalCollaborations: 0,
         totalSupportTickets: 0,
         openSupportTickets: 0
       };
@@ -100,7 +99,7 @@ export const loadStats = async (): Promise<AdminStats> => {
       pendingShipments: 0,
       completedShipments: 0,
       totalDemoRequests: 0,
-      totalCollaborations: 0,
+      // totalCollaborations: 0,
       totalSupportTickets: 0,
       openSupportTickets: 0
     };
@@ -291,41 +290,41 @@ export const loadDemoRequests = async () => {
   }
 };
 
-export const loadCollaborations = async () => {
-  try {
-    const cacheKey = 'admin-collaborations';
+// export const loadCollaborations = async () => {
+//   try {
+//     const cacheKey = 'admin-collaborations';
     
-    // Check cache first
-    const cachedData = dataCache.get(cacheKey);
-    if (cachedData && (Date.now() - cachedData.timestamp < DATA_CACHE_EXPIRY)) {
-      console.log("Returning collaborations from cache");
-      return cachedData.data;
-    }
+//     // Check cache first
+//     const cachedData = dataCache.get(cacheKey);
+//     if (cachedData && (Date.now() - cachedData.timestamp < DATA_CACHE_EXPIRY)) {
+//       console.log("Returning collaborations from cache");
+//       return cachedData.data;
+//     }
     
-    console.log("Loading collaborations from Supabase...");
-    const { data, error } = await supabase
-      .from('collaborations')
-      .select('*')
-      .order('created_at', { ascending: false });
+//     console.log("Loading collaborations from Supabase...");
+//     const { data, error } = await supabase
+//       .from('collaborations')
+//       .select('*')
+//       .order('created_at', { ascending: false });
     
-    if (error) {
-      console.error("Error loading collaborations:", error);
-      return [];
-    }
+//     if (error) {
+//       console.error("Error loading collaborations:", error);
+//       return [];
+//     }
     
-    // Store in cache
-    dataCache.set(cacheKey, {
-      data: data || [],
-      timestamp: Date.now()
-    });
+//     // Store in cache
+//     dataCache.set(cacheKey, {
+//       data: data || [],
+//       timestamp: Date.now()
+//     });
     
-    console.log("Collaborations loaded:", data?.length || 0);
-    return data || [];
-  } catch (error) {
-    console.error("Error in loadCollaborations:", error);
-    return [];
-  }
-};
+//     console.log("Collaborations loaded:", data?.length || 0);
+//     return data || [];
+//   } catch (error) {
+//     console.error("Error in loadCollaborations:", error);
+//     return [];
+//   }
+// };
 
 export const loadSupportTickets = async () => {
   try {

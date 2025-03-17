@@ -94,7 +94,7 @@ const NavBar = () => {
       {
         name: t('nav.categories.workspace', 'Workspace'),
         items: [
-          { path: "/collaborate", label: t('nav.collaborate', 'Collaborate'), icon: Users },
+          // { path: "/collaborate", label: t('nav.collaborate', 'Collaborate'), icon: Users },
           { path: "/dashboard", label: t('nav.dashboard'), icon: LayoutDashboard },
           { path: "/support", label: t('nav.support', 'Customer Support'), icon: HelpCircle },
         ]

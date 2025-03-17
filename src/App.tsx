@@ -19,7 +19,7 @@ const TrackingPage = lazy(() => import("./pages/TrackingPage"));
 const CompliancePage = lazy(() => import("./pages/CompliancePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage"));
-const CollaboratePage = lazy(() => import("./pages/CollaboratePage"));
+// const CollaboratePage = lazy(() => import("./pages/CollaboratePage"));
 const SupportPage = lazy(() => import("./pages/SupportPage"));
 const IntegrationPage = lazy(() => import("./pages/IntegrationPage"));
 const TransportationPartnersPage = lazy(() => import("./pages/TransportationPartnersPage"));
@@ -120,11 +120,11 @@ const App = () => (
                   <AdminDashboardPage />
                 </AuthWrapper>
               } />
-              <Route path="/collaborate" element={
+              {/* <Route path="/collaborate" element={
                 <AuthWrapper requireAuth>
                   <CollaboratePage />
                 </AuthWrapper>
-              } />
+              } /> */}
               <Route path="/support" element={
                 <AuthWrapper requireAuth>
                   <SupportPage />
