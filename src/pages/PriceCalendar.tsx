@@ -28,7 +28,7 @@ const PriceCalendar = () => {
   const { t } = useTranslation();
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [pricingData, setPricingData] = useState<PricingDay[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true); 
 
   // Calculate the date range for the next two weeks
   const today = new Date();
@@ -50,7 +50,7 @@ const PriceCalendar = () => {
     const data: PricingDay[] = daysInMonth.map(day => {
       // Only generate detailed pricing for the next two weeks
       if (isWithinInterval(day, nextTwoWeeksRange)) {
-        // Randomly generate load factor, more likely to be high on weekends
+        // Randomly generate load factor, more likely to be high on weekends. 
         const dayOfWeek = day.getDay();
         const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
         
@@ -71,9 +71,9 @@ const PriceCalendar = () => {
         
         // Base price depends on load factor
         const basePrices = {
-          low: 9.99,
-          medium: 14.99,
-          high: 19.99
+          low: 8.99,
+          medium: 10.99,
+          high: 13.99
         };
         
         // Estimated orders
