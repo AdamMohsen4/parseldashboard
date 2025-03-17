@@ -214,9 +214,9 @@ const PriceCalendar = () => {
                   className="rounded-md border"
                   showOutsideDays
                   components={{
-                    Day: ({ day, ...props }) => (
+                    Day: ({ date, ...props }) => (
                       <div {...props}>
-                        {renderDay(day)}
+                        {date && renderDay(date)}
                       </div>
                     )
                   }}
