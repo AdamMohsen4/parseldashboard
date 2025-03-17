@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addDays, isSameMonth, isSameDay, isWithinInterval, addWeeks } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -140,15 +139,15 @@ const PriceCalendar = () => {
   };
 
   // Custom day rendering for the calendar
-  const renderDay = (day: Date) => {
-    const pricing = getPricingForDay(day);
-    const isInNextTwoWeeks = isWithinInterval(day, nextTwoWeeksRange);
+  const renderDay = (date: Date) => {
+    const pricing = getPricingForDay(date);
+    const isInNextTwoWeeks = isWithinInterval(date, nextTwoWeeksRange);
     
     // Styles based on pricing data
     let dayClasses = "h-9 w-9 p-0 font-normal flex flex-col items-center justify-center";
     
     // For days in current month
-    if (isSameMonth(day, currentMonth)) {
+    if (isSameMonth(date, currentMonth)) {
       if (isInNextTwoWeeks && pricing) {
         // Add color based on load factor
         const colorClasses = {
@@ -168,7 +167,7 @@ const PriceCalendar = () => {
     
     return (
       <div className={dayClasses}>
-        {day.getDate()}
+        {date.getDate()}
         {isInNextTwoWeeks && pricing && pricing.basePrice > 0 && (
           <span className="text-[8px] mt-0.5 font-medium">
             {formatPrice(pricing.basePrice)}
@@ -181,8 +180,8 @@ const PriceCalendar = () => {
   return (
     <div className="container mx-auto py-6">
       <NavBar />
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
@@ -211,7 +210,7 @@ const PriceCalendar = () => {
                   mode="single"
                   month={currentMonth}
                   onMonthChange={setCurrentMonth}
-                  className="rounded-md border"
+                  className="rounded-md border w-full"
                   showOutsideDays
                   components={{
                     Day: ({ date, ...props }) => (
@@ -226,7 +225,7 @@ const PriceCalendar = () => {
           </Card>
         </div>
         
-        <div>
+        <div className="lg:col-span-1">
           <Card>
             <CardHeader>
               <CardTitle>{t('shipping.legend', 'Legend')}</CardTitle>
