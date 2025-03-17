@@ -13,7 +13,7 @@ import {
   Briefcase,
   ShoppingCart,
   HelpCircle,
-  WarehouseIcon
+  Calendar
 } from "lucide-react";
 
 type NavItemType = {
@@ -62,6 +62,7 @@ const useNavCategories = () => {
             ]
           },
           { path: "/tracking", label: t('nav.tracking'), icon: Truck },
+          { path: "/price-calendar", label: t('nav.priceCalendar', 'Price Calendar'), icon: Calendar },
         ]
       },
       {
