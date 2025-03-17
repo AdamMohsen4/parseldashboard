@@ -113,7 +113,7 @@ const PriceCalendar = () => {
   useEffect(() => {
     setIsLoading(true);
     
-    // In a real application, you would fetch this data from Supabase
+    // In a real application, I would fetch this data from Supabase
     // For now, we'll use mock data
     setTimeout(() => {
       const data = generateMockPricingData();

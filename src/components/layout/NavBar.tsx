@@ -19,7 +19,8 @@ import {
   User,
   Briefcase,
   ShoppingCart,
-  HelpCircle
+  HelpCircle,
+  Calendar
 } from "lucide-react";
 import { useState } from "react";
 import { 
@@ -71,10 +72,12 @@ const NavBar = () => {
               { path: "/shipment/private", label: t('nav.shipment.private', 'Private Customer'), icon: User, },
               { path: "/shipment/ecommerce", label: t('nav.shipment.ecommerce', 'E-commerce Business'), icon: ShoppingCart },
             
+            
             ]
           },
          
           { path: "/tracking", label: t('nav.tracking'), icon: Truck},
+          { path: "/price-calendar", label: t('nav.priceCalendar', 'Price Calendar'), icon: Calendar},
 
         ]
       },
