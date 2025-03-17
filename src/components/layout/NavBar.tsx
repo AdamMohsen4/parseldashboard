@@ -20,7 +20,8 @@ import {
   Briefcase,
   ShoppingCart,
   HelpCircle,
-  Calendar
+  Calendar,
+  InfoIcon
 } from "lucide-react";
 import { useState } from "react";
 import { 
@@ -37,6 +38,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import path from "path";
 
 const NavBar = () => {
   const { isSignedIn, user } = useUser();
@@ -86,10 +88,21 @@ const NavBar = () => {
         items: [
           { path: "/3pl", label: t('nav.3pl', '3PL Services'), icon: Package },
           { path: "/warehouse", label: t('nav.warehouse', 'Warehouse Marketplace'), icon: Warehouse },
-          { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
-          { path: "/transportation-partners", label: t('nav.transportationPartners', 'Transportation Partners'), icon: Truck },
           { path: "/book", label: t('nav.book'), icon: Phone },
-        ]
+          {
+            path: "/info",
+            label: t('nav.info', 'Information'),
+            icon: InfoIcon,
+            subItems: [
+              { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
+              { path: "/transportation-partners", label: t('nav.transportationPartners', 'Transportation Partners'), icon: Truck },
+              { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
+            ]
+          }
+        ],
+
+        
+        
       },
       {
         name: t('nav.categories.workspace', 'Workspace'),
