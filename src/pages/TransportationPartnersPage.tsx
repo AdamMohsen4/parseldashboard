@@ -39,7 +39,7 @@ const TransportationPartnersPage = () => {
                   <CardTitle className="flex items-center gap-2">
                     <div className="flex items-center">
                       <img 
-                        src="/lovable-uploads/4d88d3ca-7d74-4fc7-af8f-849c3eeed233.png" 
+                        src="uploads/4d88d3ca-7d74-4fc7-af8f-849c3eeed233.png" 
                         alt="Posti logo" 
                         className="h-8 w-auto mr-2" 
                       />
@@ -64,7 +64,7 @@ const TransportationPartnersPage = () => {
                   <CardTitle className="flex items-center gap-2">
                     <div className="flex items-center">
                       <img 
-                        src="/lovable-uploads/999aad3b-fea5-47ef-bf42-4541b244b869.png" 
+                        src="uploads/999aad3b-fea5-47ef-bf42-4541b244b869.png" 
                         alt="Jakeluyhtio logo" 
                         className="h-8 w-auto mr-2" 
                       />
@@ -120,7 +120,7 @@ const TransportationPartnersPage = () => {
                   <div>
                     <CardTitle className="flex items-center gap-2">
                       <img 
-                        src="/lovable-uploads/4d88d3ca-7d74-4fc7-af8f-849c3eeed233.png" 
+                        src="uploads/4d88d3ca-7d74-4fc7-af8f-849c3eeed233.png" 
                         alt="Posti logo" 
                         className="h-8 w-auto mr-2" 
                       />
@@ -195,7 +195,7 @@ const TransportationPartnersPage = () => {
                   <div>
                     <CardTitle className="flex items-center gap-2">
                       <img 
-                        src="/lovable-uploads/999aad3b-fea5-47ef-bf42-4541b244b869.png" 
+                        src="uploads/999aad3b-fea5-47ef-bf42-4541b244b869.png" 
                         alt="Jakeluyhtio logo" 
                         className="h-8 w-auto mr-2" 
                       />
