@@ -23,14 +23,12 @@ interface PricingDay {
   estimatedOrders: number;
 }
 
-// This is the price calendar component that will be used to display days with higher or lower shipping fees based on the amount of orders
 const PriceCalendar = () => {
   const { t } = useTranslation();
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [pricingData, setPricingData] = useState<PricingDay[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Calculate the date range for the next two weeks
   const today = new Date();
   const twoWeeksFromNow = addWeeks(today, 2);
   
@@ -39,25 +37,20 @@ const PriceCalendar = () => {
     end: twoWeeksFromNow
   };
 
-  // Function to generate mock pricing data for the calendar
   const generateMockPricingData = () => {
-    // Get all days in the current month
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
     const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
-    // Generate pricing data for each day
     const data: PricingDay[] = daysInMonth.map(day => {
-      // Only generate detailed pricing for the next two weeks
       if (isWithinInterval(day, nextTwoWeeksRange)) {
-        // Randomly generate load factor, more likely to be high on weekends
         const dayOfWeek = day.getDay();
         const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
         
         let loadProbabilities = isWeekend 
-          ? { low: 0.1, medium: 0.3, high: 0.6 }  // Weekends more likely to be high
-          : { low: 0.5, medium: 0.3, high: 0.2 }; // Weekdays more likely to be low
-        
+          ? { low: 0.1, medium: 0.3, high: 0.6 }
+          : { low: 0.5, medium: 0.3, high: 0.2 };
+
         const randomVal = Math.random();
         let loadFactor: 'low' | 'medium' | 'high';
         
@@ -69,14 +62,12 @@ const PriceCalendar = () => {
           loadFactor = 'high';
         }
         
-        // Base price depends on load factor
         const basePrices = {
           low: 9.99,
           medium: 14.99,
           high: 19.99
         };
         
-        // Estimated orders
         const orderRanges = {
           low: { min: 10, max: 50 },
           medium: { min: 51, max: 150 },
@@ -95,7 +86,6 @@ const PriceCalendar = () => {
           estimatedOrders
         };
       } else {
-        // For days outside the two-week window, just provide basic data
         return {
           date: day,
           loadFactor: 'medium',
@@ -108,12 +98,9 @@ const PriceCalendar = () => {
     return data;
   };
 
-  // Fetch or generate pricing data when the current month changes
   useEffect(() => {
     setIsLoading(true);
     
-    // In a real application, I would fetch this data from Supabase
-    // For now, we'll use mock data
     setTimeout(() => {
       const data = generateMockPricingData();
       setPricingData(data);
@@ -121,14 +108,12 @@ const PriceCalendar = () => {
     }, 800);
   }, [currentMonth]);
 
-  // Get pricing data for a specific day
   const getPricingForDay = (day: Date): PricingDay | undefined => {
     return pricingData.find(pricingDay => 
       isSameDay(pricingDay.date, day)
     );
   };
 
-  // Format price with currency
   const formatPrice = (price: number): string => {
     return new Intl.NumberFormat('en-US', { 
       style: 'currency', 
@@ -138,18 +123,14 @@ const PriceCalendar = () => {
     }).format(price);
   };
 
-  // Custom day rendering for the calendar
   const renderDay = (date: Date) => {
     const pricing = getPricingForDay(date);
     const isInNextTwoWeeks = isWithinInterval(date, nextTwoWeeksRange);
     
-    // Styles based on pricing data
     let dayClasses = "h-9 w-9 p-0 font-normal flex flex-col items-center justify-center";
     
-    // For days in current month
     if (isSameMonth(date, currentMonth)) {
       if (isInNextTwoWeeks && pricing) {
-        // Add color based on load factor
         const colorClasses = {
           low: "bg-green-100 hover:bg-green-200 text-green-800",
           medium: "bg-yellow-100 hover:bg-yellow-200 text-yellow-800",
@@ -161,7 +142,6 @@ const PriceCalendar = () => {
         dayClasses += " text-gray-400";
       }
     } else {
-      // For days outside current month
       dayClasses += " text-gray-300";
     }
     
@@ -178,11 +158,11 @@ const PriceCalendar = () => {
   };
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="container mx-auto py-6 max-w-[1400px]">
       <NavBar />
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
-          <Card>
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="lg:col-span-4">
+          <Card className="h-full">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span>{t('shipping.priceCalendar', 'Price Calendar')}</span>
@@ -206,20 +186,22 @@ const PriceCalendar = () => {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : (
-                <Calendar
-                  mode="single"
-                  month={currentMonth}
-                  onMonthChange={setCurrentMonth}
-                  className="rounded-md border w-full"
-                  showOutsideDays
-                  components={{
-                    Day: ({ date, ...props }) => (
-                      <div {...props}>
-                        {date && renderDay(date)}
-                      </div>
-                    )
-                  }}
-                />
+                <div className="h-[650px] flex items-center justify-center">
+                  <Calendar
+                    mode="single"
+                    month={currentMonth}
+                    onMonthChange={setCurrentMonth}
+                    className="rounded-md border w-full max-w-none scale-125 transform-gpu"
+                    showOutsideDays
+                    components={{
+                      Day: ({ date, ...props }) => (
+                        <div {...props}>
+                          {date && renderDay(date)}
+                        </div>
+                      )
+                    }}
+                  />
+                </div>
               )}
             </CardContent>
           </Card>
