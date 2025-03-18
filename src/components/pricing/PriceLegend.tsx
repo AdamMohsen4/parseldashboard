@@ -66,9 +66,9 @@ const PriceLegend: React.FC<PriceLegendProps> = ({ pricingData, pickup, delivery
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="w-4 h-4 rounded bg-green-50 border-b-2 border-green-200 mr-2"></div>
-              <span className="text-sm">{t('shipping.lowVolume', 'Low Demand')}</span>
+              <span className="text-sm">{t('shipping.lowVolume', 'High Demand')}</span>
             </div>
-            <span className="text-sm font-medium">{formatPrice(9.99)}</span>
+            <span className="text-sm font-medium">{formatPrice(8.99)}</span>
           </div>
           
           <div className="flex items-center justify-between">
@@ -76,15 +76,15 @@ const PriceLegend: React.FC<PriceLegendProps> = ({ pricingData, pickup, delivery
               <div className="w-4 h-4 rounded bg-yellow-50 border-b-2 border-yellow-200 mr-2"></div>
               <span className="text-sm">{t('shipping.mediumVolume', 'Medium Demand')}</span>
             </div>
-            <span className="text-sm font-medium">{formatPrice(14.99)}</span>
+            <span className="text-sm font-medium">{formatPrice(10.99)}</span>
           </div>
           
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="w-4 h-4 rounded bg-red-50 border-b-2 border-red-200 mr-2"></div>
-              <span className="text-sm">{t('shipping.highVolume', 'High Demand')}</span>
+              <span className="text-sm">{t('shipping.highVolume', 'Low Demand')}</span>
             </div>
-            <span className="text-sm font-medium">{formatPrice(19.99)}</span>
+            <span className="text-sm font-medium">{formatPrice(13.99)}</span>
           </div>
           
           <div className="flex items-center justify-between text-gray-400">
