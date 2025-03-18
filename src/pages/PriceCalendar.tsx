@@ -37,10 +37,10 @@ const PriceCalendar = () => {
   }, [currentMonth]);
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="container mx-auto py-6 max-w-7xl">
       <NavBar />
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-9">
           <PriceCalendarView
             currentMonth={currentMonth}
             setCurrentMonth={setCurrentMonth}
@@ -50,7 +50,7 @@ const PriceCalendar = () => {
           />
         </div>
         
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-3">
           <PriceLegend pricingData={pricingData} />
         </div>
       </div>

@@ -117,48 +117,6 @@ export type Database = {
         }
         Relationships: []
       }
-      collaborations: {
-        Row: {
-          business_name: string
-          contact_email: string
-          contact_phone: string
-          created_at: string
-          destination: string
-          frequency: string
-          id: string
-          next_shipment_date: string
-          notes: string | null
-          user_id: string
-          volume: string
-        }
-        Insert: {
-          business_name: string
-          contact_email: string
-          contact_phone: string
-          created_at?: string
-          destination: string
-          frequency: string
-          id?: string
-          next_shipment_date: string
-          notes?: string | null
-          user_id: string
-          volume: string
-        }
-        Update: {
-          business_name?: string
-          contact_email?: string
-          contact_phone?: string
-          created_at?: string
-          destination?: string
-          frequency?: string
-          id?: string
-          next_shipment_date?: string
-          notes?: string | null
-          user_id?: string
-          volume?: string
-        }
-        Relationships: []
-      }
       demo_requests: {
         Row: {
           company: string | null
