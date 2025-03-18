@@ -6,13 +6,17 @@ import NavBar from "@/components/layout/NavBar";
 import { generateMockPricingData, PricingDay, DateRange } from "@/utils/pricingUtils";
 import PriceCalendarView from "@/components/pricing/PriceCalendarView";
 import PriceLegend from "@/components/pricing/PriceLegend";
+import AddressInputs from "@/components/pricing/AddressInputs";
+import { toast } from "@/components/ui/use-toast";
 
-// This is the price calendar component that will be used to display days with higher or lower shipping fees based on the amount of orders
 const PriceCalendar = () => {
   const { t } = useTranslation();
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [pricingData, setPricingData] = useState<PricingDay[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true); 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showCalendar, setShowCalendar] = useState<boolean>(false);
+  const [pickup, setPickup] = useState<string>('');
+  const [delivery, setDelivery] = useState<string>('');
 
   // Calculate the date range for the next two weeks
   const today = new Date();
@@ -23,36 +27,66 @@ const PriceCalendar = () => {
     end: twoWeeksFromNow
   };
 
-  // Fetch or generate pricing data when the current month changes
-  useEffect(() => {
+  // Handle address search
+  const handleSearch = (pickupAddress: string, deliveryAddress: string) => {
+    setPickup(pickupAddress);
+    setDelivery(deliveryAddress);
+    setShowCalendar(true);
     setIsLoading(true);
     
-    // In a real application, I would fetch this data from Supabase
-    // For now, we'll use mock data
+    // Show toast notification
+    toast({
+      title: t('shipping.searchingRates', 'Searching for rates'),
+      description: t('shipping.betweenLocations', 'Between {{pickup}} and {{delivery}}', 
+        { pickup: pickupAddress, delivery: deliveryAddress }),
+    });
+
+    // Generate pricing data based on the locations
     setTimeout(() => {
       const data = generateMockPricingData(currentMonth, nextTwoWeeksRange);
       setPricingData(data);
       setIsLoading(false);
     }, 800);
-  }, [currentMonth]);
+  };
+
+  // Fetch or generate new pricing data when month changes (only if locations are selected)
+  useEffect(() => {
+    if (showCalendar) {
+      setIsLoading(true);
+      setTimeout(() => {
+        const data = generateMockPricingData(currentMonth, nextTwoWeeksRange);
+        setPricingData(data);
+        setIsLoading(false);
+      }, 800);
+    }
+  }, [currentMonth, showCalendar]);
 
   return (
     <div className="container mx-auto py-6">
       <NavBar />
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
-          <PriceCalendarView
-            currentMonth={currentMonth}
-            setCurrentMonth={setCurrentMonth}
-            pricingData={pricingData}
-            isLoading={isLoading}
-            dateRange={nextTwoWeeksRange}
-          />
-        </div>
+      
+      <div className="mt-8 space-y-6">
+        {/* Address Input Section */}
+        <AddressInputs onSearch={handleSearch} />
         
-        <div className="lg:col-span-1">
-          <PriceLegend pricingData={pricingData} />
-        </div>
+        {/* Calendar Section - Only show after search */}
+        {showCalendar && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-9">
+              <PriceCalendarView
+                currentMonth={currentMonth}
+                setCurrentMonth={setCurrentMonth}
+                pricingData={pricingData}
+                isLoading={isLoading}
+                dateRange={nextTwoWeeksRange}
+              />
+            </div>
+            
+            <div className="lg:col-span-3">
+              <PriceLegend pricingData={pricingData} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -33,7 +33,7 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
   const { t } = useTranslation();
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>{t('shipping.priceCalendar', 'Price Calendar')}</span>
@@ -57,27 +57,29 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <Calendar
-            mode="single"
-            month={currentMonth}
-            onMonthChange={setCurrentMonth}
-            className="rounded-md border w-full"
-            showOutsideDays
-            components={{
-              Day: ({ date, ...props }) => (
-                <div {...props}>
-                  {date && (
-                    <CalendarDay 
-                      date={date}
-                      currentMonth={currentMonth}
-                      pricingData={pricingData}
-                      dateRange={dateRange}
-                    />
-                  )}
-                </div>
-              )
-            }}
-          />
+          <div className="scale-110 transform origin-top-left">
+            <Calendar
+              mode="single"
+              month={currentMonth}
+              onMonthChange={setCurrentMonth}
+              className="rounded-md border w-full pointer-events-auto"
+              showOutsideDays
+              components={{
+                Day: ({ date, ...props }) => (
+                  <div {...props}>
+                    {date && (
+                      <CalendarDay 
+                        date={date}
+                        currentMonth={currentMonth}
+                        pricingData={pricingData}
+                        dateRange={dateRange}
+                      />
+                    )}
+                  </div>
+                )
+              }}
+            />
+          </div>
         )}
       </CardContent>
     </Card>
