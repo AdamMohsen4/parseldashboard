@@ -410,6 +410,16 @@ const ThreePLServicePage = () => {
                         required
                       />
                     </div>
+
+                         <div>
+                      <Label htmlFor="estimatedVolume">Estimated Storage Volume (pallets/month)</Label>
+                      <Input 
+                        id="estimatedVolume" 
+                        value={estimatedVolume}
+                        onChange={(e) => setEstimatedVolume(e.target.value)}
+                        required
+                      />
+                    </div>
                     
                     <div className="flex items-center space-x-2">
                       <Checkbox 
@@ -556,6 +566,7 @@ const ThreePLServicePage = () => {
                     <p><strong>Contact:</strong> {contactName} ({contactEmail})</p>
                     <p><strong>Product Type:</strong> {productType}</p>
                     <p><strong>Storage Volume:</strong> {estimatedVolume} pallets/month</p>
+                    <p><strong>Storage Volume:</strong> {estimatedVolume} shelves/month</p>
                     <p><strong>Average Orders:</strong> {averageOrders}/month</p>
                     {documentUrl && (
                       <p><strong>Document:</strong> Uploaded</p>

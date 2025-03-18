@@ -1,0 +1,1 @@
+# Contains functions/classes for recieving, validating and normalizing data from different sources shipment data
