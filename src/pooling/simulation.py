@@ -1,1 +1,0 @@
-# Provide scrips to simulate different scenarios, testing aggregation and optimization logic with samle or historical data
