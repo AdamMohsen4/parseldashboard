@@ -85,12 +85,12 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="flex justify-center items-center transform origin-center pb-6">
+          <div className="scale-110 transform origin-center pb-6">
             <Calendar
               mode="single"
               month={currentMonth}
               onMonthChange={setCurrentMonth}
-              className="mx-auto rounded-md border-0 w-full max-w-[95%] pointer-events-auto"
+              className="rounded-md border-0 w-full pointer-events-auto"
               showOutsideDays
               components={{
                 Day: ({ date, ...props }) => (
