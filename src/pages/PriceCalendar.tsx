@@ -61,29 +61,56 @@ const PriceCalendar = () => {
     }
   }, [currentMonth, showCalendar]);
 
+  // Create journey title from pickup and delivery locations
+  const getJourneyTitle = () => {
+    if (pickup && delivery) {
+      return `${t('shipping.shipFrom', 'Ship from')} ${pickup} ${t('shipping.to', 'to')} ${delivery}`;
+    }
+    return t('shipping.findRates', 'Find Shipping Rates');
+  };
+
   return (
-    <div className="container mx-auto py-6">
+    <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
       <NavBar />
       
       <div className="mt-8 space-y-6">
+        {showCalendar && (
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-semibold text-gray-800">{getJourneyTitle()}</h1>
+            <p className="text-sm text-gray-500 mt-1">
+              {t('shipping.selectDate', 'Select your preferred shipping date')}
+            </p>
+          </div>
+        )}
+        
         {/* Address Input Section */}
         <AddressInputs onSearch={handleSearch} />
         
         {/* Calendar Section - Only show after search */}
         {showCalendar && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-9">
-              <PriceCalendarView
-                currentMonth={currentMonth}
-                setCurrentMonth={setCurrentMonth}
-                pricingData={pricingData}
-                isLoading={isLoading}
-                dateRange={nextTwoWeeksRange}
-              />
+          <div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-9 order-2 lg:order-1">
+                <PriceCalendarView
+                  currentMonth={currentMonth}
+                  setCurrentMonth={setCurrentMonth}
+                  pricingData={pricingData}
+                  isLoading={isLoading}
+                  dateRange={nextTwoWeeksRange}
+                />
+              </div>
+              
+              <div className="lg:col-span-3 order-1 lg:order-2">
+                <PriceLegend 
+                  pricingData={pricingData} 
+                  pickup={pickup}
+                  delivery={delivery}
+                />
+              </div>
             </div>
             
-            <div className="lg:col-span-3">
-              <PriceLegend pricingData={pricingData} />
+            <div className="mt-6 text-center text-sm text-gray-500">
+              {t('shipping.pricesNote', '* Prices are estimated based on current demand and may change')}
             </div>
           </div>
         )}
