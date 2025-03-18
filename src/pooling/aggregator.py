@@ -55,6 +55,16 @@ if __name__ == "__main__":
         Shipment(3, 15, 8, "A"),
         Shipment(4, 30, 15, "C"),
         Shipment(5, 25, 12, "B"),
+        Shipment(1, 10, 5, "A"),
+        Shipment(2, 20, 10, "B"),
+        Shipment(3, 15, 8, "A"),
+        Shipment(4, 30, 15, "C"),
+        Shipment(5, 25, 12, "B"),
+        Shipment(1, 10, 5, "A"),
+        Shipment(2, 20, 10, "B"),
+        Shipment(3, 15, 8, "A"),
+        Shipment(4, 30, 15, "C"),
+        Shipment(5, 25, 12, "B"),
     ]
     
     target_volume = 50  # Example target for testing
