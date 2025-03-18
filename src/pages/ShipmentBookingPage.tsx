@@ -413,19 +413,20 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     <div className="space-y-4">
                       <h3 className="font-semibold">Package Details</h3>
                       
-                      <div>
+                        <div>
                         <Label htmlFor="weight">Weight (kg)</Label>
                         <Input 
                           id="weight" 
                           type="number" 
                           placeholder="Enter weight" 
                           min="0.1" 
-                          max="50"
+                          max="100"
+                          step="0.1"
                           value={weight}
                           onChange={(e) => setWeight(e.target.value)}
                           required
                         />
-                      </div>
+                        </div>
                       
                       <div className="grid grid-cols-3 gap-4">
                         <div>
