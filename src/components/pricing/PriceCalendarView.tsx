@@ -33,7 +33,7 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
   const { t } = useTranslation();
 
   return (
-    <Card className="h-full">
+    <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>{t('shipping.priceCalendar', 'Price Calendar')}</span>
@@ -51,35 +51,33 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
           </TooltipProvider>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pb-6">
+      <CardContent>
         {isLoading ? (
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="flex justify-center scale-110 transform origin-top">
-            <Calendar
-              mode="single"
-              month={currentMonth}
-              onMonthChange={setCurrentMonth}
-              className="rounded-md border w-full"
-              showOutsideDays
-              components={{
-                Day: ({ date, ...props }) => (
-                  <div {...props}>
-                    {date && (
-                      <CalendarDay 
-                        date={date}
-                        currentMonth={currentMonth}
-                        pricingData={pricingData}
-                        dateRange={dateRange}
-                      />
-                    )}
-                  </div>
-                )
-              }}
-            />
-          </div>
+          <Calendar
+            mode="single"
+            month={currentMonth}
+            onMonthChange={setCurrentMonth}
+            className="rounded-md border w-full"
+            showOutsideDays
+            components={{
+              Day: ({ date, ...props }) => (
+                <div {...props}>
+                  {date && (
+                    <CalendarDay 
+                      date={date}
+                      currentMonth={currentMonth}
+                      pricingData={pricingData}
+                      dateRange={dateRange}
+                    />
+                  )}
+                </div>
+              )
+            }}
+          />
         )}
       </CardContent>
     </Card>
