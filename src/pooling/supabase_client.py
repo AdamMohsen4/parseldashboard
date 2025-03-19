@@ -3,6 +3,7 @@ from supabase import create_client, Client
 import os
 import time
 import logging
+import json
 
 # Configure logging
 logging.basicConfig(
@@ -65,6 +66,49 @@ def execute_with_retry(operation_func, max_retries=MAX_RETRIES):
     
     logger.error(f"Operation failed after {max_retries} attempts: {last_error}")
     raise last_error
+
+def ensure_tables_exist():
+    """Ensure required tables exist in the Supabase database."""
+    try:
+        # Check if batches table exists by attempting to query it
+        try:
+            supabase.table("batches").select("count", count="exact").limit(1).execute()
+            logger.info("Batches table exists")
+        except Exception as e:
+            if "404" in str(e) or "does not exist" in str(e).lower():
+                logger.warning("Batches table does not exist. Creating it...")
+                
+                # Create the batches table using SQL
+                # Note: This requires appropriate permissions in Supabase
+                sql = """
+                CREATE TABLE IF NOT EXISTS batches (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(255) NOT NULL,
+                    volume FLOAT NOT NULL,
+                    weight FLOAT NOT NULL,
+                    shipment_count INTEGER NOT NULL,
+                    zone_count INTEGER NOT NULL,
+                    efficiency FLOAT NOT NULL,
+                    estimated_delivery VARCHAR(255),
+                    shipment_ids JSONB,
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+                );
+                """
+                
+                supabase.rpc("exec_sql", {"sql": sql}).execute()
+                logger.info("Batches table created successfully")
+            else:
+                logger.error(f"Error checking batches table: {e}")
+                raise e
+    except Exception as e:
+        logger.error(f"Failed to ensure tables exist: {e}")
+        raise e
+
+# Call ensure_tables_exist when the module is imported
+try:
+    ensure_tables_exist()
+except Exception as e:
+    logger.error(f"Error during table initialization: {e}")
 
 # Export a more reliable version of common operations
 def fetch_data(table, query_func=None):

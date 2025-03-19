@@ -1,8 +1,8 @@
-
-from supabase_client import supabase
+from supabase_client import supabase, ensure_tables_exist
 import time
 import schedule
 import math
+import json
 from collections import defaultdict
 from datetime import datetime, timedelta
 
@@ -239,6 +239,9 @@ def aggregate_shipments(shipments, target_volume, target_weight=None):
 def save_batch_to_supabase(batch):
     """Save a completed batch to Supabase for tracking."""
     try:
+        # Convert list of shipment IDs to JSON string
+        shipment_ids_json = json.dumps([s.shipment_id for s in batch.shipments])
+        
         batch_data = {
             "name": batch.name,
             "volume": batch.current_volume,
@@ -247,7 +250,7 @@ def save_batch_to_supabase(batch):
             "zone_count": len(batch.destination_zones),
             "efficiency": batch.efficiency,
             "estimated_delivery": batch.estimated_delivery_window(),
-            "shipment_ids": [s.shipment_id for s in batch.shipments],
+            "shipment_ids": shipment_ids_json,
             "created_at": batch.created_at.isoformat()
         }
         
@@ -257,8 +260,20 @@ def save_batch_to_supabase(batch):
             return True
         return False
     except Exception as e:
-        print(f"Error saving batch to database: {e}")
-        return False
+        if "404" in str(e) or "does not exist" in str(e).lower():
+            print("Batches table not found. Attempting to create it...")
+            try:
+                # Try to ensure tables exist and retry
+                ensure_tables_exist()
+                # Retry the save operation
+                time.sleep(1)  # Small delay before retry
+                return save_batch_to_supabase(batch)
+            except Exception as create_error:
+                print(f"Failed to create batches table: {create_error}")
+                return False
+        else:
+            print(f"Error saving batch to database: {e}")
+            return False
 
 
 def process_and_display_shipments():
@@ -298,9 +313,15 @@ def process_and_display_shipments():
         for shipment in batch.shipments:
             print(f"  - {shipment}")
     
+    # Initialize success_count to track successful saves
+    success_count = 0
+    
     # Save batches to database for tracking
     for batch in batches:
-        save_batch_to_supabase(batch)
+        if save_batch_to_supabase(batch):
+            success_count += 1
+    
+    print(f"Successfully saved {success_count}/{len(batches)} batches to database")
 
 
 if __name__ == "__main__":
