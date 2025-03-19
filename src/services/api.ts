@@ -11,18 +11,19 @@ import {
 // Mock data
 const generateMockRates = (weight: number, urgency: DeliveryUrgency): ShippingRate[] => {
   const basePrice = weight * 2.5;
+  const originalPrice = basePrice * 1.2; // Set original price higher than actual price for discount display
   const options = [
-    { carrier: 'FastShip', multiplier: 1.0, days: urgency === 'standard' ? '3-5' : '1-2' },
-    { carrier: 'GlobalPost', multiplier: 0.8, days: urgency === 'standard' ? '5-7' : '2-3' },
-    { carrier: 'ExpressCargo', multiplier: 1.2, days: urgency === 'standard' ? '2-4' : '1' },
+    { carrier: 'FastShip', multiplier: 1.0, days: urgency === 1 ? 2 : 4 },
+    { carrier: 'GlobalPost', multiplier: 0.8, days: urgency === 1 ? 3 : 6 },
+    { carrier: 'ExpressCargo', multiplier: 1.2, days: urgency === 1 ? 1 : 3 },
   ];
   
   return options.map(option => ({
     id: `rate-${Math.random().toString(36).substring(2, 9)}`,
     carrier: option.carrier,
     price: parseFloat((basePrice * option.multiplier).toFixed(2)),
-    estimatedDays: option.days,
-    availability: Math.random() > 0.1,
+    eta: option.days,
+    originalPrice: parseFloat((originalPrice * option.multiplier).toFixed(2))
   }));
 };
 
@@ -39,14 +40,18 @@ const mockShipments: Shipment[] = [
     id: 'ship-123456',
     carrier: 'FastShip',
     trackingCode: 'FS123456789',
-    status: 'in_transit',
+    status: 'in-transit',
     pickupLocation: {
-      address: '123 Main St, New York, NY',
-      coordinates: { lat: 40.7128, lng: -74.006 }
+      address: '123 Main St',
+      city: 'New York',
+      country: 'USA',
+      postalCode: '10001',
     },
     deliveryLocation: {
-      address: '456 Market St, San Francisco, CA',
-      coordinates: { lat: 37.7749, lng: -122.4194 }
+      address: '456 Market St',
+      city: 'San Francisco',
+      country: 'USA',
+      postalCode: '94103',
     },
     dimensions: {
       width: 30,
@@ -66,12 +71,16 @@ const mockShipments: Shipment[] = [
     trackingCode: 'GP987654321',
     status: 'delivered',
     pickupLocation: {
-      address: '789 Oak Dr, Chicago, IL',
-      coordinates: { lat: 41.8781, lng: -87.6298 }
+      address: '789 Oak Dr',
+      city: 'Chicago',
+      country: 'USA',
+      postalCode: '60601',
     },
     deliveryLocation: {
-      address: '101 Pine St, Seattle, WA',
-      coordinates: { lat: 47.6062, lng: -122.3321 }
+      address: '101 Pine St',
+      city: 'Seattle',
+      country: 'USA',
+      postalCode: '98101',
     },
     dimensions: {
       width: 15,
@@ -92,10 +101,7 @@ const mockTrackingPoints: TrackingPoint[] = [
     id: 'track-1',
     shipmentId: 'ship-123456',
     status: 'picked_up',
-    location: {
-      address: '123 Main St, New York, NY',
-      coordinates: { lat: 40.7128, lng: -74.006 }
-    },
+    location: '123 Main St, New York, NY',
     timestamp: '2023-10-21T09:30:00Z',
     description: 'Package picked up',
   },
@@ -103,10 +109,7 @@ const mockTrackingPoints: TrackingPoint[] = [
     id: 'track-2',
     shipmentId: 'ship-123456',
     status: 'in_transit',
-    location: {
-      address: 'Distribution Center, Columbus, OH',
-      coordinates: { lat: 39.9612, lng: -82.9988 }
-    },
+    location: 'Distribution Center, Columbus, OH',
     timestamp: '2023-10-22T06:45:00Z',
     description: 'Package in transit',
   },
@@ -114,10 +117,7 @@ const mockTrackingPoints: TrackingPoint[] = [
     id: 'track-3',
     shipmentId: 'ship-789012',
     status: 'picked_up',
-    location: {
-      address: '789 Oak Dr, Chicago, IL',
-      coordinates: { lat: 41.8781, lng: -87.6298 }
-    },
+    location: '789 Oak Dr, Chicago, IL',
     timestamp: '2023-10-16T11:20:00Z',
     description: 'Package picked up',
   },
@@ -125,10 +125,7 @@ const mockTrackingPoints: TrackingPoint[] = [
     id: 'track-4',
     shipmentId: 'ship-789012',
     status: 'in_transit',
-    location: {
-      address: 'Transfer Station, Minneapolis, MN',
-      coordinates: { lat: 44.9778, lng: -93.2650 }
-    },
+    location: 'Transfer Station, Minneapolis, MN',
     timestamp: '2023-10-17T08:15:00Z',
     description: 'Package in transit',
   },
@@ -136,10 +133,7 @@ const mockTrackingPoints: TrackingPoint[] = [
     id: 'track-5',
     shipmentId: 'ship-789012',
     status: 'delivered',
-    location: {
-      address: '101 Pine St, Seattle, WA',
-      coordinates: { lat: 47.6062, lng: -122.3321 }
-    },
+    location: '101 Pine St, Seattle, WA',
     timestamp: '2023-10-18T14:15:00Z',
     description: 'Package delivered',
   },
