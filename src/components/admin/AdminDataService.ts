@@ -113,7 +113,7 @@ const invalidateAllCaches = () => {
   dataCache.clear();
 };
 
-export const loadShipmentsWithDateRange = async (startDate: string, endDate: string, sortConfig?: { column: string, direction: 'asc' | 'desc' }) => {
+export const loadShipmentsWithDateRange = async (startDate: string, endDate: string) => {
   try {
     console.log(`Loading shipments from ${startDate} to ${endDate}`);
     
@@ -124,20 +124,12 @@ export const loadShipmentsWithDateRange = async (startDate: string, endDate: str
     // Add one day to end date to include the entire day
     toDate.setDate(toDate.getDate() + 1);
     
-    let query = supabase
+    const { data, error } = await supabase
       .from('booking')
       .select('*')
       .gte('created_at', fromDate.toISOString())
-      .lt('created_at', toDate.toISOString());
-    
-    // Apply sorting if provided
-    if (sortConfig) {
-      query = query.order(sortConfig.column, { ascending: sortConfig.direction === 'asc' });
-    } else {
-      query = query.order('created_at', { ascending: false });
-    }
-    
-    const { data, error } = await query;
+      .lt('created_at', toDate.toISOString())
+      .order('created_at', { ascending: false });
     
     if (error) {
       console.error("Error loading shipments with date range:", error);
@@ -157,32 +149,9 @@ export const loadShipmentsWithDateRange = async (startDate: string, endDate: str
   }
 };
 
-// This function will sort the data before exporting
-const sortShipmentData = (data, sortConfig) => {
-  if (!sortConfig) return data;
-  
-  const { column, direction } = sortConfig;
-  
-  return [...data].sort((a, b) => {
-    // Handle null or undefined values
-    const valA = a[column] ?? '';
-    const valB = b[column] ?? '';
-    
-    // Case-insensitive string comparison for text columns
-    if (typeof valA === 'string' && typeof valB === 'string') {
-      return direction === 'asc' 
-        ? valA.localeCompare(valB)
-        : valB.localeCompare(valA);
-    }
-    
-    // Numeric or date comparison
-    return direction === 'asc' ? valA - valB : valB - valA;
-  });
-};
-
-export const exportShipmentsToExcel = async (startDate: string, endDate: string, sortConfig?: { column: string, direction: 'asc' | 'desc' }): Promise<boolean> => {
+export const exportShipmentsToExcel = async (startDate: string, endDate: string): Promise<boolean> => {
   try {
-    const shipments = await loadShipmentsWithDateRange(startDate, endDate, sortConfig);
+    const shipments = await loadShipmentsWithDateRange(startDate, endDate);
     
     if (shipments.length === 0) {
       toast({
@@ -244,7 +213,7 @@ export const exportShipmentsToExcel = async (startDate: string, endDate: string,
   }
 };
 
-export const loadShipments = async (sortConfig?: { column: string, direction: 'asc' | 'desc' }) => {
+export const loadShipments = async () => {
   try {
     const cacheKey = 'admin-shipments';
     
@@ -256,15 +225,10 @@ export const loadShipments = async (sortConfig?: { column: string, direction: 'a
     }
     
     console.log("Loading shipments from Supabase...");
-    let query = supabase.from('booking').select('*');
-    
-    if (sortConfig) {
-      query = query.order(sortConfig.column, { ascending: sortConfig.direction === 'asc' });
-    } else {
-      query = query.order('created_at', { ascending: false });
-    }
-    
-    const { data, error } = await query;
+    const { data, error } = await supabase
+      .from('booking')
+      .select('*')
+      .order('created_at', { ascending: false });
     
     if (error) {
       console.error("Error loading shipments:", error);
@@ -601,7 +565,7 @@ export const getStatusBadgeColor = (status: string) => {
     case 'picked_up': color = "bg-purple-100 text-purple-800"; break;
     case 'exception': color = "bg-red-100 text-red-800"; break;
     case 'cancelled': color = "bg-red-100 text-red-800"; break;
-    case 'scheduled': color = "bg-blue-100 text-blue-blue-800"; break;
+    case 'scheduled': color = "bg-blue-100 text-blue-800"; break;
     case 'completed': color = "bg-green-100 text-green-800"; break;
     default: color = "bg-gray-100 text-gray-800"; break;
   }

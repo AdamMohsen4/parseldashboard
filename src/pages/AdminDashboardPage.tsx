@@ -40,10 +40,6 @@ const AdminDashboardPage = () => {
   const [shipments, setShipments] = useState([]);
   const [filteredShipments, setFilteredShipments] = useState([]);
   const [shipmentSearchQuery, setShipmentSearchQuery] = useState("");
-  const [shipmentSort, setShipmentSort] = useState({
-    column: "created_at",
-    direction: "desc" as "asc" | "desc"
-  });
 
   const [demoRequests, setDemoRequests] = useState([]);
   const [filteredDemoRequests, setFilteredDemoRequests] = useState([]);
@@ -71,9 +67,9 @@ const AdminDashboardPage = () => {
 
   useEffect(() => {
     if (shipments.length > 0) {
-      filterAndSortShipments();
+      filterShipments();
     }
-  }, [shipmentSearchQuery, shipments, shipmentSort]);
+  }, [shipmentSearchQuery, shipments]);
 
   useEffect(() => {
     if (demoRequests.length > 0) {
@@ -115,52 +111,22 @@ const AdminDashboardPage = () => {
     }
   };
 
-  const sortShipmentData = (data) => {
-    const { column, direction } = shipmentSort;
-    
-    return [...data].sort((a, b) => {
-      // Handle null or undefined values
-      const valA = a[column] ?? '';
-      const valB = b[column] ?? '';
-      
-      // Case-insensitive string comparison for text columns
-      if (typeof valA === 'string' && typeof valB === 'string') {
-        return direction === 'asc' 
-          ? valA.localeCompare(valB)
-          : valB.localeCompare(valA);
-      }
-      
-      // Numeric or date comparison
-      return direction === 'asc' ? valA - valB : valB - valA;
-    });
-  };
-
-  const handleSortShipments = (column) => {
-    setShipmentSort(prev => ({
-      column,
-      direction: prev.column === column && prev.direction === 'asc' ? 'desc' : 'asc'
-    }));
-  };
-
-  const filterAndSortShipments = () => {
-    let filtered = shipments;
-    
-    // Apply search filter
-    if (shipmentSearchQuery.trim()) {
-      const lowerCaseQuery = shipmentSearchQuery.toLowerCase();
-      filtered = shipments.filter(shipment => 
-        shipment.tracking_code?.toLowerCase().includes(lowerCaseQuery) ||
-        shipment.user_id?.toLowerCase().includes(lowerCaseQuery) ||
-        shipment.business_name?.toLowerCase().includes(lowerCaseQuery) ||
-        shipment.pickup_address?.toLowerCase().includes(lowerCaseQuery) ||
-        shipment.delivery_address?.toLowerCase().includes(lowerCaseQuery) ||
-        shipment.status?.toLowerCase().includes(lowerCaseQuery)
-      );
+  const filterShipments = () => {
+    if (!shipmentSearchQuery.trim()) {
+      setFilteredShipments(shipments);
+      return;
     }
     
-    // Apply sorting
-    const sorted = sortShipmentData(filtered);
-    setFilteredShipments(sorted);
+    const lowerCaseQuery = shipmentSearchQuery.toLowerCase();
+    const filtered = shipments.filter(shipment => 
+      shipment.tracking_code?.toLowerCase().includes(lowerCaseQuery) ||
+      shipment.user_id?.toLowerCase().includes(lowerCaseQuery) ||
+      shipment.pickup_address?.toLowerCase().includes(lowerCaseQuery) ||
+      shipment.delivery_address?.toLowerCase().includes(lowerCaseQuery) ||
+      shipment.status?.toLowerCase().includes(lowerCaseQuery)
+    );
+    
+    setFilteredShipments(filtered);
   };
 
   const filterDemoRequests = () => {
@@ -258,7 +224,7 @@ const AdminDashboardPage = () => {
   const handleExportShipments = async (startDate: string, endDate: string) => {
     try {
       setIsExporting(true);
-      await AdminDataService.exportShipmentsToExcel(startDate, endDate, shipmentSort);
+      await AdminDataService.exportShipmentsToExcel(startDate, endDate);
     } catch (error) {
       console.error("Error exporting shipments:", error);
       toast({
@@ -274,7 +240,7 @@ const AdminDashboardPage = () => {
   const loadShipments = async () => {
     const data = await AdminDataService.loadShipments();
     setShipments(data);
-    filterAndSortShipments();
+    setFilteredShipments(data);
   };
 
   const loadDemoRequests = async () => {
@@ -386,7 +352,7 @@ const AdminDashboardPage = () => {
                     <div className="flex items-center gap-2">
                       <Search className="text-muted-foreground h-5 w-5" />
                       <Input
-                        placeholder="Search by tracking code, user, address, company name..."
+                        placeholder="Search by tracking code, user, address..."
                         value={shipmentSearchQuery}
                         onChange={(e) => setShipmentSearchQuery(e.target.value)}
                         className="max-w-sm"
@@ -416,8 +382,6 @@ const AdminDashboardPage = () => {
                         onStatusChange={handleStatusChange}
                         getStatusBadgeColor={AdminDataService.getStatusBadgeColor}
                         formatDate={AdminDataService.formatDate}
-                        sortConfig={shipmentSort}
-                        onSortChange={handleSortShipments}
                       />
                     </TabsContent>
                     
@@ -428,8 +392,6 @@ const AdminDashboardPage = () => {
                         onStatusChange={handleStatusChange}
                         getStatusBadgeColor={AdminDataService.getStatusBadgeColor}
                         formatDate={AdminDataService.formatDate}
-                        sortConfig={shipmentSort}
-                        onSortChange={handleSortShipments}
                       />
                     </TabsContent>
                     
@@ -440,8 +402,6 @@ const AdminDashboardPage = () => {
                         onStatusChange={handleStatusChange}
                         getStatusBadgeColor={AdminDataService.getStatusBadgeColor}
                         formatDate={AdminDataService.formatDate}
-                        sortConfig={shipmentSort}
-                        onSortChange={handleSortShipments}
                       />
                     </TabsContent>
                     
@@ -452,8 +412,6 @@ const AdminDashboardPage = () => {
                         onStatusChange={handleStatusChange}
                         getStatusBadgeColor={AdminDataService.getStatusBadgeColor}
                         formatDate={AdminDataService.formatDate}
-                        sortConfig={shipmentSort}
-                        onSortChange={handleSortShipments}
                       />
                     </TabsContent>
                     
@@ -464,8 +422,6 @@ const AdminDashboardPage = () => {
                         onStatusChange={handleStatusChange}
                         getStatusBadgeColor={AdminDataService.getStatusBadgeColor}
                         formatDate={AdminDataService.formatDate}
-                        sortConfig={shipmentSort}
-                        onSortChange={handleSortShipments}
                       />
                     </TabsContent>
                     
@@ -476,8 +432,6 @@ const AdminDashboardPage = () => {
                         onStatusChange={handleStatusChange}
                         getStatusBadgeColor={AdminDataService.getStatusBadgeColor}
                         formatDate={AdminDataService.formatDate}
-                        sortConfig={shipmentSort}
-                        onSortChange={handleSortShipments}
                       />
                     </TabsContent>
                   </Tabs>
@@ -543,6 +497,24 @@ const AdminDashboardPage = () => {
                     </TabsContent>
                   </Tabs>
                 </TabsContent>
+{/*                 
+                <TabsContent value="collaborations">
+                  <div className="mb-4 flex items-center gap-2">
+                    <Search className="text-muted-foreground h-5 w-5" />
+                    <Input
+                      placeholder="Search by business, destination, contact..."
+                      value={collaborationSearchQuery}
+                      onChange={(e) => setCollaborationSearchQuery(e.target.value)}
+                      className="max-w-sm"
+                    />
+                  </div> */}
+{/*                   
+                  <CollaborationsTable 
+                    collaborations={filteredCollaborations} 
+                    isLoading={isLoading} 
+                    formatDate={AdminDataService.formatDate}
+                  />
+                </TabsContent> */}
                 
                 <TabsContent value="support">
                   <div className="mb-4 flex items-center gap-2">
@@ -644,3 +616,4 @@ const AdminDashboardPage = () => {
 };
 
 export default AdminDashboardPage;
+
