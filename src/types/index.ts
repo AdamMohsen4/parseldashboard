@@ -41,6 +41,8 @@ export interface Shipment {
   labelUrl?: string;
   createdAt: string;
   updatedAt: string;
+  estimatedDelivery?: string;
+  deliveredAt?: string;
 }
 
 export interface TrackingPoint {
@@ -51,6 +53,7 @@ export interface TrackingPoint {
   timestamp: string;
   latitude?: number;
   longitude?: number;
+  description?: string;
 }
 
 export interface ComplianceReport {
