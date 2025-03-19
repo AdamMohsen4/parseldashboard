@@ -1,31 +1,35 @@
-# name: Deploy to GitHub Pages
 
-# on:
-#   push:
-#     branches:
-#       - main
+name: Deploy to GitHub Pages
 
-# jobs:
-#   deploy:
-#     runs-on: ubuntu-latest
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v2
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-#       - name: Build project
-#         run: |
-#           # Your build commands here
-#           npm install
-#           npm run build
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
 
-#       - name: Deploy to GitHub Pages
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#         run: |
-#           git config --global user.name "github-actions[bot]"
-#           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-#           git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git
-#           git add .
-#           git commit -m "Deploying to gh-pages from @ ${{ github.repository }}@${{ github.sha }} 🚀" --quiet --no-verify
-#           git push --force origin HEAD:gh-pages
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
+          branch: gh-pages
+          clean: true

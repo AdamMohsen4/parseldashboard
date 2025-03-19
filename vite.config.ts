@@ -6,7 +6,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/",  // Changed from "/e-parsel/" to "/" for local development
+  base: mode === 'production' ? "/e-parsel/" : "/",  // Use repo name in production, root path in development
   server: {
     host: "::",
     port: 8080,
