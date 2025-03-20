@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useLoadScript } from '@react-google-maps/api';
+import { debounce } from 'lodash';
 
 // Libraries to load from Google Maps API
 const libraries = ['places'];
@@ -71,11 +72,27 @@ const GooglePlacesAutocompleteInput = ({
     }
   }, [props.value]);
 
+  // Debounced handler for input changes to prevent lag
+  const debouncedHandleChange = useRef(
+    debounce((value: string) => {
+      if (props.onChange) {
+        const event = {
+          target: { value }
+        } as React.ChangeEvent<HTMLInputElement>;
+        props.onChange(event);
+      }
+    }, 300)
+  ).current;
+
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    if (props.onChange) {
-      props.onChange(e);
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    debouncedHandleChange(newValue);
+    
+    // If the user clears the input, also notify the parent component
+    if (!newValue) {
+      onPlaceSelect('');
     }
   };
 
