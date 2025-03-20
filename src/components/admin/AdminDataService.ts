@@ -1,8 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { updateShipmentStatus } from "@/services/shipmentService";
-import {writeFileSync} from 'fs';
-import * as XLSX from 'node-xlsx';
+import * as XLSX from 'xlsx';
 
 // Cache for admin stats
 let statsCache = null;
@@ -150,14 +149,10 @@ export const loadShipmentsWithDateRange = async (startDate: string, endDate: str
   }
 };
 
-
-export const exportShipmentsToExcel = async (
-  startDate: string,
-  endDate: string
-): Promise<boolean> => {
+export const exportShipmentsToExcel = async (startDate: string, endDate: string): Promise<boolean> => {
   try {
     const shipments = await loadShipmentsWithDateRange(startDate, endDate);
-
+    
     if (shipments.length === 0) {
       toast({
         title: "No Data to Export",
@@ -166,66 +161,46 @@ export const exportShipmentsToExcel = async (
       });
       return false;
     }
-
-    // Define headers for the Excel file
-    const headers = [
-      "Tracking Code",
-      "User ID",
-      "Customer Type",
-      "Business Name",
-      "VAT Number",
-      "Weight (kg)",
-      "Dimensions (cm)",
-      "Pickup Address",
-      "Delivery Address",
-      "Carrier",
-      "Carrier Price",
-      "Total Price",
-      "Pickup Time",
-      "Status",
-      "Created At",
-      "Estimated Delivery",
-      "Delivery Speed",
-    ];
-
+    
     // Format the data for Excel export
-    const data = shipments.map((shipment) => [
-      shipment.tracking_code,
-      shipment.user_id,
-      shipment.customer_type,
-      shipment.business_name || "N/A",
-      shipment.vat_number || "N/A",
-      shipment.weight,
-      `${shipment.dimension_length}x${shipment.dimension_width}x${shipment.dimension_height}`,
-      shipment.pickup_address,
-      shipment.delivery_address,
-      shipment.carrier_name,
-      shipment.carrier_price,
-      shipment.total_price,
-      shipment.pickup_time,
-      shipment.status,
-      formatDate(shipment.created_at),
-      shipment.estimated_delivery,
-      shipment.delivery_speed,
-    ]);
-
-    // Combine headers and data
-    const worksheetData = [headers, ...data];
-
-    // Create a new worksheet
-    const buffer = XLSX.build([{ name: "Shipments", data: worksheetData, options: {} }]);
-
+    const formattedData = shipments.map(shipment => ({
+      "Tracking Code": shipment.tracking_code,
+      "User ID": shipment.user_id,
+      "Customer Type": shipment.customer_type,
+      "Business Name": shipment.business_name || 'N/A',
+      "VAT Number": shipment.vat_number || 'N/A',
+      "Weight (kg)": shipment.weight,
+      "Dimensions (cm)": `${shipment.dimension_length}x${shipment.dimension_width}x${shipment.dimension_height}`,
+      "Pickup Address": shipment.pickup_address,
+      "Delivery Address": shipment.delivery_address,
+      "Carrier": shipment.carrier_name,
+      "Carrier Price": shipment.carrier_price,
+      "Total Price": shipment.total_price,
+      "Pickup Time": shipment.pickup_time,
+      "Status": shipment.status,
+      "Created At": formatDate(shipment.created_at),
+      "Estimated Delivery": shipment.estimated_delivery,
+      "Delivery Speed": shipment.delivery_speed
+    }));
+    
+    // Create a worksheet from the data
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    
+    // Create a workbook and add the worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Shipments");
+    
     // Generate filename with date range
-    const fileName = `shipments_${startDate.replace(/-/g, "")}_to_${endDate.replace(/-/g, "")}.xlsx`;
-
-    // Write the file to disk
-    writeFileSync(fileName, buffer);
-
+    const fileName = `shipments_${startDate.replace(/-/g, '')}_to_${endDate.replace(/-/g, '')}.xlsx`;
+    
+    // Export the file
+    XLSX.writeFile(workbook, fileName);
+    
     toast({
       title: "Export Successful",
       description: `Shipments exported to ${fileName}`,
     });
-
+    
     return true;
   } catch (error) {
     console.error("Error exporting shipments to Excel:", error);
