@@ -8,6 +8,11 @@ import PriceCalendarView from "@/components/pricing/PriceCalendarView";
 import PriceLegend from "@/components/pricing/PriceLegend";
 import AddressInputs from "@/components/pricing/AddressInputs";
 import { toast } from "@/components/ui/use-toast";
+import { 
+  ResizablePanelGroup, 
+  ResizablePanel, 
+  ResizableHandle 
+} from "@/components/ui/resizable";
 
 const PriceCalendar = () => {
   const { t } = useTranslation();
@@ -70,7 +75,7 @@ const PriceCalendar = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-full mx-auto py-4 px-4 sm:px-6 lg:px-8">
       <NavBar />
       
       <div className="mt-8 space-y-6">
@@ -88,9 +93,12 @@ const PriceCalendar = () => {
         
         {/* Calendar Section - Only show after search */}
         {showCalendar && (
-          <div>
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-9 order-2 lg:order-1">
+          <div className="h-[calc(100vh-300px)] min-h-[500px]">
+            <ResizablePanelGroup
+              direction="horizontal"
+              className="min-h-full bg-background/95 rounded-lg border"
+            >
+              <ResizablePanel defaultSize={75} minSize={40} className="p-3">
                 <PriceCalendarView
                   currentMonth={currentMonth}
                   setCurrentMonth={setCurrentMonth}
@@ -98,16 +106,18 @@ const PriceCalendar = () => {
                   isLoading={isLoading}
                   dateRange={nextTwoWeeksRange}
                 />
-              </div>
+              </ResizablePanel>
               
-              <div className="lg:col-span-3 order-1 lg:order-2">
+              <ResizableHandle withHandle />
+              
+              <ResizablePanel defaultSize={25} minSize={15} maxSize={40} className="p-3">
                 <PriceLegend 
                   pricingData={pricingData} 
                   pickup={pickup}
                   delivery={delivery}
                 />
-              </div>
-            </div>
+              </ResizablePanel>
+            </ResizablePanelGroup>
             
             <div className="mt-6 text-center text-sm text-gray-500">
               {t('shipping.pricesNote', '* Prices are estimated based on current demand and may change')}
