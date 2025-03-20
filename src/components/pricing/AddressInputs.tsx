@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
+import GooglePlacesAutocompleteInput from "@/components/inputs/GooglePlacesAutocomplete";
 import { ArrowRight, Search, X } from "lucide-react";
 
 interface AddressInputsProps {
@@ -30,6 +30,14 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
     setDelivery('');
   };
 
+  const handlePickupSelect = (address: string) => {
+    setPickup(address);
+  };
+
+  const handleDeliverySelect = (address: string) => {
+    setDelivery(address);
+  };
+
   return (
     <Card className="bg-white shadow-sm border border-gray-100">
       <CardHeader className="pb-2">
@@ -45,10 +53,10 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
                 {t('shipping.pickup', 'From')}
               </label>
               <div className="relative">
-                <GooglePlacesAutocomplete
+                <GooglePlacesAutocompleteInput
                   id="pickup"
                   placeholder={t('shipping.enterPickup', 'Enter pickup address')}
-                  onPlaceSelect={(address) => setPickup(address)}
+                  onPlaceSelect={handlePickupSelect}
                   value={pickup}
                   onChange={(e) => setPickup(e.target.value)}
                   className="w-full pr-8"
@@ -74,10 +82,10 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
                 {t('shipping.delivery', 'To')}
               </label>
               <div className="relative">
-                <GooglePlacesAutocomplete
+                <GooglePlacesAutocompleteInput
                   id="delivery"
                   placeholder={t('shipping.enterDelivery', 'Enter delivery address')}
-                  onPlaceSelect={(address) => setDelivery(address)}
+                  onPlaceSelect={handleDeliverySelect}
                   value={delivery}
                   onChange={(e) => setDelivery(e.target.value)}
                   className="w-full pr-8"
