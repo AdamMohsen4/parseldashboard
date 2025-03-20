@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { addWeeks } from "date-fns";
 import { useTranslation } from "react-i18next";
 import NavBar from "@/components/layout/NavBar";
@@ -18,21 +18,41 @@ const PriceCalendar = () => {
   const [pickup, setPickup] = useState<string>('');
   const [delivery, setDelivery] = useState<string>('');
 
-  // Calculate the date range for the next two weeks
-  const today = new Date();
-  const twoWeeksFromNow = addWeeks(today, 2);
-  
-  const nextTwoWeeksRange: DateRange = {
-    start: today,
-    end: twoWeeksFromNow
-  };
+  // Calculate the date range for the next two weeks once
+  const dateRangeRef = React.useRef<DateRange>({
+    start: new Date(),
+    end: addWeeks(new Date(), 2)
+  });
 
-  // Handle address search
-  const handleSearch = (pickupAddress: string, deliveryAddress: string) => {
+  // Memoized function to fetch pricing data
+  const fetchPricingData = useCallback((month: Date) => {
+    setIsLoading(true);
+    
+    // Use setTimeout to simulate API call and prevent UI freezing
+    setTimeout(() => {
+      try {
+        const data = generateMockPricingData(month, dateRangeRef.current);
+        setPricingData(data);
+      } catch (error) {
+        console.error("Error generating pricing data:", error);
+        toast({
+          title: t('common.error', 'Error'),
+          description: t('shipping.errorLoadingRates', 'Error loading shipping rates. Please try again.'),
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }, 500);
+  }, [t]);
+
+  // Handle address search with memoization to prevent unnecessary re-renders
+  const handleSearch = useCallback((pickupAddress: string, deliveryAddress: string) => {
+    if (!pickupAddress || !deliveryAddress) return;
+    
     setPickup(pickupAddress);
     setDelivery(deliveryAddress);
     setShowCalendar(true);
-    setIsLoading(true);
     
     // Show toast notification
     toast({
@@ -41,33 +61,30 @@ const PriceCalendar = () => {
         { pickup: pickupAddress, delivery: deliveryAddress }),
     });
 
-    // Generate pricing data based on the locations
-    setTimeout(() => {
-      const data = generateMockPricingData(currentMonth, nextTwoWeeksRange);
-      setPricingData(data);
-      setIsLoading(false);
-    }, 800);
-  };
+    // Reset dateRange to ensure we show the next two weeks from today
+    dateRangeRef.current = {
+      start: new Date(),
+      end: addWeeks(new Date(), 2)
+    };
+    
+    // Fetch pricing data
+    fetchPricingData(currentMonth);
+  }, [currentMonth, fetchPricingData, t]);
 
-  // Fetch or generate new pricing data when month changes (only if locations are selected)
+  // Fetch pricing data when month changes (only if locations are selected)
   useEffect(() => {
-    if (showCalendar) {
-      setIsLoading(true);
-      setTimeout(() => {
-        const data = generateMockPricingData(currentMonth, nextTwoWeeksRange);
-        setPricingData(data);
-        setIsLoading(false);
-      }, 800);
+    if (showCalendar && pickup && delivery) {
+      fetchPricingData(currentMonth);
     }
-  }, [currentMonth, showCalendar]);
+  }, [currentMonth, showCalendar, pickup, delivery, fetchPricingData]);
 
   // Create journey title from pickup and delivery locations
-  const getJourneyTitle = () => {
+  const getJourneyTitle = useCallback(() => {
     if (pickup && delivery) {
       return `${t('shipping.shipFrom', 'Ship from')} ${pickup} ${t('shipping.to', 'to')} ${delivery}`;
     }
     return t('shipping.findRates', 'Find Shipping Rates');
-  };
+  }, [pickup, delivery, t]);
 
   return (
     <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
@@ -96,7 +113,7 @@ const PriceCalendar = () => {
                   setCurrentMonth={setCurrentMonth}
                   pricingData={pricingData}
                   isLoading={isLoading}
-                  dateRange={nextTwoWeeksRange}
+                  dateRange={dateRangeRef.current}
                 />
               </div>
               
