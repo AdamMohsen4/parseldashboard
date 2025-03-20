@@ -14,6 +14,8 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
   const { t } = useTranslation();
   const [pickup, setPickup] = useState<string>('');
   const [delivery, setDelivery] = useState<string>('');
+  const [typedPickup, setTypedPickup] = useState<string>('');
+  const [typedDelivery, setTypedDelivery] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,10 +26,12 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
 
   const handleClearPickup = () => {
     setPickup('');
+    setTypedPickup('');
   };
 
   const handleClearDelivery = () => {
     setDelivery('');
+    setTypedDelivery('');
   };
 
   const handlePickupSelect = (address: string) => {
@@ -36,6 +40,22 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
 
   const handleDeliverySelect = (address: string) => {
     setDelivery(address);
+  };
+
+  const handlePickupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTypedPickup(e.target.value);
+    // Only update pickup state if we're typing, not when selecting from dropdown
+    if (!e.target.value) {
+      setPickup('');
+    }
+  };
+
+  const handleDeliveryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTypedDelivery(e.target.value);
+    // Only update delivery state if we're typing, not when selecting from dropdown
+    if (!e.target.value) {
+      setDelivery('');
+    }
   };
 
   return (
@@ -57,11 +77,11 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
                   id="pickup"
                   placeholder={t('shipping.enterPickup', 'Enter pickup address')}
                   onPlaceSelect={handlePickupSelect}
-                  value={pickup}
-                  onChange={(e) => setPickup(e.target.value)}
+                  value={typedPickup || pickup}
+                  onChange={handlePickupChange}
                   className="w-full pr-8"
                 />
-                {pickup && (
+                {(pickup || typedPickup) && (
                   <button 
                     type="button" 
                     onClick={handleClearPickup}
@@ -86,11 +106,11 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
                   id="delivery"
                   placeholder={t('shipping.enterDelivery', 'Enter delivery address')}
                   onPlaceSelect={handleDeliverySelect}
-                  value={delivery}
-                  onChange={(e) => setDelivery(e.target.value)}
+                  value={typedDelivery || delivery}
+                  onChange={handleDeliveryChange}
                   className="w-full pr-8"
                 />
-                {delivery && (
+                {(delivery || typedDelivery) && (
                   <button 
                     type="button" 
                     onClick={handleClearDelivery}

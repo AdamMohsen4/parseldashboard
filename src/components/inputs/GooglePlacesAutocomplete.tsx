@@ -24,6 +24,7 @@ const GooglePlacesAutocompleteInput = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const [inputValue, setInputValue] = useState(props.value || '');
+  const [placesAutocompleteInitialized, setPlacesAutocompleteInitialized] = useState(false);
   
   // Load the Google Maps script
   const { isLoaded, loadError } = useLoadScript({
@@ -33,7 +34,7 @@ const GooglePlacesAutocompleteInput = ({
 
   // Initialize autocomplete when the script is loaded
   useEffect(() => {
-    if (!isLoaded || !inputRef.current) return;
+    if (!isLoaded || !inputRef.current || placesAutocompleteInitialized) return;
 
     // Create new autocomplete instance
     const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
@@ -42,6 +43,7 @@ const GooglePlacesAutocompleteInput = ({
     });
     
     autocompleteRef.current = autocomplete;
+    setPlacesAutocompleteInitialized(true);
 
     // Listen for place changes
     autocomplete.addListener('place_changed', () => {
@@ -57,9 +59,10 @@ const GooglePlacesAutocompleteInput = ({
       if (autocompleteRef.current) {
         google.maps.event.clearInstanceListeners(autocompleteRef.current);
         autocompleteRef.current = null;
+        setPlacesAutocompleteInitialized(false);
       }
     };
-  }, [isLoaded, onPlaceSelect]);
+  }, [isLoaded, onPlaceSelect, placesAutocompleteInitialized]);
 
   // Update input value when props.value changes
   useEffect(() => {
