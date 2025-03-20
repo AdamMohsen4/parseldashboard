@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
@@ -14,35 +14,29 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
   const { t } = useTranslation();
   const [pickup, setPickup] = useState<string>('');
   const [delivery, setDelivery] = useState<string>('');
-  const [isSearching, setIsSearching] = useState<boolean>(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (pickup && delivery) {
-      setIsSearching(true);
-      // Add a small delay to show loading state and prevent multiple rapid submissions
-      setTimeout(() => {
-        onSearch(pickup, delivery);
-        setIsSearching(false);
-      }, 100);
+      onSearch(pickup, delivery);
     }
   };
 
-  const handleClearPickup = useCallback(() => {
+  const handleClearPickup = () => {
     setPickup('');
-  }, []);
+  };
 
-  const handleClearDelivery = useCallback(() => {
+  const handleClearDelivery = () => {
     setDelivery('');
-  }, []);
+  };
 
-  const handlePickupSelect = useCallback((address: string) => {
+  const handlePickupSelect = (address: string) => {
     setPickup(address);
-  }, []);
+  };
 
-  const handleDeliverySelect = useCallback((address: string) => {
+  const handleDeliverySelect = (address: string) => {
     setDelivery(address);
-  }, []);
+  };
 
   return (
     <Card className="bg-white shadow-sm border border-gray-100">
@@ -64,6 +58,7 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
                   placeholder={t('shipping.enterPickup', 'Enter pickup address')}
                   onPlaceSelect={handlePickupSelect}
                   value={pickup}
+                  onChange={(e) => setPickup(e.target.value)}
                   className="w-full pr-8"
                 />
                 {pickup && (
@@ -92,6 +87,7 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
                   placeholder={t('shipping.enterDelivery', 'Enter delivery address')}
                   onPlaceSelect={handleDeliverySelect}
                   value={delivery}
+                  onChange={(e) => setDelivery(e.target.value)}
                   className="w-full pr-8"
                 />
                 {delivery && (
@@ -110,11 +106,11 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
           <div className="flex justify-center">
             <Button 
               type="submit" 
-              disabled={!pickup || !delivery || isSearching}
+              disabled={!pickup || !delivery}
               className="px-8 py-2 bg-primary hover:bg-primary/90 transition-colors"
             >
-              <Search className={`mr-2 h-4 w-4 ${isSearching ? 'animate-spin' : ''}`} />
-              {isSearching ? t('common.searching', 'Searching...') : t('shipping.search', 'Search')}
+              <Search className="mr-2 h-4 w-4" />
+              {t('shipping.search', 'Search')}
             </Button>
           </div>
         </form>
