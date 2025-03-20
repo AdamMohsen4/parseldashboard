@@ -63,16 +63,16 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="flex justify-center items-center transform origin-center pb-6">
+          <div className="flex justify-center items-center transform origin-center pb-8">
             <Calendar
               mode="single"
               month={currentMonth}
               onMonthChange={setCurrentMonth}
-              className="mx-auto rounded-md border-0 w-full max-w-[95%] pointer-events-auto flex flex-col items-center"
+              className="mx-auto rounded-md border-0 w-full max-w-[90%] pointer-events-auto flex flex-col items-center"
               showOutsideDays
               components={{
                 Day: ({ date, ...props }) => (
