@@ -10,7 +10,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
 import { bookShipment, cancelBooking } from "@/services/bookingService";
-import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
+import GooglePlacesAutocompleteInput from "@/components/inputs/GooglePlacesAutocomplete";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Briefcase, Download, ShoppingCart, User } from "lucide-react";
 import { getBookingByTrackingCode } from "@/services/bookingDb";
@@ -472,7 +472,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                       
                       <div>
                         <Label htmlFor="pickup">Pickup Address</Label>
-                        <GooglePlacesAutocomplete
+                        <GooglePlacesAutocompleteInput
                           id="pickup"
                           placeholder="Enter pickup address"
                           value={pickup}
@@ -484,7 +484,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                       
                       <div>
                         <Label htmlFor="delivery">Delivery Address</Label>
-                        <GooglePlacesAutocomplete
+                        <GooglePlacesAutocompleteInput
                           id="delivery"
                           placeholder="Enter delivery address"
                           value={delivery}

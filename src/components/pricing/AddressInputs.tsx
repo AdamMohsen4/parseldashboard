@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
+import GooglePlacesAutocompleteInput from "@/components/inputs/GooglePlacesAutocomplete";
 import { ArrowRight, Search, X } from "lucide-react";
 
 interface AddressInputsProps {
@@ -14,6 +14,8 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
   const { t } = useTranslation();
   const [pickup, setPickup] = useState<string>('');
   const [delivery, setDelivery] = useState<string>('');
+  const [typedPickup, setTypedPickup] = useState<string>('');
+  const [typedDelivery, setTypedDelivery] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,10 +26,36 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
 
   const handleClearPickup = () => {
     setPickup('');
+    setTypedPickup('');
   };
 
   const handleClearDelivery = () => {
     setDelivery('');
+    setTypedDelivery('');
+  };
+
+  const handlePickupSelect = (address: string) => {
+    setPickup(address);
+  };
+
+  const handleDeliverySelect = (address: string) => {
+    setDelivery(address);
+  };
+
+  const handlePickupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTypedPickup(e.target.value);
+    // Only update pickup state if we're typing, not when selecting from dropdown
+    if (!e.target.value) {
+      setPickup('');
+    }
+  };
+
+  const handleDeliveryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTypedDelivery(e.target.value);
+    // Only update delivery state if we're typing, not when selecting from dropdown
+    if (!e.target.value) {
+      setDelivery('');
+    }
   };
 
   return (
@@ -45,15 +73,15 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
                 {t('shipping.pickup', 'From')}
               </label>
               <div className="relative">
-                <GooglePlacesAutocomplete
+                <GooglePlacesAutocompleteInput
                   id="pickup"
                   placeholder={t('shipping.enterPickup', 'Enter pickup address')}
-                  onPlaceSelect={(address) => setPickup(address)}
-                  value={pickup}
-                  onChange={(e) => setPickup(e.target.value)}
+                  onPlaceSelect={handlePickupSelect}
+                  value={typedPickup || pickup}
+                  onChange={handlePickupChange}
                   className="w-full pr-8"
                 />
-                {pickup && (
+                {(pickup || typedPickup) && (
                   <button 
                     type="button" 
                     onClick={handleClearPickup}
@@ -74,15 +102,15 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
                 {t('shipping.delivery', 'To')}
               </label>
               <div className="relative">
-                <GooglePlacesAutocomplete
+                <GooglePlacesAutocompleteInput
                   id="delivery"
                   placeholder={t('shipping.enterDelivery', 'Enter delivery address')}
-                  onPlaceSelect={(address) => setDelivery(address)}
-                  value={delivery}
-                  onChange={(e) => setDelivery(e.target.value)}
+                  onPlaceSelect={handleDeliverySelect}
+                  value={typedDelivery || delivery}
+                  onChange={handleDeliveryChange}
                   className="w-full pr-8"
                 />
-                {delivery && (
+                {(delivery || typedDelivery) && (
                   <button 
                     type="button" 
                     onClick={handleClearDelivery}
