@@ -30,8 +30,7 @@ class Batch:
 
     def can_add(self, shipment):
         """Check if shipment fits within remaining volume."""
-        return self.current_volume + shipment.volume <= 17.6
-        
+        return self.current_volume + shipment.volume <= self.target_volume
 
     def add_shipment(self, shipment):
         """Add shipment to batch if there is enough space."""
@@ -120,7 +119,7 @@ def process_and_display_shipments():
     """Fetch, process, display shipments, and send them to Supabase."""
     shipments = fetch_shipments()
     if shipments:
-        target_volume = 5  
+        target_volume = 3
         batches = aggregate_shipments(shipments, target_volume)
 
         for i, batch in enumerate(batches, start=1):

@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useLoadScript } from '@react-google-maps/api';
+import { debounce } from 'lodash';
 
 // Libraries to load from Google Maps API
 const libraries = ['places'];
@@ -14,7 +15,7 @@ interface GooglePlacesAutocompleteProps extends React.InputHTMLAttributes<HTMLIn
   placeholder?: string;
 }
 
-const GooglePlacesAutocomplete = ({ 
+const GooglePlacesAutocompleteInput = ({ 
   onPlaceSelect, 
   className, 
   label, 
@@ -22,7 +23,9 @@ const GooglePlacesAutocomplete = ({
   ...props 
 }: GooglePlacesAutocompleteProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const [inputValue, setInputValue] = useState(props.value || '');
+  const [placesAutocompleteInitialized, setPlacesAutocompleteInitialized] = useState(false);
   
   // Load the Google Maps script
   const { isLoaded, loadError } = useLoadScript({
@@ -32,12 +35,16 @@ const GooglePlacesAutocomplete = ({
 
   // Initialize autocomplete when the script is loaded
   useEffect(() => {
-    if (!isLoaded || !inputRef.current) return;
+    if (!isLoaded || !inputRef.current || placesAutocompleteInitialized) return;
 
+    // Create new autocomplete instance
     const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
       types: ['address'],
       fields: ['formatted_address'],
     });
+    
+    autocompleteRef.current = autocomplete;
+    setPlacesAutocompleteInitialized(true);
 
     // Listen for place changes
     autocomplete.addListener('place_changed', () => {
@@ -50,16 +57,42 @@ const GooglePlacesAutocomplete = ({
 
     // Cleanup
     return () => {
-      // Remove event listeners 
-      google.maps.event.clearInstanceListeners(autocomplete);
+      if (autocompleteRef.current) {
+        google.maps.event.clearInstanceListeners(autocompleteRef.current);
+        autocompleteRef.current = null;
+        setPlacesAutocompleteInitialized(false);
+      }
     };
-  }, [isLoaded, onPlaceSelect]);
+  }, [isLoaded, onPlaceSelect, placesAutocompleteInitialized]);
+
+  // Update input value when props.value changes
+  useEffect(() => {
+    if (props.value !== undefined && props.value !== inputValue) {
+      setInputValue(props.value.toString());
+    }
+  }, [props.value]);
+
+  // Debounced handler for input changes to prevent lag
+  const debouncedHandleChange = useRef(
+    debounce((value: string) => {
+      if (props.onChange) {
+        const event = {
+          target: { value }
+        } as React.ChangeEvent<HTMLInputElement>;
+        props.onChange(event);
+      }
+    }, 300)
+  ).current;
 
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    if (props.onChange) {
-      props.onChange(e);
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    debouncedHandleChange(newValue);
+    
+    // If the user clears the input, also notify the parent component
+    if (!newValue) {
+      onPlaceSelect('');
     }
   };
 
@@ -91,4 +124,4 @@ const GooglePlacesAutocomplete = ({
   );
 };
 
-export default GooglePlacesAutocomplete;
+export default GooglePlacesAutocompleteInput;
