@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { updateShipmentStatus } from "@/services/shipmentService";
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 // Cache for admin stats
 let statsCache = null;
@@ -183,35 +183,27 @@ export const exportShipmentsToExcel = async (startDate: string, endDate: string)
       "Delivery Speed": shipment.delivery_speed
     }));
     
-    // Create a worksheet from the data
-    const worksheet = XLSX.utils.json_to_sheet(formattedData);
-    
-    // Create a workbook and add the worksheet
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Shipments");
-    
-    // Generate filename with date range
-    const fileName = `shipments_${startDate.replace(/-/g, '')}_to_${endDate.replace(/-/g, '')}.xlsx`;
-    
-    // Export the file
-    XLSX.writeFile(workbook, fileName);
-    
-    toast({
-      title: "Export Successful",
-      description: `Shipments exported to ${fileName}`,
-    });
-    
-    return true;
-  } catch (error) {
-    console.error("Error exporting shipments to Excel:", error);
-    toast({
-      title: "Export Failed",
-      description: "Failed to export shipments. Please try again.",
-      variant: "destructive",
-    });
-    return false;
+    async function exportToExcel(formattedData: any[], startDate: string, endDate: string) {
+      // Create a new workbook and add a worksheet
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Shipments");
+  
+      // Add header row (assuming formattedData is an array of objects)
+      const headers = Object.keys(formattedData[0]); // Extract keys as column headers
+      worksheet.addRow(headers);
+  
+      // Add data rows
+      formattedData.forEach((row) => {
+          worksheet.addRow(Object.values(row));
+      });
+  
+      // Generate filename with date range
+      const fileName = `shipments_${startDate.replace(/-/g, '')}_to_${endDate.replace(/-/g, '')}.xlsx`;
+  
+      // Write the file
+      await workbook.xlsx.writeFile(fileName);
+      console.log(`Excel file "${fileName}" has been created successfully!`);
   }
-};
 
 export const loadShipments = async () => {
   try {
