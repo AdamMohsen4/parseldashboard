@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
@@ -7,14 +8,22 @@ import { useTranslation } from "react-i18next";
 import { ArrowRight, Package, Shield, LineChart, CheckCircle, Truck, Map } from "lucide-react";
 import PartnersCarousel from "@/components/home/PartnersCarousel";
 import HeroCarousel from "@/components/home/HeroCarousel";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import AddressInputs from "@/components/pricing/AddressInputs";
 
 const Index = () => {
   const { isSignedIn } = useUser();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  
+  const handleSearch = (pickup: string, delivery: string) => {
+    // Navigate to price calendar with the search parameters
+    navigate(`/price-calendar?pickup=${encodeURIComponent(pickup)}&delivery=${encodeURIComponent(delivery)}`);
+  };
   
   return <div className="min-h-screen bg-background">
       <NavBar />
-
 
       {/* Hero section */}
       <section className="px-4 relative overflow-hidden py-16">
@@ -51,6 +60,13 @@ const Index = () => {
               <HeroCarousel />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Find Shipping Rates Section - New */}
+      <section className="py-12 bg-muted/50">
+        <div className="container mx-auto max-w-5xl px-4">
+          <AddressInputs onSearch={handleSearch} />
         </div>
       </section>
 
@@ -207,3 +223,4 @@ const Index = () => {
 };
 
 export default Index;
+
