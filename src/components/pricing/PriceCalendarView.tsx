@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -45,39 +44,22 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
   return (
     <Card className="h-full bg-white border border-gray-100 shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-xl text-gray-800">
-          {format(currentMonth, 'MMMM yyyy')}
-        </CardTitle>
+        
         <div className="flex items-center space-x-2">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={() => navigateMonth('prev')}
-            className="h-8 w-8 rounded-full border-gray-200"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={() => navigateMonth('next')}
-            className="h-8 w-8 rounded-full border-gray-200"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500">
-                  <Info className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs">
-                <p>{t('shipping.priceCalendarInfo', 'Shipping rates vary based on demand. Green indicates lower prices, yellow for medium, and red for premium rates.')}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </div>
+        {/* Tooltip moved to the right */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500">
+                <Info className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs">
+              <p>{t('shipping.priceCalendarInfo', 'Shipping rates vary based on demand. Green indicates lower prices, yellow for medium, and red for premium rates.')}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -90,7 +72,7 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
               mode="single"
               month={currentMonth}
               onMonthChange={setCurrentMonth}
-              className="mx-auto rounded-md border-0 w-full max-w-[95%] pointer-events-auto"
+              className="mx-auto rounded-md border-0 w-full max-w-[95%] pointer-events-auto flex flex-col items-center"
               showOutsideDays
               components={{
                 Day: ({ date, ...props }) => (
