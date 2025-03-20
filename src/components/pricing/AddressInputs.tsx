@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
@@ -14,35 +14,49 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
   const { t } = useTranslation();
   const [pickup, setPickup] = useState<string>('');
   const [delivery, setDelivery] = useState<string>('');
-  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [typedPickup, setTypedPickup] = useState<string>('');
+  const [typedDelivery, setTypedDelivery] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (pickup && delivery) {
-      setIsSearching(true);
-      // Add a small delay to show loading state and prevent multiple rapid submissions
-      setTimeout(() => {
-        onSearch(pickup, delivery);
-        setIsSearching(false);
-      }, 100);
+      onSearch(pickup, delivery);
     }
   };
 
-  const handleClearPickup = useCallback(() => {
+  const handleClearPickup = () => {
     setPickup('');
-  }, []);
+    setTypedPickup('');
+  };
 
-  const handleClearDelivery = useCallback(() => {
+  const handleClearDelivery = () => {
     setDelivery('');
-  }, []);
+    setTypedDelivery('');
+  };
 
-  const handlePickupSelect = useCallback((address: string) => {
+  const handlePickupSelect = (address: string) => {
     setPickup(address);
-  }, []);
+  };
 
-  const handleDeliverySelect = useCallback((address: string) => {
+  const handleDeliverySelect = (address: string) => {
     setDelivery(address);
-  }, []);
+  };
+
+  const handlePickupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTypedPickup(e.target.value);
+    // Only update pickup state if we're typing, not when selecting from dropdown
+    if (!e.target.value) {
+      setPickup('');
+    }
+  };
+
+  const handleDeliveryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTypedDelivery(e.target.value);
+    // Only update delivery state if we're typing, not when selecting from dropdown
+    if (!e.target.value) {
+      setDelivery('');
+    }
+  };
 
   return (
     <Card className="bg-white shadow-sm border border-gray-100">
@@ -63,10 +77,11 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
                   id="pickup"
                   placeholder={t('shipping.enterPickup', 'Enter pickup address')}
                   onPlaceSelect={handlePickupSelect}
-                  value={pickup}
+                  value={typedPickup || pickup}
+                  onChange={handlePickupChange}
                   className="w-full pr-8"
                 />
-                {pickup && (
+                {(pickup || typedPickup) && (
                   <button 
                     type="button" 
                     onClick={handleClearPickup}
@@ -91,10 +106,11 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
                   id="delivery"
                   placeholder={t('shipping.enterDelivery', 'Enter delivery address')}
                   onPlaceSelect={handleDeliverySelect}
-                  value={delivery}
+                  value={typedDelivery || delivery}
+                  onChange={handleDeliveryChange}
                   className="w-full pr-8"
                 />
-                {delivery && (
+                {(delivery || typedDelivery) && (
                   <button 
                     type="button" 
                     onClick={handleClearDelivery}
@@ -110,11 +126,11 @@ const AddressInputs: React.FC<AddressInputsProps> = ({ onSearch }) => {
           <div className="flex justify-center">
             <Button 
               type="submit" 
-              disabled={!pickup || !delivery || isSearching}
+              disabled={!pickup || !delivery}
               className="px-8 py-2 bg-primary hover:bg-primary/90 transition-colors"
             >
-              <Search className={`mr-2 h-4 w-4 ${isSearching ? 'animate-spin' : ''}`} />
-              {isSearching ? t('common.searching', 'Searching...') : t('shipping.search', 'Search')}
+              <Search className="mr-2 h-4 w-4" />
+              {t('shipping.search', 'Search')}
             </Button>
           </div>
         </form>
