@@ -86,17 +86,17 @@ const NavBar = () => {
       {
         name: t('nav.categories.services', 'Services'),
         items: [
-          { path: "/3pl", label: t('nav.3pl', '3PL Services'), icon: Package },
-          { path: "/warehouse", label: t('nav.warehouse', 'Warehouse Marketplace'), icon: Warehouse },
+          // { path: "/3pl", label: t('nav.3pl', '3PL Services'), icon: Package },
+          // { path: "/warehouse", label: t('nav.warehouse', 'Warehouse Marketplace'), icon: Warehouse },
           { path: "/book", label: t('nav.book'), icon: Phone },
           {
             path: "/info",
             label: t('nav.info', 'Information'),
             icon: InfoIcon,
             subItems: [
-              { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
+              // { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
               { path: "/transportation-partners", label: t('nav.transportationPartners', 'Transportation Partners'), icon: Truck },
-              { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
+              // { path: "/compliance", label: t('nav.compliance'), icon: FileCheck },
             ]
           }
         ],
