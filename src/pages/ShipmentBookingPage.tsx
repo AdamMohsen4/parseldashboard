@@ -76,7 +76,7 @@ const ShipmentBookingPage: React.FC<{ customerType?: CustomerType }> = ({ custom
   // Label generation
   const [labelLanguage, setLabelLanguage] = useState<string>("en");
   const [isGeneratingLabel, setIsGeneratingLabel] = useState(false);
-  
+
   useEffect(() => {
     if (initialCustomerType) {
       setSelectedCustomerType(initialCustomerType);
@@ -562,7 +562,7 @@ const ShipmentBookingPage: React.FC<{ customerType?: CustomerType }> = ({ custom
                   <Link to="/dashboard">View All Shipments</Link>
                 </Button>
                 <Button
-                  onClick={() => {
+                  onClick={()={() => {
                     setBookingConfirmed(false);
                     setBookingResult(null);
                     localStorage.removeItem('lastBooking');
@@ -867,4 +867,4 @@ const ShipmentBookingPage: React.FC<{ customerType?: CustomerType }> = ({ custom
                           id="senderCountry"
                           className="w-full h-10 pl-10 pr-4 rounded-md border border-input bg-background appearance-none cursor-pointer"
                           value={senderCountry}
-                          onChange={(
+                          onChange={(e
