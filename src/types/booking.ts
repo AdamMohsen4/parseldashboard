@@ -36,19 +36,6 @@ export interface BookingRequest {
   
   // Add cancellation window
   cancellationDeadline?: Date;
-  
-  // Sender details
-  senderName?: string;
-  senderEmail?: string;
-  senderPhone?: string;
-  
-  // Recipient details
-  recipientName?: string;
-  recipientEmail?: string;
-  recipientPhone?: string;
-  
-  // Additional fields
-  additionalInstructions?: string;
 }
 
 export interface BookingResponse {
