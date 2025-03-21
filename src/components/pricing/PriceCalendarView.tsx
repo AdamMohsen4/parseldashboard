@@ -1,7 +1,8 @@
+
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
-import { Info, ChevronLeft, ChevronRight } from "lucide-react";
+import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PricingDay, DateRange } from "@/utils/pricingUtils";
 import { useTranslation } from "react-i18next";
@@ -12,7 +13,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import CalendarDay from "./CalendarDay";
-import { format } from "date-fns";
 
 interface PriceCalendarViewProps {
   currentMonth: Date;
@@ -31,23 +31,10 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    const newDate = new Date(currentMonth);
-    if (direction === 'prev') {
-      newDate.setMonth(newDate.getMonth() - 1);
-    } else {
-      newDate.setMonth(newDate.getMonth() + 1);
-    }
-    setCurrentMonth(newDate);
-  };
-
   return (
     <Card className="h-full bg-white border border-gray-100 shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        
-        <div className="flex items-center space-x-2">
-        </div>
-        {/* Tooltip moved to the right */}
+        <div className="flex items-center space-x-2"></div>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

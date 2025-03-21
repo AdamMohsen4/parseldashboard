@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { updateShipmentStatus } from "@/services/shipmentService";
@@ -17,7 +18,6 @@ export interface AdminStats {
   pendingShipments: number;
   completedShipments: number;
   totalDemoRequests: number;
-  // totalCollaborations: number;
   totalSupportTickets: number;
   openSupportTickets: number;
 }
@@ -47,10 +47,6 @@ export const loadStats = async (): Promise<AdminStats> => {
     const { count: demoCount, error: demoError } = await supabase
       .from('demo_requests')
       .select('*', { count: 'exact', head: true });
-      
-    // const { count: collabCount, error: collabError } = await supabase
-    //   .from('collaborations')
-    //   .select('*', { count: 'exact', head: true });
     
     const { count: supportCount, error: supportError } = await supabase
       .from('support_tickets')
@@ -68,7 +64,6 @@ export const loadStats = async (): Promise<AdminStats> => {
         pendingShipments: pendingCount || 0,
         completedShipments: completedCount || 0,
         totalDemoRequests: demoCount || 0,
-        // totalCollaborations: collabCount || 0,
         totalSupportTickets: supportCount || 0,
         openSupportTickets: openSupportCount || 0
       };
@@ -87,7 +82,6 @@ export const loadStats = async (): Promise<AdminStats> => {
         pendingShipments: 0,
         completedShipments: 0,
         totalDemoRequests: 0,
-        // totalCollaborations: 0,
         totalSupportTickets: 0,
         openSupportTickets: 0
       };
@@ -99,7 +93,6 @@ export const loadStats = async (): Promise<AdminStats> => {
       pendingShipments: 0,
       completedShipments: 0,
       totalDemoRequests: 0,
-      // totalCollaborations: 0,
       totalSupportTickets: 0,
       openSupportTickets: 0
     };
@@ -289,42 +282,6 @@ export const loadDemoRequests = async () => {
     return [];
   }
 };
-
-// export const loadCollaborations = async () => {
-//   try {
-//     const cacheKey = 'admin-collaborations';
-    
-//     // Check cache first
-//     const cachedData = dataCache.get(cacheKey);
-//     if (cachedData && (Date.now() - cachedData.timestamp < DATA_CACHE_EXPIRY)) {
-//       console.log("Returning collaborations from cache");
-//       return cachedData.data;
-//     }
-    
-//     console.log("Loading collaborations from Supabase...");
-//     const { data, error } = await supabase
-//       .from('collaborations')
-//       .select('*')
-//       .order('created_at', { ascending: false });
-    
-//     if (error) {
-//       console.error("Error loading collaborations:", error);
-//       return [];
-//     }
-    
-//     // Store in cache
-//     dataCache.set(cacheKey, {
-//       data: data || [],
-//       timestamp: Date.now()
-//     });
-    
-//     console.log("Collaborations loaded:", data?.length || 0);
-//     return data || [];
-//   } catch (error) {
-//     console.error("Error in loadCollaborations:", error);
-//     return [];
-//   }
-// };
 
 export const loadSupportTickets = async () => {
   try {
