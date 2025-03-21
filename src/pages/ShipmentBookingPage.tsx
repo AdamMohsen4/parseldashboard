@@ -12,7 +12,7 @@ import LabelLanguageSelector from "@/components/labels/LabelLanguageSelector";
 import { CustomerType, BookingRequest, BookingResponse } from "@/types/booking";
 import { getCountryFlag, getCountryName, getCountryDialCode, translateLabel } from "@/lib/utils";
 
-// Fixed the import to include needed services
+// Fixed import to include needed services
 import { bookShipment, cancelBooking, generateLabel } from "@/services/bookingService";
 
 const ShipmentBookingPage: React.FC<{ customerType?: CustomerType }> = ({ customerType: initialCustomerType }) => {
@@ -101,7 +101,11 @@ const ShipmentBookingPage: React.FC<{ customerType?: CustomerType }> = ({ custom
             shipmentId: `SHIP-${Math.floor(Math.random() * 1000000)}`,
             totalPrice: 15.99,
             cancellationDeadline: new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours from now
-            canBeCancelled: true
+            canBeCancelled: true,
+            carrier: {
+              name: "DHL Parcel Connect",
+              price: 10
+            }
           });
           setBookingConfirmed(true);
           setCanCancelBooking(true);
@@ -201,9 +205,9 @@ const ShipmentBookingPage: React.FC<{ customerType?: CustomerType }> = ({ custom
   };
 
   const handleCancelBooking = async () => {
-    if (!bookingResult?.trackingCode && !bookingResult?.tracking_code) return;
+    if (!bookingResult?.trackingCode) return;
     
-    const trackingCode = bookingResult.trackingCode || bookingResult.tracking_code;
+    const trackingCode = bookingResult.trackingCode;
     
     if (!trackingCode || !user?.id) return;
     
@@ -317,7 +321,7 @@ const ShipmentBookingPage: React.FC<{ customerType?: CustomerType }> = ({ custom
   const handleGenerateLabel = async () => {
     if (!bookingResult) return;
     
-    const trackingCode = bookingResult.trackingCode || bookingResult.tracking_code;
+    const trackingCode = bookingResult.trackingCode;
     const shipmentId = bookingResult.shipmentId || "SHIP-" + Math.floor(Math.random() * 1000000);
     
     if (!trackingCode) {
@@ -335,7 +339,7 @@ const ShipmentBookingPage: React.FC<{ customerType?: CustomerType }> = ({ custom
       const dimensions = `${length}x${width}x${height} cm`;
       const result = await generateLabel({
         shipmentId,
-        carrierName: bookingResult.carrier_name || "E-Parcel Nordic",
+        carrierName: bookingResult.carrier?.name || "E-Parcel Nordic",
         trackingCode,
         senderAddress: `${senderStreetAddress}, ${senderCity}, ${senderCountry}`,
         recipientAddress: `${recipientStreetAddress}, ${recipientCity}, ${recipientCountry}`,
@@ -493,15 +497,15 @@ const ShipmentBookingPage: React.FC<{ customerType?: CustomerType }> = ({ custom
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-gray-500">Tracking Code</p>
-                    <p className="text-lg font-mono font-medium">{bookingResult?.trackingCode || bookingResult?.tracking_code}</p>
+                    <p className="text-lg font-mono font-medium">{bookingResult?.trackingCode}</p>
                   </div>
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-gray-500">Carrier</p>
-                    <p className="text-lg font-medium">{bookingResult?.carrier_name || carrier.name}</p>
+                    <p className="text-lg font-medium">{bookingResult?.carrier?.name || carrier.name}</p>
                   </div>
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-gray-500">Total Price</p>
-                    <p className="text-lg font-medium">€{bookingResult?.totalPrice || bookingResult?.total_price}</p>
+                    <p className="text-lg font-medium">€{bookingResult?.totalPrice}</p>
                   </div>
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-gray-500">Estimated Delivery</p>
@@ -537,7 +541,7 @@ const ShipmentBookingPage: React.FC<{ customerType?: CustomerType }> = ({ custom
                   <p className="text-sm text-amber-700 mb-4">
                     You can cancel this booking until:
                     <span className="font-medium block">
-                      {new Date(bookingResult.cancellationDeadline || bookingResult.cancellation_deadline).toLocaleString()}
+                      {new Date(bookingResult?.cancellationDeadline || '').toLocaleString()}
                     </span>
                   </p>
                   <Button
@@ -863,438 +867,4 @@ const ShipmentBookingPage: React.FC<{ customerType?: CustomerType }> = ({ custom
                           id="senderCountry"
                           className="w-full h-10 pl-10 pr-4 rounded-md border border-input bg-background appearance-none cursor-pointer"
                           value={senderCountry}
-                          onChange={(e) => setSenderCountry(e.target.value)}
-                          required
-                        >
-                          <option value="SE">Sverige</option>
-                          <option value="FI">Finland</option>
-                          <option value="NO">Norge</option>
-                          <option value="DK">Danmark</option>
-                        </select>
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                          {getCountryFlag(senderCountry)}
-                        </div>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                          <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="senderPhone" className="flex items-center">
-                        {translateLabel("phoneNumber", currentLanguage)}
-                        <span className="text-red-500 ml-1">*</span>
-                      </Label>
-                      <Input
-                        id="senderPhone"
-                        placeholder=""
-                        prefix={getCountryDialCode(senderCountry)}
-                        value={senderPhone}
-                        onChange={(e) => setSenderPhone(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="senderEmail" className="flex items-center">
-                        {translateLabel("email", currentLanguage)}
-                      </Label>
-                      <Input
-                        id="senderEmail"
-                        type="email"
-                        placeholder=""
-                        value={senderEmail}
-                        onChange={(e) => setSenderEmail(e.target.value)}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="senderPersonalId" className="flex items-center">
-                        {translateLabel("personalId", currentLanguage)}
-                        <span className="text-red-500 ml-1">*</span>
-                      </Label>
-                      <Input
-                        id="senderPersonalId"
-                        placeholder=""
-                        value={senderPersonalId}
-                        onChange={(e) => setSenderPersonalId(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                {/* To Panel */}
-                <div className="border rounded-md relative">
-                  <button 
-                    type="button"
-                    className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 top-0 z-10 bg-white rounded-full p-2 border border-slate-200 hover:bg-slate-50"
-                    onClick={handleSwapLocations}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M7 16L3 12M3 12L7 8M3 12H21M17 8L21 12M21 12L17 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-                  
-                  <div className="bg-slate-700 text-white p-3 font-semibold">
-                    {translateLabel("to", currentLanguage)}
-                  </div>
-                  
-                  <div className="p-4 space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="recipientName" className="flex items-center">
-                        {translateLabel("recipient", currentLanguage)}
-                        <span className="text-red-500 ml-1">*</span>
-                      </Label>
-                      <Input
-                        id="recipientName"
-                        placeholder=""
-                        value={recipientName}
-                        onChange={(e) => setRecipientName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="recipientStreetAddress" className="flex items-center">
-                        {translateLabel("streetAddress", currentLanguage)}
-                        <span className="text-red-500 ml-1">*</span>
-                      </Label>
-                      <Input
-                        id="recipientStreetAddress"
-                        placeholder=""
-                        value={recipientStreetAddress}
-                        onChange={(e) => setRecipientStreetAddress(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="recipientStreetAddress2">
-                        {translateLabel("streetAddress2", currentLanguage)}
-                      </Label>
-                      <Input
-                        id="recipientStreetAddress2"
-                        placeholder=""
-                        value={recipientStreetAddress2}
-                        onChange={(e) => setRecipientStreetAddress2(e.target.value)}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="recipientPostalCode" className="flex items-center">
-                        {translateLabel("postalCode", currentLanguage)}
-                        <span className="text-red-500 ml-1">*</span>
-                      </Label>
-                      <Input
-                        id="recipientPostalCode"
-                        placeholder=""
-                        value={recipientPostalCode}
-                        onChange={(e) => setRecipientPostalCode(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="recipientCity" className="flex items-center">
-                        {translateLabel("city", currentLanguage)}
-                        <span className="text-red-500 ml-1">*</span>
-                      </Label>
-                      <Input
-                        id="recipientCity"
-                        placeholder=""
-                        value={recipientCity}
-                        onChange={(e) => setRecipientCity(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="recipientCountry" className="flex items-center">
-                        {translateLabel("country", currentLanguage)}
-                        <span className="text-red-500 ml-1">*</span>
-                      </Label>
-                      <div className="relative">
-                        <select
-                          id="recipientCountry"
-                          className="w-full h-10 pl-10 pr-4 rounded-md border border-input bg-background appearance-none cursor-pointer"
-                          value={recipientCountry}
-                          onChange={(e) => setRecipientCountry(e.target.value)}
-                          required
-                        >
-                          <option value="SE">Sverige</option>
-                          <option value="FI">Finland</option>
-                          <option value="NO">Norge</option>
-                          <option value="DK">Danmark</option>
-                        </select>
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                          {getCountryFlag(recipientCountry)}
-                        </div>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                          <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="recipientPhone" className="flex items-center">
-                        {translateLabel("phoneNumber", currentLanguage)}
-                        <span className="text-red-500 ml-1">*</span>
-                      </Label>
-                      <Input
-                        id="recipientPhone"
-                        placeholder=""
-                        prefix={getCountryDialCode(recipientCountry)}
-                        value={recipientPhone}
-                        onChange={(e) => setRecipientPhone(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="recipientEmail">
-                        {translateLabel("email", currentLanguage)}
-                      </Label>
-                      <Input
-                        id="recipientEmail"
-                        type="email"
-                        placeholder=""
-                        value={recipientEmail}
-                        onChange={(e) => setRecipientEmail(e.target.value)}
-                      />
-                    </div>
-                    
-                    {!recipientEmail && (
-                      <p className="text-xs text-muted-foreground">
-                        {translateLabel("recipientWillNotBeNotified", currentLanguage)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-slate-50 p-6 rounded-lg border mb-8">
-                <h3 className="text-lg font-medium mb-4">{translateLabel("summary", currentLanguage)}</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-slate-200 p-2 rounded-md">
-                      <MapPin className="h-4 w-4 text-slate-700" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{translateLabel("from", currentLanguage)}</p>
-                      <p>{senderPostalCode}</p>
-                      <p>{senderCity}</p>
-                      <p>{getCountryName(senderCountry)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <div className="bg-slate-200 p-2 rounded-md">
-                      <MapPin className="h-4 w-4 text-slate-700" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{translateLabel("to", currentLanguage)}</p>
-                      <p>{recipientPostalCode}</p>
-                      <p>{recipientCity}</p>
-                      <p>{getCountryName(recipientCountry)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <div className="bg-slate-200 p-2 rounded-md">
-                      <Package className="h-4 w-4 text-slate-700" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{translateLabel("package", currentLanguage)}</p>
-                      <p>
-                        {quantity}x{packageType === "package" ? "Paket" : 
-                        packageType === "document" ? "Dokument" : "Pall"}
-                      </p>
-                      <p>{length}x{width}x{height} cm</p>
-                      <p>{weight} kg</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex justify-between gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleBack}
-                >
-                  {translateLabel("back", currentLanguage)}
-                </Button>
-                
-                <Button
-                  type="submit"
-                  disabled={isBooking}
-                >
-                  {translateLabel("continue", currentLanguage)}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  // Contents and References screen (final step)
-  if (currentStep === "contents") {
-    return (
-      <div className="min-h-screen bg-background">
-        <NavBar />
-  
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-5xl mx-auto">
-            {renderStepIndicator()}
-            
-            <form onSubmit={handleSubmit}>
-              <div className="mb-8">
-                <div className="border rounded-lg">
-                  <div className="bg-slate-700 text-white p-3 font-semibold">
-                    {translateLabel("contentAndReferences", currentLanguage)}
-                  </div>
-                  
-                  <div className="p-6 space-y-6">
-                    <div>
-                      <Label htmlFor="additionalInstructions" className="block mb-2">
-                        {translateLabel("additionalInfo", currentLanguage)}
-                      </Label>
-                      <textarea
-                        id="additionalInstructions"
-                        className="w-full p-3 rounded-md border border-input min-h-24 resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        value={additionalInstructions}
-                        onChange={(e) => setAdditionalInstructions(e.target.value)}
-                      ></textarea>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <h3 className="font-medium">{translateLabel("service", currentLanguage)}</h3>
-                      
-                      <div className="border rounded-lg p-4 bg-white">
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-3">
-                            <Truck className="h-5 w-5 text-primary" />
-                            <div>
-                              <h4 className="font-medium">DHL Parcel Connect</h4>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-slate-50 p-6 rounded-lg border mb-8">
-                <h3 className="text-lg font-medium mb-4">{translateLabel("summary", currentLanguage)}</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-slate-200 p-2 rounded-md">
-                      <MapPin className="h-4 w-4 text-slate-700" />
-                    </div>
-                    <div className="text-sm">
-                      <p className="font-medium">{translateLabel("from", currentLanguage)}</p>
-                      <p>{senderPostalCode}</p>
-                      <p>{senderCity}</p>
-                      <p>{getCountryName(senderCountry)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <div className="bg-slate-200 p-2 rounded-md">
-                      <MapPin className="h-4 w-4 text-slate-700" />
-                    </div>
-                    <div className="text-sm">
-                      <p className="font-medium">{translateLabel("to", currentLanguage)}</p>
-                      <p>{recipientPostalCode}</p>
-                      <p>{recipientCity}</p>
-                      <p>{getCountryName(recipientCountry)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <div className="bg-slate-200 p-2 rounded-md">
-                      <Package className="h-4 w-4 text-slate-700" />
-                    </div>
-                    <div className="text-sm">
-                      <p className="font-medium">{translateLabel("package", currentLanguage)}</p>
-                      <p>
-                        {quantity}x{packageType === "package" ? "Paket" : 
-                        packageType === "document" ? "Dokument" : "Pall"}
-                      </p>
-                      <p>{length}x{width}x{height} cm</p>
-                      <p>{weight} kg</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="border-t border-slate-200 pt-4 mt-4">
-                  <div className="flex justify-between items-center">
-                    <p className="font-medium">{translateLabel("priceExcludingVAT", currentLanguage)}</p>
-                    <p className="font-medium">210.96 kr</p>
-                  </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <p className="font-medium">{translateLabel("vat", currentLanguage)}</p>
-                    <p className="font-medium">52.74 kr</p>
-                  </div>
-                  <div className="flex justify-between items-center mt-2 text-lg">
-                    <p className="font-bold">{translateLabel("totalPrice", currentLanguage)}</p>
-                    <p className="font-bold">263.70 kr</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex justify-between gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleBack}
-                >
-                  {translateLabel("back", currentLanguage)}
-                </Button>
-                
-                <Button
-                  type="submit"
-                  disabled={isBooking}
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                >
-                  {isBooking ? (
-                    <span className="flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      {translateLabel("continue", currentLanguage)}...
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      <Truck className="h-4 w-4" />
-                      {translateLabel("continue", currentLanguage)}
-                    </span>
-                  )}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  // This should never happen
-  return null;
-};
-
-export default ShipmentBookingPage;
-
-//
-
+                          onChange={(

@@ -8,6 +8,7 @@ import { saveBookingToSupabase } from "./bookingDb";
 import { supabase } from "@/integrations/supabase/client";
 
 export type { BookingRequest, BookingResponse };
+export { generateLabel }; // Export the generateLabel function
 
 const validateBookingRequest = (request: BookingRequest): { valid: boolean; message?: string } => {
   if (!request.weight || parseFloat(request.weight) <= 0) {

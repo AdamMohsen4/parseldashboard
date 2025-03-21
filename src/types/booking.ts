@@ -63,6 +63,12 @@ export interface BookingResponse {
   // Add cancellation details
   cancellationDeadline?: string;
   canBeCancelled?: boolean;
+  
+  // Add carrier information
+  carrier?: {
+    name: string;
+    price: number;
+  };
 }
 
 // API Key interface for e-commerce integration
