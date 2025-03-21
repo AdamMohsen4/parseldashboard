@@ -1,11 +1,17 @@
 
 import React, { useState } from 'react';
-import { Package, Navigation, Scale, Ruler, Clock, Truck } from 'lucide-react';
+import { Package, Navigation, Scale, Ruler, ArrowRightLeft, Truck } from 'lucide-react';
 import Button from '../common/Button';
 import Card from '../common/Card';
 import { ParcelDimensions, Location, DeliveryUrgency } from '@/types';
 import { API } from '@/services/api';
 import { toast } from 'sonner';
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { getCountryFlag, getCountryName } from '@/lib/utils';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 
 interface BookingFormProps {
   onRatesCalculated: (rates: any[]) => void;
@@ -28,19 +34,20 @@ const BookingForm: React.FC<BookingFormProps> = ({
   
   const [pickupLocation, setPickupLocation] = useState<Location>({
     address: '',
-    city: 'Malmö',
-    country: 'Sweden',
-    postalCode: '21134'
+    city: 'Stockholm',
+    country: 'SE',
+    postalCode: '112 23'
   });
   
   const [deliveryLocation, setDeliveryLocation] = useState<Location>({
     address: '',
     city: 'Helsinki',
-    country: 'Finland',
-    postalCode: '00100'
+    country: 'FI',
+    postalCode: '00341'
   });
   
   const [urgency, setUrgency] = useState<DeliveryUrgency>(3);
+  const [packageType, setPackageType] = useState<string>("package");
   
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,223 +85,317 @@ const BookingForm: React.FC<BookingFormProps> = ({
       setIsLoading(false);
     }
   };
+
+  const handleSwapLocations = () => {
+    const temp = { ...pickupLocation };
+    setPickupLocation({ ...deliveryLocation });
+    setDeliveryLocation(temp);
+  };
   
   return (
-    <Card className="w-full max-w-3xl mx-auto overflow-hidden animate-fade-in">
-      <div className="border-b pb-4 mb-6">
-        <h2 className="text-2xl font-semibold flex items-center gap-2">
-          <Package className="text-primary h-6 w-6" />
-          <span>Parcel Information</span>
-        </h2>
-        <p className="text-muted-foreground">Enter your shipment details to get the best rates</p>
+    <Card className="w-full max-w-5xl mx-auto overflow-hidden animate-fade-in">
+      <div className="mb-6">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white font-bold">
+            1
+          </div>
+          <h2 className="text-xl font-medium">Shipping Details</h2>
+        </div>
+        
+        <ResizablePanelGroup direction="horizontal" className="min-h-[200px] rounded-lg border">
+          <ResizablePanel defaultSize={50}>
+            <div className="p-4">
+              <div className="bg-slate-700 text-white p-3 font-semibold">
+                Från
+              </div>
+              
+              <div className="p-4 space-y-4">
+                <div className="space-y-2">
+                  <Label>Land</Label>
+                  <Select 
+                    value={pickupLocation.country} 
+                    onValueChange={(value) => setPickupLocation({...pickupLocation, country: value})}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue>
+                        <div className="flex items-center gap-2">
+                          <span>{getCountryFlag(pickupLocation.country)}</span>
+                          <span>{getCountryName(pickupLocation.country)}</span>
+                        </div>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SE">
+                        <div className="flex items-center gap-2">
+                          <span>🇸🇪</span>
+                          <span>Sverige</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="FI">
+                        <div className="flex items-center gap-2">
+                          <span>🇫🇮</span>
+                          <span>Finland</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="NO">
+                        <div className="flex items-center gap-2">
+                          <span>🇳🇴</span>
+                          <span>Norge</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="DK">
+                        <div className="flex items-center gap-2">
+                          <span>🇩🇰</span>
+                          <span>Danmark</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Postnummer</Label>
+                  <Input 
+                    placeholder="Postal code" 
+                    value={pickupLocation.postalCode}
+                    onChange={(e) => setPickupLocation({...pickupLocation, postalCode: e.target.value})}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {pickupLocation.postalCode}, {pickupLocation.city}
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <RadioGroup className="flex gap-4" value="privatperson" onValueChange={() => {}}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="company" id="from-company" />
+                      <Label htmlFor="from-company">Företag</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="privatperson" id="from-private" />
+                      <Label htmlFor="from-private">Privatperson</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </div>
+            </div>
+          </ResizablePanel>
+          
+          <ResizableHandle withHandle>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-200 hover:bg-slate-300 cursor-pointer z-10" onClick={handleSwapLocations}>
+              <ArrowRightLeft className="h-4 w-4" />
+            </div>
+          </ResizableHandle>
+          
+          <ResizablePanel defaultSize={50}>
+            <div className="p-4">
+              <div className="bg-slate-700 text-white p-3 font-semibold">
+                Till
+              </div>
+              
+              <div className="p-4 space-y-4">
+                <div className="space-y-2">
+                  <Label>Land</Label>
+                  <Select 
+                    value={deliveryLocation.country} 
+                    onValueChange={(value) => setDeliveryLocation({...deliveryLocation, country: value})}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue>
+                        <div className="flex items-center gap-2">
+                          <span>{getCountryFlag(deliveryLocation.country)}</span>
+                          <span>{getCountryName(deliveryLocation.country)}</span>
+                        </div>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SE">
+                        <div className="flex items-center gap-2">
+                          <span>🇸🇪</span>
+                          <span>Sverige</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="FI">
+                        <div className="flex items-center gap-2">
+                          <span>🇫🇮</span>
+                          <span>Finland</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="NO">
+                        <div className="flex items-center gap-2">
+                          <span>🇳🇴</span>
+                          <span>Norge</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="DK">
+                        <div className="flex items-center gap-2">
+                          <span>🇩🇰</span>
+                          <span>Danmark</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Postnummer</Label>
+                  <Input 
+                    placeholder="Postal code" 
+                    value={deliveryLocation.postalCode}
+                    onChange={(e) => setDeliveryLocation({...deliveryLocation, postalCode: e.target.value})}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {deliveryLocation.postalCode}, {deliveryLocation.city}
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <RadioGroup className="flex gap-4" value="privatperson" onValueChange={() => {}}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="company" id="to-company" />
+                      <Label htmlFor="to-company">Företag</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="privatperson" id="to-private" />
+                      <Label htmlFor="to-private">Privatperson</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </div>
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
       
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Dimensions Section */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-lg font-medium">
-            <Scale className="text-primary h-5 w-5" />
-            <h3>Parcel Dimensions</h3>
+      <div className="mb-6">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white font-bold">
+            2
           </div>
+          <h2 className="text-xl font-medium">Parcel Information</h2>
+        </div>
+        
+        <div className="border rounded-lg p-6">
+          <h3 className="text-lg font-medium mb-4">Ange sändningsdetaljer</h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-5 gap-4 mb-6">
             <div className="space-y-2">
-              <label className="block text-sm font-medium">
-                Weight (kg)
-              </label>
-              <input
+              <Label>Antal</Label>
+              <Input
+                type="number"
+                min="1"
+                value="1"
+                className="text-center"
+                onChange={() => {}}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Vad skickar du</Label>
+              <Select value={packageType} onValueChange={setPackageType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select package type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="package">Paket</SelectItem>
+                  <SelectItem value="document">Dokument</SelectItem>
+                  <SelectItem value="pallet">Pall</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Längd</Label>
+              <Input
+                type="number"
+                min="1"
+                value={dimensions.length.toString()}
+                onChange={(e) => setDimensions({ ...dimensions, length: parseInt(e.target.value) || 0 })}
+                postfix="cm"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Bredd</Label>
+              <Input
+                type="number"
+                min="1"
+                value={dimensions.width.toString()}
+                onChange={(e) => setDimensions({ ...dimensions, width: parseInt(e.target.value) || 0 })}
+                postfix="cm"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Höjd</Label>
+              <Input
+                type="number"
+                min="1"
+                value={dimensions.height.toString()}
+                onChange={(e) => setDimensions({ ...dimensions, height: parseInt(e.target.value) || 0 })}
+                postfix="cm"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Vikt</Label>
+              <Input
                 type="number"
                 min="0.1"
-                max="50"
                 step="0.1"
-                value={dimensions.weight}
-                onChange={(e) => setDimensions({ ...dimensions, weight: parseFloat(e.target.value) })}
-                className="w-full px-3 py-2 rounded-md border border-input bg-background"
-                required
+                value={dimensions.weight.toString()}
+                onChange={(e) => setDimensions({ ...dimensions, weight: parseFloat(e.target.value) || 0 })}
+                postfix="kg"
               />
             </div>
-            
-            <div className="grid grid-cols-3 gap-2">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium">
-                  Length (cm)
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={dimensions.length}
-                  onChange={(e) => setDimensions({ ...dimensions, length: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 rounded-md border border-input bg-background"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="block text-sm font-medium">
-                  Width (cm)
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={dimensions.width}
-                  onChange={(e) => setDimensions({ ...dimensions, width: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 rounded-md border border-input bg-background"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="block text-sm font-medium">
-                  Height (cm)
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={dimensions.height}
-                  onChange={(e) => setDimensions({ ...dimensions, height: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 rounded-md border border-input bg-background"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Locations Section */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-lg font-medium">
-            <Navigation className="text-primary h-5 w-5" />
-            <h3>Pickup & Delivery</h3>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">
-                Pickup Location
-              </label>
-              <input
-                type="text"
-                placeholder="City, Country"
-                value={`${pickupLocation.city}, ${pickupLocation.country}`}
-                onChange={(e) => {
-                  const [city, country] = e.target.value.split(',').map(part => part.trim());
-                  setPickupLocation({
-                    ...pickupLocation,
-                    city: city || '',
-                    country: country || pickupLocation.country
-                  });
-                }}
-                className="w-full px-3 py-2 rounded-md border border-input bg-background"
-                required
-              />
-            </div>
+          <div className="flex justify-between gap-4">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              Lägg till kolli
+            </Button>
             
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">
-                Delivery Location
-              </label>
-              <input
-                type="text"
-                placeholder="City, Country"
-                value={`${deliveryLocation.city}, ${deliveryLocation.country}`}
-                onChange={(e) => {
-                  const [city, country] = e.target.value.split(',').map(part => part.trim());
-                  setDeliveryLocation({
-                    ...deliveryLocation,
-                    city: city || '',
-                    country: country || deliveryLocation.country
-                  });
-                }}
-                className="w-full px-3 py-2 rounded-md border border-input bg-background"
-                required
-              />
-            </div>
+            <Button
+              type="submit"
+              onClick={handleSubmit}
+              isLoading={isLoading}
+              className="bg-green-600 hover:bg-green-700 text-white"
+              icon={<Truck className="h-5 w-5" />}
+            >
+              Kontrollera priser!
+            </Button>
           </div>
         </div>
+      </div>
+      
+      <div className="bg-slate-50 p-6 rounded-lg border">
+        <h3 className="text-lg font-medium mb-4">Sammanfattning</h3>
         
-        {/* Urgency Section */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-lg font-medium">
-            <Clock className="text-primary h-5 w-5" />
-            <h3>Delivery Time</h3>
+        <div className="flex items-start gap-4">
+          <div className="bg-slate-200 p-3 rounded-md">
+            <Navigation className="h-6 w-6 text-slate-700" />
           </div>
           
-          <div className="grid grid-cols-3 gap-3">
-            <label className="relative flex cursor-pointer flex-col rounded-md border border-input bg-background p-4 hover:bg-secondary/50 focus:outline-none">
-              <span className="flex items-center justify-center text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
-                Express
-              </span>
-              <span className="flex items-center justify-center text-lg font-bold">1 Day</span>
-              <input
-                type="radio"
-                name="urgency"
-                value="1"
-                checked={urgency === 1}
-                onChange={() => setUrgency(1)}
-                className="absolute h-0 w-0 opacity-0"
-              />
-              {urgency === 1 && (
-                <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary">
-                  <span className="h-2 w-2 rounded-full bg-white" />
-                </span>
-              )}
-            </label>
+          <div className="grid grid-cols-2 gap-x-8 gap-y-2 flex-1">
+            <div>
+              <p className="font-medium">Från</p>
+              <p>{pickupLocation.postalCode}</p>
+              <p>{pickupLocation.city}</p>
+              <p>{getCountryName(pickupLocation.country)}</p>
+            </div>
             
-            <label className="relative flex cursor-pointer flex-col rounded-md border border-input bg-background p-4 hover:bg-secondary/50 focus:outline-none">
-              <span className="flex items-center justify-center text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
-                Standard
-              </span>
-              <span className="flex items-center justify-center text-lg font-bold">3 Days</span>
-              <input
-                type="radio"
-                name="urgency"
-                value="3"
-                checked={urgency === 3}
-                onChange={() => setUrgency(3)}
-                className="absolute h-0 w-0 opacity-0"
-              />
-              {urgency === 3 && (
-                <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary">
-                  <span className="h-2 w-2 rounded-full bg-white" />
-                </span>
-              )}
-            </label>
-            
-            <label className="relative flex cursor-pointer flex-col rounded-md border border-input bg-background p-4 hover:bg-secondary/50 focus:outline-none">
-              <span className="flex items-center justify-center text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
-                Economy
-              </span>
-              <span className="flex items-center justify-center text-lg font-bold">5 Days</span>
-              <input
-                type="radio"
-                name="urgency"
-                value="5"
-                checked={urgency === 5}
-                onChange={() => setUrgency(5)}
-                className="absolute h-0 w-0 opacity-0"
-              />
-              {urgency === 5 && (
-                <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary">
-                  <span className="h-2 w-2 rounded-full bg-white" />
-                </span>
-              )}
-            </label>
+            <div>
+              <p className="font-medium">Till</p>
+              <p>{deliveryLocation.postalCode}</p>
+              <p>{deliveryLocation.city}</p>
+              <p>{getCountryName(deliveryLocation.country)}</p>
+            </div>
           </div>
         </div>
-        
-        {/* Submit Button */}
-        <div className="pt-2">
-          <Button
-            type="submit"
-            className="w-full"
-            size="lg"
-            isLoading={isLoading}
-            icon={<Truck className="h-5 w-5" />}
-          >
-            Calculate Shipping Rates
-          </Button>
-        </div>
-      </form>
+      </div>
     </Card>
   );
 };

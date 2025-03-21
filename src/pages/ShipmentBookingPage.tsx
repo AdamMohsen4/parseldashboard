@@ -12,10 +12,12 @@ import { useUser } from "@clerk/clerk-react";
 import { bookShipment, cancelBooking } from "@/services/bookingService";
 import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Briefcase, Download, ShoppingCart, User } from "lucide-react";
+import { Briefcase, Download, Package, ShoppingCart, Truck, User } from "lucide-react";
 import { getBookingByTrackingCode } from "@/services/bookingDb";
 import LabelLanguageSelector from "@/components/labels/LabelLanguageSelector";
 import { generateLabel } from "@/services/labelService";
+import { getCountryFlag, getCountryName } from "@/lib/utils";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 
@@ -32,7 +34,9 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [width, setWidth] = useState("15");
   const [height, setHeight] = useState("10");
   const [pickup, setPickup] = useState("Stockholm, SE");
+  const [pickupPostalCode, setPickupPostalCode] = useState("112 23");
   const [delivery, setDelivery] = useState("Helsinki, FI");
+  const [deliveryPostalCode, setDeliveryPostalCode] = useState("00341");
   const [deliverySpeed, setDeliverySpeed] = useState("standard");
   const [compliance, setCompliance] = useState(false);
   const [showBookingConfirmation, setShowBookingConfirmation] = useState(false);
@@ -45,6 +49,10 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [canCancelBooking, setCanCancelBooking] = useState(false);
   const [labelLanguage, setLabelLanguage] = useState("en");
   const [isGeneratingLabel, setIsGeneratingLabel] = useState(false);
+  const [pickupCountry, setPickupCountry] = useState("SE");
+  const [deliveryCountry, setDeliveryCountry] = useState("FI");
+  const [packageType, setPackageType] = useState("package");
+  const [quantity, setQuantity] = useState("1");
   
   useEffect(() => {
     const checkSavedBooking = async () => {
@@ -199,6 +207,20 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleSwapLocations = () => {
+    const tempPickup = pickup;
+    const tempPickupPostal = pickupPostalCode;
+    const tempPickupCountry = pickupCountry;
+    
+    setPickup(delivery);
+    setPickupPostalCode(deliveryPostalCode);
+    setPickupCountry(deliveryCountry);
+    
+    setDelivery(tempPickup);
+    setDeliveryPostalCode(tempPickupPostal);
+    setDeliveryCountry(tempPickupCountry);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -356,336 +378,547 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     );
   }
 
+  if (bookingConfirmed) {
+    return (
+      <div className="min-h-screen bg-background">
+        <NavBar />
+        <div className="container mx-auto px-4 py-8">
+          <Card className="max-w-4xl mx-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Package className="h-6 w-6 text-primary" />
+                Booking Confirmed
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="bg-green-50 p-6 rounded-lg border border-green-200">
+                <h2 className="text-xl font-semibold text-green-800 mb-4">Your shipment is booked!</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-gray-500">Tracking Code</p>
+                    <p className="text-lg font-mono font-medium">{bookingResult?.trackingCode || bookingResult?.tracking_code}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-gray-500">Carrier</p>
+                    <p className="text-lg font-medium">{bookingResult?.carrier_name || carrier.name}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-gray-500">Total Price</p>
+                    <p className="text-lg font-medium">€{bookingResult?.totalPrice || bookingResult?.total_price}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-gray-500">Estimated Delivery</p>
+                    <p className="text-lg font-medium">{carrier.eta}</p>
+                  </div>
+                </div>
+                
+                <div className="mt-6 border-t border-green-200 pt-6">
+                  <h3 className="font-medium mb-2">Shipping Label</h3>
+                  <div className="flex items-end gap-4">
+                    <div className="flex-1">
+                      <LabelLanguageSelector 
+                        value={labelLanguage}
+                        onChange={setLabelLanguage}
+                      />
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2"
+                      onClick={handleGenerateLabel}
+                      disabled={isGeneratingLabel}
+                    >
+                      <Download className="h-4 w-4" />
+                      {isGeneratingLabel ? "Generating..." : "Generate & Download Label"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
+              {canCancelBooking && (
+                <div className="border border-amber-200 rounded-lg p-4 bg-amber-50">
+                  <h3 className="font-medium text-amber-800 mb-2">Need to cancel?</h3>
+                  <p className="text-sm text-amber-700 mb-4">
+                    You can cancel this booking until:
+                    <span className="font-medium block">
+                      {new Date(bookingResult.cancellationDeadline || bookingResult.cancellation_deadline).toLocaleString()}
+                    </span>
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="text-red-600 border-red-200 hover:bg-red-50"
+                    onClick={handleCancelBooking}
+                  >
+                    Cancel Booking
+                  </Button>
+                </div>
+              )}
+              
+              <div className="flex justify-between gap-4 pt-4">
+                <Button
+                  variant="outline"
+                  asChild
+                >
+                  <Link to="/dashboard">View All Shipments</Link>
+                </Button>
+                <Button
+                  onClick={() => {
+                    setBookingConfirmed(false);
+                    setBookingResult(null);
+                    localStorage.removeItem('lastBooking');
+                    navigate('/shipment');
+                  }}
+                >
+                  Book Another Shipment
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <NavBar />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="md:w-2/5">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Book a Shipment</CardTitle>
-                {selectedCustomerType && (
-                  <div className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full">
-                    {selectedCustomerType === "business" && <Briefcase className="h-4 w-4" />}
-                    {selectedCustomerType === "private" && <User className="h-4 w-4" />}
-                    {selectedCustomerType === "ecommerce" && <ShoppingCart className="h-4 w-4" />}
-                    <span className="text-sm capitalize">{selectedCustomerType}</span>
-                  </div>
-                )}
-              </CardHeader>
-              <CardContent>
-                {!bookingConfirmed ? (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    {(selectedCustomerType === "business" || selectedCustomerType === "ecommerce") && (
-                      <div className="space-y-4">
-                        <h3 className="font-semibold">Business Details</h3>
-                        
-                        <div>
-                          <Label htmlFor="businessName">Business Name</Label>
-                          <Input 
-                            id="businessName" 
-                            type="text" 
-                            placeholder="Enter business name" 
-                            value={businessName}
-                            onChange={(e) => setBusinessName(e.target.value)}
-                            required
-                          />
-                        </div>
-                        
-                        {selectedCustomerType === "business" && (
-                          <div>
-                            <Label htmlFor="vatNumber">VAT Number</Label>
-                            <Input 
-                              id="vatNumber" 
-                              type="text" 
-                              placeholder="Enter VAT number" 
-                              value={vatNumber}
-                              onChange={(e) => setVatNumber(e.target.value)}
-                              required
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Package Details</h3>
-                      
-                        <div>
-                        <Label htmlFor="weight">Weight (kg)</Label>
-                        <Input 
-                          id="weight" 
-                          type="number" 
-                          placeholder="Enter weight" 
-                          min="0.1" 
-                          max="100"
-                          step="0.1"
-                          value={weight}
-                          onChange={(e) => setWeight(e.target.value)}
-                          required
-                        />
-                        </div>
-                      
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <Label htmlFor="length">Length (cm)</Label>
-                          <Input 
-                            id="length" 
-                            type="number" 
-                            placeholder="L" 
-                            value={length}
-                            onChange={(e) => setLength(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="width">Width (cm)</Label>
-                          <Input 
-                            id="width" 
-                            type="number" 
-                            placeholder="W" 
-                            value={width}
-                            onChange={(e) => setWidth(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="height">Height (cm)</Label>
-                          <Input 
-                            id="height" 
-                            type="number" 
-                            placeholder="H" 
-                            value={height}
-                            onChange={(e) => setHeight(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Locations</h3>
-                      
-                      <div>
-                        <Label htmlFor="pickup">Pickup Address</Label>
-                        <GooglePlacesAutocomplete
-                          id="pickup"
-                          placeholder="Enter pickup address"
-                          value={pickup}
-                          onChange={(e) => setPickup(e.target.value)}
-                          onPlaceSelect={(address) => setPickup(address)}
-                          required
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="delivery">Delivery Address</Label>
-                        <GooglePlacesAutocomplete
-                          id="delivery"
-                          placeholder="Enter delivery address"
-                          value={delivery}
-                          onChange={(e) => setDelivery(e.target.value)}
-                          onPlaceSelect={(address) => setDelivery(address)}
-                          required
-                        />
-                      </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Delivery Options</h3>
-                      
-                      <RadioGroup 
-                        value={deliverySpeed} 
-                        onValueChange={setDeliverySpeed}
-                        className="space-y-2"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="standard" id="standard" />
-                          <Label htmlFor="standard">Standard (3 days)</Label>
-                        </div>
-                      </RadioGroup>
-                      
-                      <div className="flex items-center space-x-2 pt-2">
-                        <Checkbox 
-                          id="compliance" 
-                          checked={compliance}
-                          onCheckedChange={(checked) => setCompliance(checked === true)}
-                        />
-                        <Label htmlFor="compliance" className="text-sm">
-                          Add Compliance Package (+€2)
-                          <Link to="/compliance" className="ml-1 text-primary text-sm underline">
-                            Learn more
-                          </Link>
-                        </Label>
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col space-y-2">
-                      <Button 
-                        type="submit" 
-                        className="w-full" 
-                        disabled={isBooking || bookingConfirmed}
-                      >
-                        {isBooking ? "Processing..." : bookingConfirmed ? "Booked" : "Book Shipment"}
-                      </Button>
-                      {process.env.NODE_ENV === 'development' && (
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          className="w-full" 
-                          onClick={createTestBooking}
-                        >
-                          Create Test Booking
-                        </Button>
-                      )}
-                    </div>
-                  </form>
-                ) : (
-                  <div className="bg-green-50 p-4 rounded-lg border border-green-500">
-                    <h4 className="font-medium mb-2 text-green-700">Booking Confirmed!</h4>
-                    <div className="space-y-2 text-sm">
-                      <p><strong>Tracking Code:</strong> {bookingResult?.trackingCode || bookingResult?.tracking_code}</p>
-                      <p><strong>Carrier:</strong> {bookingResult?.carrier_name || carrier.name}</p>
-                      <p><strong>Total Price:</strong> €{bookingResult?.totalPrice || bookingResult?.total_price}</p>
-                      <div className="pt-3 flex gap-2">
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          asChild
-                        >
-                          <Link to="/dashboard">View All Shipments</Link>
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="default" 
-                          onClick={() => {
-                            setBookingConfirmed(false);
-                            setBookingResult(null);
-                            localStorage.removeItem('lastBooking');
-                          }}
-                        >
-                          Book Another Shipment
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+              <span className="text-xs font-bold">1</span>
+            </div>
+            <h2 className="text-xl font-medium">Grundläggande detaljer</h2>
+            
+            <div className="flex-1 flex items-center gap-4">
+              <div className="flex-1 h-px bg-border"></div>
+              
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                <span className="text-xs font-bold">2</span>
+              </div>
+              <span className="text-sm text-muted-foreground">Välj tjänst</span>
+              
+              <div className="flex-1 h-px bg-border"></div>
+              
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                <span className="text-xs font-bold">3</span>
+              </div>
+              <span className="text-sm text-muted-foreground">Adress</span>
+              
+              <div className="flex-1 h-px bg-border"></div>
+              
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                <span className="text-xs font-bold">4</span>
+              </div>
+              <span className="text-sm text-muted-foreground">Innehåll och referens</span>
+            </div>
           </div>
           
-          <div className="md:w-3/5">
-            <Card>
-              <CardHeader>
-                <CardTitle>Fixed Rate Shipping</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div 
-                    className="border border-primary rounded-lg p-4 flex justify-between items-center"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="text-2xl">{carrier.icon}</div>
-                      <div>
-                        <h4 className="font-medium">{carrier.name}</h4>
-                        <p className="text-sm text-muted-foreground">Estimated delivery: {carrier.eta}</p>
+          <form onSubmit={handleSubmit}>
+            <ResizablePanelGroup direction="horizontal" className="min-h-[200px] rounded-lg border mb-8">
+              <ResizablePanel defaultSize={50}>
+                <div className="p-0">
+                  <div className="bg-slate-700 text-white p-3 font-semibold">
+                    Från
+                  </div>
+                  
+                  <div className="p-4 space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="fromCountry">Land</Label>
+                      <div className="relative">
+                        <select
+                          id="fromCountry"
+                          className="w-full h-10 pl-10 pr-4 rounded-md border border-input bg-background appearance-none cursor-pointer"
+                          value={pickupCountry}
+                          onChange={(e) => setPickupCountry(e.target.value)}
+                        >
+                          <option value="SE">Sverige</option>
+                          <option value="FI">Finland</option>
+                          <option value="NO">Norge</option>
+                          <option value="DK">Danmark</option>
+                        </select>
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                          {getCountryFlag(pickupCountry)}
+                        </div>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                          <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold">€{carrier.price}{compliance ? " + €2" : ""}</p>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="fromPostal">Postnummer</Label>
+                      <Input
+                        id="fromPostal"
+                        placeholder="Enter postal code"
+                        value={pickupPostalCode}
+                        onChange={(e) => setPickupPostalCode(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {pickupPostalCode}, Stockholm
+                      </p>
+                    </div>
+                    
+                    <div className="flex space-x-4">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="fromCompany"
+                          name="fromType"
+                          className="h-4 w-4 rounded-full border-gray-300 text-primary focus:ring-primary"
+                        />
+                        <Label htmlFor="fromCompany">Företag</Label>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="fromPrivate"
+                          name="fromType"
+                          className="h-4 w-4 rounded-full border-gray-300 text-primary focus:ring-primary"
+                          defaultChecked
+                        />
+                        <Label htmlFor="fromPrivate">Privatperson</Label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ResizablePanel>
+              
+              <ResizableHandle withHandle>
+                <div 
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-200 hover:bg-slate-300 cursor-pointer z-10"
+                  onClick={handleSwapLocations}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 16L3 12M3 12L7 8M3 12H21M17 8L21 12M21 12L17 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </ResizableHandle>
+              
+              <ResizablePanel defaultSize={50}>
+                <div className="p-0">
+                  <div className="bg-slate-700 text-white p-3 font-semibold">
+                    Till
+                  </div>
+                  
+                  <div className="p-4 space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="toCountry">Land</Label>
+                      <div className="relative">
+                        <select
+                          id="toCountry"
+                          className="w-full h-10 pl-10 pr-4 rounded-md border border-input bg-background appearance-none cursor-pointer"
+                          value={deliveryCountry}
+                          onChange={(e) => setDeliveryCountry(e.target.value)}
+                        >
+                          <option value="SE">Sverige</option>
+                          <option value="FI">Finland</option>
+                          <option value="NO">Norge</option>
+                          <option value="DK">Danmark</option>
+                        </select>
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                          {getCountryFlag(deliveryCountry)}
+                        </div>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                          <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="toPostal">Postnummer</Label>
+                      <Input
+                        id="toPostal"
+                        placeholder="Enter postal code"
+                        value={deliveryPostalCode}
+                        onChange={(e) => setDeliveryPostalCode(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {deliveryPostalCode}, Helsinki
+                      </p>
+                    </div>
+                    
+                    <div className="flex space-x-4">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="toCompany"
+                          name="toType"
+                          className="h-4 w-4 rounded-full border-gray-300 text-primary focus:ring-primary"
+                        />
+                        <Label htmlFor="toCompany">Företag</Label>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="toPrivate"
+                          name="toType"
+                          className="h-4 w-4 rounded-full border-gray-300 text-primary focus:ring-primary"
+                          defaultChecked
+                        />
+                        <Label htmlFor="toPrivate">Privatperson</Label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ResizablePanel>
+            </ResizablePanelGroup>
+            
+            <div className="mb-8">
+              <div className="border rounded-lg">
+                <div className="bg-slate-700 text-white p-3 font-semibold">
+                  Ange sändningsdetaljer
+                </div>
+                
+                <div className="p-6">
+                  <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+                    <div>
+                      <Label htmlFor="quantity" className="block mb-2">Antal</Label>
+                      <div className="relative">
+                        <Input
+                          id="quantity"
+                          type="number"
+                          min="1"
+                          value={quantity}
+                          onChange={(e) => setQuantity(e.target.value)}
+                          className="text-center"
+                        />
+                        <div className="absolute inset-y-0 right-0 flex flex-col">
+                          <button 
+                            type="button" 
+                            className="flex-1 px-2 bg-slate-100 border-l border-b border-input hover:bg-slate-200"
+                            onClick={() => setQuantity((parseInt(quantity) + 1).toString())}
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M12 5L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M5 12L19 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </button>
+                          <button 
+                            type="button" 
+                            className="flex-1 px-2 bg-slate-100 border-l border-input hover:bg-slate-200"
+                            onClick={() => setQuantity(Math.max(1, parseInt(quantity) - 1).toString())}
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M5 12L19 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="packageType" className="block mb-2">Vad skickar du</Label>
+                      <div className="relative">
+                        <select
+                          id="packageType"
+                          className="w-full h-10 pl-3 pr-10 rounded-md border border-input bg-background appearance-none"
+                          value={packageType}
+                          onChange={(e) => setPackageType(e.target.value)}
+                        >
+                          <option value="package">Paket</option>
+                          <option value="document">Dokument</option>
+                          <option value="pallet">Pall</option>
+                        </select>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                          <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="length" className="block mb-2">Längd</Label>
+                      <Input
+                        id="length"
+                        type="number"
+                        min="1"
+                        value={length}
+                        onChange={(e) => setLength(e.target.value)}
+                        postfix="cm"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="width" className="block mb-2">Bredd</Label>
+                      <Input
+                        id="width"
+                        type="number"
+                        min="1"
+                        value={width}
+                        onChange={(e) => setWidth(e.target.value)}
+                        postfix="cm"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="height" className="block mb-2">Höjd</Label>
+                      <Input
+                        id="height"
+                        type="number"
+                        min="1"
+                        value={height}
+                        onChange={(e) => setHeight(e.target.value)}
+                        postfix="cm"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="weight" className="block mb-2">Vikt</Label>
+                      <Input
+                        id="weight"
+                        type="number"
+                        min="0.1"
+                        step="0.1"
+                        value={weight}
+                        onChange={(e) => setWeight(e.target.value)}
+                        postfix="kg"
+                      />
                     </div>
                   </div>
                   
-                  <div className="mt-8 bg-muted p-4 rounded-lg">
-                    <h4 className="font-medium mb-2">About our rates</h4>
-                    <p className="text-sm text-muted-foreground">
-                      All shipments include tracking and insurance up to €500. Additional insurance 
-                      can be purchased during checkout. Rates shown include all taxes and fees.
-                    </p>
-                    {selectedCustomerType && (
-                      <div className="mt-3 pt-3 border-t border-border">
-                        <h5 className="font-medium text-sm mb-1">
-                          {selectedCustomerType === "business" && "Business Rate"}
-                          {selectedCustomerType === "private" && "Private Customer Rate"}
-                          {selectedCustomerType === "ecommerce" && "E-commerce Business Rate"}
-                        </h5>
-                        <p className="text-sm text-muted-foreground">
-                          {selectedCustomerType === "business" && "Our business rate includes commercial insurance and priority handling."}
-                          {selectedCustomerType === "private" && "Our standard rate for private customers includes all basic services."}
-                          {selectedCustomerType === "ecommerce" && "Our special e-commerce rate includes volume discounts and integration capabilities."}
-                        </p>
+                  <div className="flex justify-between gap-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex items-center gap-2"
+                      onClick={() => {}}
+                    >
+                      <Package className="h-4 w-4" />
+                      Lägg till kolli
+                    </Button>
+                    
+                    <Button
+                      type="submit"
+                      disabled={isBooking}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      {isBooking ? (
+                        <span className="flex items-center gap-2">
+                          <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Bearbetar...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <Truck className="h-4 w-4" />
+                          Kontrollera priser!
+                        </span>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-slate-50 p-6 rounded-lg border mb-8">
+              <h3 className="text-lg font-medium mb-4">Sammanfattning</h3>
+              
+              <div className="flex items-start gap-4">
+                <div className="bg-slate-200 p-3 rounded-md">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-slate-700">
+                    <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 12L20 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 12V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 12L4 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-x-8 gap-y-2 flex-1">
+                  <div>
+                    <p className="font-medium">Från</p>
+                    <p>{pickupPostalCode}</p>
+                    <p>Stockholm</p>
+                    <p>{getCountryName(pickupCountry)}</p>
+                  </div>
+                  
+                  <div>
+                    <p className="font-medium">Till</p>
+                    <p>{deliveryPostalCode}</p>
+                    <p>Helsinki</p>
+                    <p>{getCountryName(deliveryCountry)}</p>
+                  </div>
+                </div>
+              </div>
+              
+              {(selectedCustomerType === "business" || selectedCustomerType === "ecommerce") && (
+                <div className="mt-6 pt-6 border-t border-slate-200">
+                  <h4 className="font-medium mb-4">Business Details</h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="businessName">Business Name</Label>
+                      <Input 
+                        id="businessName" 
+                        value={businessName}
+                        onChange={(e) => setBusinessName(e.target.value)}
+                        placeholder="Enter your business name"
+                        required={selectedCustomerType === "business" || selectedCustomerType === "ecommerce"}
+                      />
+                    </div>
+                    
+                    {selectedCustomerType === "business" && (
+                      <div className="space-y-2">
+                        <Label htmlFor="vatNumber">VAT Number</Label>
+                        <Input 
+                          id="vatNumber" 
+                          value={vatNumber}
+                          onChange={(e) => setVatNumber(e.target.value)}
+                          placeholder="Enter VAT number"
+                          required={selectedCustomerType === "business"}
+                        />
                       </div>
                     )}
                   </div>
-                  
-                  {canCancelBooking && bookingResult && (
-                    <div className="mt-8 bg-amber-50 p-4 rounded-lg border border-amber-500">
-                      <h4 className="font-medium mb-2 text-amber-700">Cancel Booking</h4>
-                      <div className="space-y-2 text-sm">
-                        <p>
-                          You can cancel this booking until:
-                          <br />
-                          <strong>
-                            {new Date(bookingResult.cancellationDeadline || bookingResult.cancellation_deadline).toLocaleString()}
-                          </strong>
-                        </p>
-                        <p className="text-muted-foreground">
-                          After this time, cancellation will not be possible and you will be charged for the shipment.
-                        </p>
-                        <div className="pt-3">
-                          <Button 
-                            size="sm" 
-                            variant="destructive"
-                            onClick={handleCancelBooking}
-                          >
-                            Cancel Booking
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {bookingResult && (
-                    <div className="mt-8 bg-blue-50 p-4 rounded-lg border border-blue-500">
-                      <h4 className="font-medium mb-2 text-blue-700">Shipping Label</h4>
-                      
-                      <div className="space-y-3">
-                        <LabelLanguageSelector 
-                          value={labelLanguage}
-                          onChange={setLabelLanguage}
-                        />
-                        
-                        <div className="pt-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            onClick={handleGenerateLabel}
-                            disabled={isGeneratingLabel}
-                            className="flex items-center gap-2"
-                          >
-                            <Download className="h-4 w-4" />
-                            {isGeneratingLabel ? "Generating..." : "Generate & Download Label"}
-                          </Button>
-                          
-                          {bookingResult.labelUrl && (
-                            <p className="text-xs text-muted-foreground mt-1">
-                              A label has already been generated. Generate again to get a new version in your selected language.
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              )}
+            </div>
+          </form>
+          
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Fixed Rate Shipping</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div 
+                className="border border-primary rounded-lg p-4 flex justify-between items-center"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="text-2xl">{carrier.icon}</div>
+                  <div>
+                    <h4 className="font-medium">{carrier.name}</h4>
+                    <p className="text-sm text-muted-foreground">Estimated delivery: {carrier.eta}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-bold">€{carrier.price}{compliance ? " + €2" : ""}</p>
+                </div>
+              </div>
+              
+              <div className="mt-4 flex items-center space-x-2">
+                <Checkbox 
+                  id="compliance" 
+                  checked={compliance}
+                  onCheckedChange={(checked) => setCompliance(checked === true)}
+                />
+                <Label htmlFor="compliance" className="text-sm">
+                  Add Compliance Package (+€2)
+                  <Link to="/compliance" className="ml-1 text-primary text-sm underline">
+                    Learn more
+                  </Link>
+                </Label>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
