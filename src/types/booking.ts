@@ -1,93 +1,50 @@
-export type CustomerType = "business" | "private" | "ecommerce";
-
-export interface BookingRequest {
-  // Package details
-  weight: string;
-  dimensions: {
-    length: string;
-    width: string;
-    height: string;
-  };
-  
-  // Addresses
-  pickup: string;
-  delivery: string;
-  
-  // Carrier details
-  carrier: {
-    name: string;
-    price: number;
-  };
-  
-  // Options
-  deliverySpeed: string;
-  includeCompliance: boolean;
-  
-  // Pickup slot (optional)
-  pickupSlotId?: string;
-  
-  // User ID
-  userId: string;
-  
-  // Customer type data
-  customerType?: CustomerType;
-  businessName?: string;
-  vatNumber?: string;
-  
-  // Add cancellation window
-  cancellationDeadline?: Date;
-}
-
 export interface BookingResponse {
   success: boolean;
+  message?: string;
   shipmentId?: string;
   trackingCode?: string;
   labelUrl?: string;
   pickupTime?: string;
   totalPrice?: number;
-  message?: string;
-  
-  // Add cancellation details
   cancellationDeadline?: string;
   canBeCancelled?: boolean;
 }
 
-// API Key interface for e-commerce integration
-export interface ApiKey {
-  id: string;
-  userId: string;
-  apiKey: string;
-  businessName: string;
-  createdAt: string;
-  lastUsedAt?: string;
-  isActive: boolean;
-}
-
-// E-commerce API request interface
-export interface EcommerceShipmentRequest {
-  apiKey: string;
-  orderNumber: string;
+// Update BookingRequest to include the pickup and delivery address objects
+export interface BookingRequest {
   weight: string;
   dimensions: {
     length: string;
     width: string;
     height: string;
   };
-  pickup: string;
-  delivery: string;
-  customerEmail?: string;
-  customerName?: string;
-  customerPhone?: string;
-  productDescription?: string;
-  includeCompliance?: boolean;
-}
-
-// E-commerce API response interface
-export interface EcommerceShipmentResponse {
-  success: boolean;
-  trackingCode?: string;
-  labelUrl?: string;
-  estimatedDelivery?: string;
-  shipmentId?: string;
-  message?: string;
+  pickup: {
+    name: string;
+    address: string;
+    postalCode: string;
+    city: string;
+    country: string;
+    phone: string;
+    email: string;
+  };
+  delivery: {
+    name: string;
+    address: string;
+    postalCode: string;
+    city: string;
+    country: string;
+    phone: string;
+    email: string;
+  };
+  carrier: {
+    name: string;
+    price: number;
+  };
+  deliverySpeed: string;
+  includeCompliance: boolean;
+  userId: string;
+  customerType?: string;
+  businessName?: string;
+  vatNumber?: string;
+  pickupSlotId: string;
 }
