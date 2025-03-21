@@ -132,8 +132,13 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         pickup,
         delivery,
         carrier: { name: carrier.name, price: carrier.price },
-        deliverySpeed,
-        includeCompliance: compliance,
+        address,
+        phone,
+        email,
+        first_name,
+        last_name,
+        // deliverySpeed,
+        // includeCompliance: compliance,
         userId: user.id,
         customerType: selectedCustomerType || "private",
         businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
@@ -810,8 +815,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                         </span>
                       ) : (
                         <span className="flex items-center gap-2">
-                          <Truck className="h-4 w-4" />
-                          Kontrollera priser!
+                          Fortsätt
                         </span>
                       )}
                     </Button>
@@ -883,8 +887,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
               )}
             </div>
           </form>
-          
-          
         </div>
       </div>
     </div>
