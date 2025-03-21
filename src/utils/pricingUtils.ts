@@ -6,6 +6,9 @@ export interface PricingDay {
   loadFactor: 'low' | 'medium' | 'high';
   basePrice: number;
   estimatedOrders: number;
+  // Add these properties to fix the type errors
+  priceLevel: 'low' | 'medium' | 'high';
+  price: number;
 }
 
 export interface DateRange {
@@ -62,11 +65,17 @@ export const generateMockPricingData = (currentMonth: Date, dateRange: DateRange
         + orderRanges[loadFactor].min
       );
       
+      // Calculate the final price
+      const price = basePrices[loadFactor];
+      
       return {
         date: day,
         loadFactor,
         basePrice: basePrices[loadFactor],
-        estimatedOrders
+        estimatedOrders,
+        // Add these to fix the type errors
+        priceLevel: loadFactor, // Using loadFactor as priceLevel
+        price: price
       };
     } else {
       // For days outside the date range window, just provide basic data
@@ -74,7 +83,10 @@ export const generateMockPricingData = (currentMonth: Date, dateRange: DateRange
         date: day,
         loadFactor: 'medium',
         basePrice: 0,
-        estimatedOrders: 0
+        estimatedOrders: 0,
+        // Add these to fix the type errors
+        priceLevel: 'medium',
+        price: 0
       };
     }
   });
