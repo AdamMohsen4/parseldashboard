@@ -1,153 +1,101 @@
+export type CustomerType = "business" | "private" | "ecommerce";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Separator } from "@/components/ui/separator";
-import { toast } from "@/components/ui/use-toast";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import NavBar from "@/components/layout/NavBar";
-import { useUser } from "@clerk/clerk-react";
-import { bookShipment, cancelBooking } from "@/services/bookingService";
-import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
-import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  Briefcase, 
-  Download, 
-  MapPin, 
-  Package, 
-  Plus, 
-  ShoppingCart, 
-  Truck, 
-  User 
-} from "lucide-react";
-import { getBookingByTrackingCode } from "@/services/bookingDb";
-import LabelLanguageSelector from "@/components/labels/LabelLanguageSelector";
-import { generateLabel } from "@/services/labelService";
-import { 
-  getCountryFlag, 
-  getCountryName, 
-  formatPostalCode, 
-  getCountryDialCode, 
-  translateLabel 
-} from "@/lib/utils";
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { useTranslation } from "react-i18next";
-
-type CustomerType = "business" | "private" | "ecommerce" | null;
-type CurrentStep = "details" | "address" | "contents" | "summary";
-
-interface ShipmentBookingPageProps {
+export interface BookingRequest {
+  // Package details
+  weight: string;
+  dimensions: {
+    length: string;
+    width: string;
+    height: string;
+  };
+  
+  // Addresses
+  pickup: string;
+  delivery: string;
+  
+  // Carrier details
+  carrier: {
+    name: string;
+    price: number;
+  };
+  
+  // Options
+  deliverySpeed: string;
+  includeCompliance: boolean;
+  
+  // Pickup slot (optional)
+  pickupSlotId?: string;
+  
+  // User ID
+  userId: string;
+  
+  // Customer type data
   customerType?: CustomerType;
+  businessName?: string;
+  vatNumber?: string;
+  
+  // Add cancellation window
+  cancellationDeadline?: Date;
+  
+  // Sender details
+  senderName?: string;
+  senderEmail?: string;
+  senderPhone?: string;
+  
+  // Recipient details
+  recipientName?: string;
+  recipientEmail?: string;
+  recipientPhone?: string;
+  
+  // Additional fields
+  additionalInstructions?: string;
 }
 
-const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
-  const { isSignedIn, user } = useUser();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { i18n } = useTranslation();
-  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
+export interface BookingResponse {
+  success: boolean;
+  shipmentId?: string;
+  trackingCode?: string;
+  labelUrl?: string;
+  pickupTime?: string;
+  totalPrice?: number;
+  message?: string;
   
-  // Booking flow state
-  const [currentStep, setCurrentStep] = useState<CurrentStep>("details");
-  
-  // Package details
-  const [weight, setWeight] = useState("5");
-  const [length, setLength] = useState("20");
-  const [width, setWidth] = useState("15");
-  const [height, setHeight] = useState("10");
-  const [packageType, setPackageType] = useState("package");
-  const [quantity, setQuantity] = useState("1");
-  
-  // Sender information
-  const [senderName, setSenderName] = useState("");
-  const [senderStreetAddress, setSenderStreetAddress] = useState("");
-  const [senderStreetAddress2, setSenderStreetAddress2] = useState("");
-  const [senderPostalCode, setSenderPostalCode] = useState("112 23");
-  const [senderCity, setSenderCity] = useState("Stockholm");
-  const [senderCountry, setSenderCountry] = useState("SE");
-  const [senderPhone, setSenderPhone] = useState("");
-  const [senderEmail, setSenderEmail] = useState("");
-  const [senderPersonalId, setSenderPersonalId] = useState("");
-  
-  // Recipient information
-  const [recipientName, setRecipientName] = useState("");
-  const [recipientStreetAddress, setRecipientStreetAddress] = useState("");
-  const [recipientStreetAddress2, setRecipientStreetAddress2] = useState("");
-  const [recipientPostalCode, setRecipientPostalCode] = useState("00341");
-  const [recipientCity, setRecipientCity] = useState("HELSINKI");
-  const [recipientCountry, setRecipientCountry] = useState("FI");
-  const [recipientPhone, setRecipientPhone] = useState("");
-  const [recipientEmail, setRecipientEmail] = useState("");
-  
-  // Service options
-  const [deliverySpeed, setDeliverySpeed] = useState("standard");
-  const [compliance, setCompliance] = useState(false);
-  const [additionalInstructions, setAdditionalInstructions] = useState("");
-  
-  // Booking state
-  const [showBookingConfirmation, setShowBookingConfirmation] = useState(false);
-  const [isBooking, setIsBooking] = useState(false);
-  const [bookingResult, setBookingResult] = useState<any>(null);
-  const [selectedCustomerType, setSelectedCustomerType] = useState<CustomerType>(customerType || null);
-  const [businessName, setBusinessName] = useState("");
-  const [vatNumber, setVatNumber] = useState("");
-  const [bookingConfirmed, setBookingConfirmed] = useState(false);
-  const [canCancelBooking, setCanCancelBooking] = useState(false);
-  const [labelLanguage, setLabelLanguage] = useState("en");
-  const [isGeneratingLabel, setIsGeneratingLabel] = useState(false);
-  
-  useEffect(() => {
-    const checkSavedBooking = async () => {
-      if (isSignedIn && user) {
-        const savedBookingInfo = localStorage.getItem('lastBooking');
-        
-        if (savedBookingInfo) {
-          const { trackingCode, timestamp } = JSON.parse(savedBookingInfo);
-          
-          const bookingData = await getBookingByTrackingCode(trackingCode, user.id);
-          
-          if (bookingData) {
-            setBookingResult(bookingData);
-            setBookingConfirmed(true);
-            
-            const cancellationDeadline = new Date(bookingData.cancellation_deadline);
-            const now = new Date();
-            
-            if (now < cancellationDeadline) {
-              setCanCancelBooking(true);
-            } else {
-              localStorage.removeItem('lastBooking');
-              setCanCancelBooking(false);
-            }
-          } else {
-            localStorage.removeItem('lastBooking');
-          }
-        }
-      }
-    };
-    
-    checkSavedBooking();
-  }, [isSignedIn, user]);
+  // Add cancellation details
+  cancellationDeadline?: string;
+  canBeCancelled?: boolean;
+}
 
-  const showCustomerTypeSelection = !selectedCustomerType && location.pathname === "/shipment";
+// API Key interface for e-commerce integration
+export interface ApiKey {
+  id: string;
+  userId: string;
+  apiKey: string;
+  businessName: string;
+  createdAt: string;
+  lastUsedAt?: string;
+  isActive: boolean;
+}
 
-  useEffect(() => {
-    if (customerType) {
-      setSelectedCustomerType(customerType);
-    }
-  }, [customerType]);
-
-  const getCarrierPrice = () => {
-    switch (selectedCustomerType) {
-      case "business": return 9;
-      case "ecommerce": return 8;
-      default: return 10;
-    }
+// E-commerce API request interface
+export interface EcommerceShipmentRequest {
+  apiKey: string;
+  orderNumber: string;
+  weight: string;
+  dimensions: {
+    length: string;
+    width: string;
+    height: string;
   };
+  pickup: string;
+  delivery: string;
+  customerEmail?: string;
+  customerName?: string;
+  customerPhone?: string;
+  productDescription?: string;
+  includeCompliance?: boolean;
+}
 
+<<<<<<< HEAD
   const carrier = {
     id: 1,
     name: "DHL Parcel Connect",
@@ -1328,3 +1276,14 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 
 export default ShipmentBookingPage;
 
+=======
+// E-commerce API response interface
+export interface EcommerceShipmentResponse {
+  success: boolean;
+  trackingCode?: string;
+  labelUrl?: string;
+  estimatedDelivery?: string;
+  shipmentId?: string;
+  message?: string;
+}
+>>>>>>> 72e06e579b42237fe2bc3aeac2dd8b05c14ed477
