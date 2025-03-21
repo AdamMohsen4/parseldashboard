@@ -54,7 +54,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Benefits section - NEW */}
+      {/* Benefits section */}
       <section className="py-16 bg-secondary/10">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
