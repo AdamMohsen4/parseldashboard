@@ -36,19 +36,6 @@ export interface BookingRequest {
   
   // Add cancellation window
   cancellationDeadline?: Date;
-  
-  // Sender details
-  senderName?: string;
-  senderEmail?: string;
-  senderPhone?: string;
-  
-  // Recipient details
-  recipientName?: string;
-  recipientEmail?: string;
-  recipientPhone?: string;
-  
-  // Additional fields
-  additionalInstructions?: string;
 }
 
 export interface BookingResponse {
@@ -63,12 +50,6 @@ export interface BookingResponse {
   // Add cancellation details
   cancellationDeadline?: string;
   canBeCancelled?: boolean;
-  
-  // Add carrier information
-  carrier?: {
-    name: string;
-    price: number;
-  };
 }
 
 // API Key interface for e-commerce integration
