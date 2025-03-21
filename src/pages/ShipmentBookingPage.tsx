@@ -1,101 +1,128 @@
-export type CustomerType = "business" | "private" | "ecommerce";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
+import { MapPin, Package, Truck, Download, Briefcase, User, ShoppingCart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
+import NavBar from "@/components/layout/NavBar";
+import LabelLanguageSelector from "@/components/labels/LabelLanguageSelector";
+import { CustomerType, BookingRequest, BookingResponse } from "@/types/booking";
+import { getCountryFlag, getCountryName, getCountryDialCode, translateLabel } from "@/lib/utils";
 
-export interface BookingRequest {
+// Fixed the import to include needed services
+import { bookShipment, cancelBooking, generateLabel } from "@/services/bookingService";
+
+const ShipmentBookingPage: React.FC<{ customerType?: CustomerType }> = ({ customerType: initialCustomerType }) => {
+  const { isSignedIn, user } = useUser();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  // State for steps
+  const [currentStep, setCurrentStep] = useState<"details" | "address" | "contents">("details");
+  const [currentLanguage, setCurrentLanguage] = useState<string>("sv");
+  
+  // Customer type selection
+  const [showCustomerTypeSelection, setShowCustomerTypeSelection] = useState(!initialCustomerType);
+  const [selectedCustomerType, setSelectedCustomerType] = useState<CustomerType | undefined>(initialCustomerType);
+  
   // Package details
-  weight: string;
-  dimensions: {
-    length: string;
-    width: string;
-    height: string;
+  const [quantity, setQuantity] = useState("1");
+  const [packageType, setPackageType] = useState("package");
+  const [weight, setWeight] = useState("");
+  const [length, setLength] = useState("");
+  const [width, setWidth] = useState("");
+  const [height, setHeight] = useState("");
+  
+  // Sender information
+  const [senderName, setSenderName] = useState("");
+  const [senderStreetAddress, setSenderStreetAddress] = useState("");
+  const [senderStreetAddress2, setSenderStreetAddress2] = useState("");
+  const [senderPostalCode, setSenderPostalCode] = useState("");
+  const [senderCity, setSenderCity] = useState("");
+  const [senderCountry, setSenderCountry] = useState("SE");
+  const [senderPhone, setSenderPhone] = useState("");
+  const [senderEmail, setSenderEmail] = useState("");
+  const [senderPersonalId, setSenderPersonalId] = useState("");
+  
+  // Recipient information
+  const [recipientName, setRecipientName] = useState("");
+  const [recipientStreetAddress, setRecipientStreetAddress] = useState("");
+  const [recipientStreetAddress2, setRecipientStreetAddress2] = useState("");
+  const [recipientPostalCode, setRecipientPostalCode] = useState("");
+  const [recipientCity, setRecipientCity] = useState("");
+  const [recipientCountry, setRecipientCountry] = useState("FI");
+  const [recipientPhone, setRecipientPhone] = useState("");
+  const [recipientEmail, setRecipientEmail] = useState("");
+  
+  // Business information
+  const [businessName, setBusinessName] = useState("");
+  const [vatNumber, setVatNumber] = useState("");
+  
+  // Shipping options
+  const [deliverySpeed, setDeliverySpeed] = useState("standard");
+  const [compliance, setCompliance] = useState(false);
+  const [additionalInstructions, setAdditionalInstructions] = useState("");
+  
+  // Booking state
+  const [isBooking, setIsBooking] = useState(false);
+  const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  const [bookingResult, setBookingResult] = useState<BookingResponse | null>(null);
+  const [showBookingConfirmation, setShowBookingConfirmation] = useState(false);
+  const [canCancelBooking, setCanCancelBooking] = useState(false);
+  
+  // Label generation
+  const [labelLanguage, setLabelLanguage] = useState<string>("en");
+  const [isGeneratingLabel, setIsGeneratingLabel] = useState(false);
+  
+  useEffect(() => {
+    if (initialCustomerType) {
+      setSelectedCustomerType(initialCustomerType);
+      setShowCustomerTypeSelection(false);
+    }
+    
+    // Check if there's a saved booking in localStorage
+    const savedBooking = localStorage.getItem('lastBooking');
+    if (savedBooking) {
+      try {
+        const { trackingCode, timestamp } = JSON.parse(savedBooking);
+        const bookingTime = new Date(timestamp);
+        const now = new Date();
+        const hoursDiff = (now.getTime() - bookingTime.getTime()) / (1000 * 60 * 60);
+        
+        // If the booking is less than 24 hours old, show confirmation
+        if (hoursDiff < 24) {
+          // Set up a mock booking result
+          setBookingResult({
+            success: true,
+            trackingCode,
+            shipmentId: `SHIP-${Math.floor(Math.random() * 1000000)}`,
+            totalPrice: 15.99,
+            cancellationDeadline: new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours from now
+            canBeCancelled: true
+          });
+          setBookingConfirmed(true);
+          setCanCancelBooking(true);
+        }
+      } catch (error) {
+        console.error("Error parsing saved booking:", error);
+        localStorage.removeItem('lastBooking');
+      }
+    }
+  }, [initialCustomerType]);
+  
+  const getCarrierPrice = () => {
+    if (selectedCustomerType === "business") {
+      return 9;
+    } else if (selectedCustomerType === "ecommerce") {
+      return 8;
+    } else {
+      return 10;
+    }
   };
-  
-  // Addresses
-  pickup: string;
-  delivery: string;
-  
-  // Carrier details
-  carrier: {
-    name: string;
-    price: number;
-  };
-  
-  // Options
-  deliverySpeed: string;
-  includeCompliance: boolean;
-  
-  // Pickup slot (optional)
-  pickupSlotId?: string;
-  
-  // User ID
-  userId: string;
-  
-  // Customer type data
-  customerType?: CustomerType;
-  businessName?: string;
-  vatNumber?: string;
-  
-  // Add cancellation window
-  cancellationDeadline?: Date;
-  
-  // Sender details
-  senderName?: string;
-  senderEmail?: string;
-  senderPhone?: string;
-  
-  // Recipient details
-  recipientName?: string;
-  recipientEmail?: string;
-  recipientPhone?: string;
-  
-  // Additional fields
-  additionalInstructions?: string;
-}
 
-export interface BookingResponse {
-  success: boolean;
-  shipmentId?: string;
-  trackingCode?: string;
-  labelUrl?: string;
-  pickupTime?: string;
-  totalPrice?: number;
-  message?: string;
-  
-  // Add cancellation details
-  cancellationDeadline?: string;
-  canBeCancelled?: boolean;
-}
-
-// API Key interface for e-commerce integration
-export interface ApiKey {
-  id: string;
-  userId: string;
-  apiKey: string;
-  businessName: string;
-  createdAt: string;
-  lastUsedAt?: string;
-  isActive: boolean;
-}
-
-// E-commerce API request interface
-export interface EcommerceShipmentRequest {
-  apiKey: string;
-  orderNumber: string;
-  weight: string;
-  dimensions: {
-    length: string;
-    width: string;
-    height: string;
-  };
-  pickup: string;
-  delivery: string;
-  customerEmail?: string;
-  customerName?: string;
-  customerPhone?: string;
-  productDescription?: string;
-  includeCompliance?: boolean;
-}
-
-<<<<<<< HEAD
   const carrier = {
     id: 1,
     name: "DHL Parcel Connect",
@@ -1048,12 +1075,6 @@ export interface EcommerceShipmentRequest {
                     )}
                   </div>
                 </div>
-<<<<<<< HEAD
-              )}
-            </div>
-          </form>
-        
-=======
               </div>
               
               <div className="bg-slate-50 p-6 rounded-lg border mb-8">
@@ -1119,7 +1140,6 @@ export interface EcommerceShipmentRequest {
               </div>
             </form>
           </div>
->>>>>>> a27342d698890ce5aa3e533b1c376cb4d7250b5c
         </div>
       </div>
     );
@@ -1276,14 +1296,5 @@ export interface EcommerceShipmentRequest {
 
 export default ShipmentBookingPage;
 
-=======
-// E-commerce API response interface
-export interface EcommerceShipmentResponse {
-  success: boolean;
-  trackingCode?: string;
-  labelUrl?: string;
-  estimatedDelivery?: string;
-  shipmentId?: string;
-  message?: string;
-}
->>>>>>> 72e06e579b42237fe2bc3aeac2dd8b05c14ed477
+//
+
