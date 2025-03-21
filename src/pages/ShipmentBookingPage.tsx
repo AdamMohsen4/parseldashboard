@@ -883,42 +883,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
               )}
             </div>
           </form>
-          
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Fixed Rate Shipping</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div 
-                className="border border-primary rounded-lg p-4 flex justify-between items-center"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="text-2xl">{carrier.icon}</div>
-                  <div>
-                    <h4 className="font-medium">{carrier.name}</h4>
-                    <p className="text-sm text-muted-foreground">Estimated delivery: {carrier.eta}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold">€{carrier.price}{compliance ? " + €2" : ""}</p>
-                </div>
-              </div>
-              
-              <div className="mt-4 flex items-center space-x-2">
-                <Checkbox 
-                  id="compliance" 
-                  checked={compliance}
-                  onCheckedChange={(checked) => setCompliance(checked === true)}
-                />
-                <Label htmlFor="compliance" className="text-sm">
-                  Add Compliance Package (+€2)
-                  <Link to="/compliance" className="ml-1 text-primary text-sm underline">
-                    Learn more
-                  </Link>
-                </Label>
-              </div>
-            </CardContent>
-          </Card>
+        
         </div>
       </div>
     </div>
