@@ -34,7 +34,6 @@ const PriceCalendar = () => {
     setShowCalendar(true);
     setIsLoading(true);
     
-    // Show toast notification
     toast({
       title: t('shipping.searchingRates', 'Searching for rates'),
       description: t('shipping.betweenLocations', 'Between {{pickup}} and {{delivery}}', 
