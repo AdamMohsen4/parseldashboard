@@ -42,6 +42,7 @@ const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
           id: booking.id.toString(),
           userId: booking.user_id,
           trackingCode: booking.tracking_code || '',
+        
           weight: booking.weight || '',
           dimensions: {
             length: booking.dimension_length || '',
@@ -58,14 +59,7 @@ const ShipmentList = ({ limit, showViewAll = false }: ShipmentListProps) => {
           pickupTime: booking.pickup_time,
           totalPrice: Number(booking.total_price) || 10,
           estimatedDelivery: booking.estimated_delivery ? new Date(booking.estimated_delivery).toISOString().split('T')[0] : undefined,
-          events: [],
-          // Add the missing carrier property
-          carrier: {
-            name: booking.carrier_name || 'E-Parcel Nordic',
-            price: Number(booking.carrier_price) || 10,
-            eta: '3 days',
-            icon: '📦'
-          }
+          events: []
         }));
         setShipments(mappedShipments);
       } else {

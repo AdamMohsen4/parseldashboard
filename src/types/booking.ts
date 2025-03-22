@@ -41,7 +41,6 @@ export interface BookingRequest {
   businessName?: string;
   vatNumber?: string;
   pickupSlotId: string;
-  deliveryDate?: string; // Added for delivery date selection functionality
 }
 
 export interface ApiKey {

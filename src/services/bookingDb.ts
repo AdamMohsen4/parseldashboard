@@ -41,7 +41,7 @@ export const saveBookingToSupabase = async (
     });
     
     const { data, error } = await supabase
-      .from('booking')  // 'booking' is the correct table name in Supabase, not 'bookings'
+      .from('booking')
       .insert([{
         user_id: request.userId,
         tracking_code: trackingCode,
@@ -107,7 +107,7 @@ export const fetchBookingsFromSupabase = async (userId: string, limit?: number) 
     }
     
     let query = supabase
-      .from('booking')  // 'booking' is the correct table name, not 'bookings'
+      .from('booking')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
@@ -148,7 +148,7 @@ export const findBookingByOrderNumber = async (userId: string, orderNumber: stri
     }
     
     const { data, error } = await supabase
-      .from('booking')  // 'booking' is the correct table name, not 'bookings'
+      .from('booking')
       .select('*')
       .eq('user_id', userId)
       .ilike('business_name', `%${orderNumber}%`)
@@ -184,7 +184,7 @@ export const getBookingByTrackingCode = async (trackingCode: string, userId: str
     }
     
     const { data, error } = await supabase
-      .from('booking')  // 'booking' is the correct table name, not 'bookings'
+      .from('booking')
       .select('*')
       .eq('tracking_code', trackingCode)
       .eq('user_id', userId)
