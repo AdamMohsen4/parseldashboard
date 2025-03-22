@@ -13,9 +13,9 @@ import PriceCalendar from "./pages/PriceCalendar";
 
 // Lazy load less frequently used pages
 const ShipmentBookingPage = lazy(() => import("./pages/ShipmentBookingPage"));
-const ThreePLServicePage = lazy(() => import("./pages/ThreePLServicePage").then(module => ({ default: module })));
+const ThreePLServicePage = lazy(() => import("./pages/ThreePLServicePage"));
 const TrackingPage = lazy(() => import("./pages/TrackingPage"));
-const CompliancePage = lazy(() => import("./pages/CompliancePage").then(module => ({ default: module })));
+const CompliancePage = lazy(() => import("./pages/CompliancePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage"));
 // const CollaboratePage = lazy(() => import("./pages/CollaboratePage"));
@@ -23,7 +23,7 @@ const SupportPage = lazy(() => import("./pages/SupportPage"));
 const IntegrationPage = lazy(() => import("./pages/IntegrationPage"));
 const TransportationPartnersPage = lazy(() => import("./pages/TransportationPartnersPage"));
 const ShipmentsPage = lazy(() => import("./pages/ShipmentsPage"));
-const WarehousePage = lazy(() => import("./pages/WarehousePage").then(module => ({ default: module })));
+const WarehousePage = lazy(() => import("./pages/WarehousePage"));
 
 // Loading fallback component
 const LoadingFallback = () => (

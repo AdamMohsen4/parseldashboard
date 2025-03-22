@@ -45,10 +45,10 @@ export interface BookingRequest {
 
 export interface ApiKey {
   id: string;
-  key: string;
-  name: string;
-  created: string;
-  lastUsed?: string;
-  permissions: string[];
-  active: boolean;
+  apiKey: string;
+  userId: string;
+  businessName: string;
+  createdAt: string;
+  lastUsedAt?: string;
+  isActive: boolean;
 }

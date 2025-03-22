@@ -1,4 +1,3 @@
-
 import { toast } from "@/components/ui/use-toast";
 import { generateLabel } from "./labelService";
 import { schedulePickup } from "./pickupService";
@@ -141,8 +140,8 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
           carrier: request.carrier,
           weight: request.weight,
           dimensions: request.dimensions,
-          pickup: request.pickup,
-          delivery: request.delivery,
+          pickup: JSON.stringify(request.pickup),
+          delivery: JSON.stringify(request.delivery),
           deliverySpeed: request.deliverySpeed,
           includeCompliance: request.includeCompliance,
           labelUrl: labelResult.labelUrl,
