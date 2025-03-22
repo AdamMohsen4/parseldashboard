@@ -42,7 +42,7 @@ export const saveBookingToSupabase = async (
     
     const { data, error } = await supabase
       .from('booking')
-      .insert({
+      .insert([{
         user_id: request.userId,
         tracking_code: trackingCode,
         carrier_name: request.carrier.name,
@@ -64,7 +64,7 @@ export const saveBookingToSupabase = async (
         business_name: request.businessName,
         vat_number: request.vatNumber,
         cancellation_deadline: cancellationDeadline.toISOString()
-      })
+      }])
       .select()
       .maybeSingle();
       
