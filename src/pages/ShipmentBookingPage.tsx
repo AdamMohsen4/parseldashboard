@@ -20,7 +20,6 @@ import { generateLabel } from "@/services/labelService";
 import { getCountryFlag, getCountryName } from "@/lib/utils";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import ShipmentVolume from "@/components/booking/ShipmentVolume";
-import DeliveryDateSelector from "@/components/booking/DeliveryDateSelector";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 
@@ -66,7 +65,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [recipientPhone, setRecipientPhone] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
   const [selectedVolume, setSelectedVolume] = useState("m");
-  const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(undefined);
   
   useEffect(() => {
     const checkSavedBooking = async () => {
@@ -128,15 +126,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       return;
     }
 
-    if (!deliveryDate) {
-      toast({
-        title: "Leveransdatum saknas",
-        description: "Vänligen välj ett leveransdatum för din försändelse.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsBooking(true);
     
     try {
@@ -168,8 +157,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         customerType: selectedCustomerType || "private",
         businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
         vatNumber: selectedCustomerType === "business" ? vatNumber : undefined,
-        pickupSlotId: "slot-1", // Default slot
-        deliveryDate: deliveryDate.toISOString() // Add delivery date
+        pickupSlotId: "slot-1" // Default slot
       });
       
       if (result.success) {
@@ -664,25 +652,17 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
             
             {currentStep === 2 && (
               <div>
-                <div className="border rounded-lg mb-6">
+                <div className="border rounded-lg">
                   <div className="bg-slate-700 text-white p-3 font-semibold">
                     Ange sändningsdetaljer
                   </div>
                   
                   <div className="p-6">
+                    {/* Add ShipmentVolume component here */}
                     <ShipmentVolume 
                       selectedVolume={selectedVolume}
                       onVolumeSelect={setSelectedVolume}
                     />
-                    
-                    {/* Add the new DeliveryDateSelector component */}
-                    <div className="mt-8">
-                      <h2 className="text-2xl font-medium mb-6">Leveransdatum</h2>
-                      <DeliveryDateSelector 
-                        selectedDate={deliveryDate}
-                        onDateSelect={setDeliveryDate}
-                      />
-                    </div>
                     
                     <div className="flex justify-between gap-4 mt-6">
                       <Button
@@ -849,104 +829,36 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="flex justify-between gap-4 mt-6">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handlePreviousStep}
-                    >
-                      Previous
-                    </Button>
-                    
-                    <Button
-                      type="button"
-                      onClick={handleNextStep}
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      Continue
-                    </Button>
-                  </div>
                 </div>
-              </div>
-            )}
-            
-            {currentStep === 4 && (
-              <div>
-                <div className="border rounded-lg mb-8">
-                  <div className="bg-slate-700 text-white p-3 font-semibold">
-                    Bekräfta och boka
-                  </div>
+                
+                <div className="flex justify-between gap-4">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handlePreviousStep}
+                  >
+                    Previous
+                  </Button>
                   
-                  <div className="p-6 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div>
-                        <h3 className="text-lg font-medium mb-4">Sändningsdetaljer</h3>
-                        <div className="space-y-3">
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Volym</span>
-                            <span className="font-medium">{selectedVolume.toUpperCase()}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Leveransdatum</span>
-                            <span className="font-medium">{deliveryDate?.toLocaleDateString() || "Inte valt"}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Pris</span>
-                            <span className="font-medium">€{getCarrierPrice()}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Carrier</span>
-                            <span className="font-medium">{carrier.name}</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h3 className="text-lg font-medium mb-4">Villkor</h3>
-                        <div className="space-y-4">
-                          <div className="flex items-start space-x-2">
-                            <Checkbox id="terms" className="mt-1" />
-                            <Label htmlFor="terms" className="text-sm">
-                              Jag accepterar <a href="#" className="text-primary hover:underline">villkoren</a> för denna tjänst.
-                            </Label>
-                          </div>
-                          
-                          <div className="flex items-start space-x-2">
-                            <Checkbox 
-                              id="compliance" 
-                              checked={compliance}
-                              onCheckedChange={(checked) => setCompliance(checked as boolean)}
-                              className="mt-1" 
-                            />
-                            <Label htmlFor="compliance" className="text-sm">
-                              Lägg till compliancekontroll (+€2.50) för att säkerställa att försändelsen uppfyller alla regler.
-                            </Label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="border-t pt-6 mt-6">
-                      <div className="flex justify-between">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={handlePreviousStep}
-                        >
-                          Previous
-                        </Button>
-                        
-                        <Button
-                          type="submit"
-                          className="bg-green-600 hover:bg-green-700 text-white"
-                          disabled={isBooking || !deliveryDate}
-                        >
-                          {isBooking ? "Booking..." : "Book Now"}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
+                  <Button
+                    type="submit"
+                    disabled={isBooking}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    {isBooking ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Bearbetar...
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        Bekräfta bokning
+                      </span>
+                    )}
+                  </Button>
                 </div>
               </div>
             )}
