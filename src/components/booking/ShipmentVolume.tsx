@@ -15,7 +15,6 @@ interface PackageSize {
   dimensions: string;
   deliveryTime: string;
   price: number;
-  imageSrc: string;
   badge?: string;
 }
 
@@ -32,8 +31,6 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
       dimensions: 'max. 3 x 25 x 35 cm, 2 kg',
       deliveryTime: 'Framme inom 5 arbetsdagar',
       price: 5.90,
-      imageSrc: '/uploads/edfe51d6-29ea-4f27-8c28-80d7cbc2ae64.png',
-      badge: 'Levereras till brevlådan'
     },
     {
       id: 's',
@@ -41,7 +38,6 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
       dimensions: 'max. 11 x 32 x 42 cm, 25 kg',
       deliveryTime: 'Framme inom 1–3 arbetsdagar',
       price: 7.90,
-      imageSrc: '/uploads/edfe51d6-29ea-4f27-8c28-80d7cbc2ae64.png',
     },
     {
       id: 'm',
@@ -49,7 +45,6 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
       dimensions: 'max. 19 x 36 x 60 cm, 25 kg',
       deliveryTime: 'Framme inom 1–3 arbetsdagar',
       price: 9.90,
-      imageSrc: '/uploads/edfe51d6-29ea-4f27-8c28-80d7cbc2ae64.png',
     },
     {
       id: 'l',
@@ -57,7 +52,6 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
       dimensions: 'max. 37 x 36 x 60 cm, 25 kg',
       deliveryTime: 'Framme inom 1–3 arbetsdagar',
       price: 11.90,
-      imageSrc: '/uploads/edfe51d6-29ea-4f27-8c28-80d7cbc2ae64.png',
     },
     {
       id: 'xl',
@@ -65,7 +59,6 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
       dimensions: 'max. 100 x 60 x 40 cm, 25 kg',
       deliveryTime: 'Framme inom 1–3 arbetsdagar',
       price: 19.90,
-      imageSrc: '/uploads/edfe51d6-29ea-4f27-8c28-80d7cbc2ae64.png',
     },
     {
       id: 'xxl',
@@ -73,7 +66,6 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
       dimensions: 'Max 200 cm och längd + omkrets max 300 cm, max 25 kg',
       deliveryTime: 'Framme inom 1–3 arbetsdagar',
       price: 39.90,
-      imageSrc: '/uploads/edfe51d6-29ea-4f27-8c28-80d7cbc2ae64.png',
     },
   ];
 
@@ -99,13 +91,6 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
               </div>
             )}
             
-            <div className="bg-rose-50 bg-opacity-50 p-4 flex justify-center">
-              <img
-                src={pkg.imageSrc}
-                alt={`Package size ${pkg.name}`}
-                className="h-24 object-contain"
-              />
-            </div>
             
             <div className="p-4">
               <h3 className="font-medium text-lg">{pkg.name}</h3>
@@ -116,7 +101,7 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
                 text-center py-2 px-4 rounded-full font-medium
                 ${selectedVolume === pkg.id 
                   ? 'bg-primary text-white' 
-                  : 'bg-orange-500 text-white'}
+                  : 'bg-blue-500 text-white'}
               `}>
                 {pkg.price.toFixed(2)} €
               </div>
@@ -160,7 +145,7 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
           </div>
         </div>
         
-        <button className="mt-4 border border-orange-500 text-orange-500 hover:bg-orange-50 rounded-full py-2 px-6 transition-colors">
+        <button className="mt-4 border border-blue-500 text-blue-500 hover:bg-orange-50 rounded-full py-2 px-6 transition-colors">
           Visa lämpliga storlekar
         </button>
       </div>
