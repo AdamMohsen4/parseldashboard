@@ -266,13 +266,13 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       return;
     }
 
-    setWeight("5");
-    setLength("20");
-    setWidth("15");
-    setHeight("10");
-    setPickup("Stockholm, SE");
-    setDelivery("Helsinki, FI");
-    setShowBookingConfirmation(true);
+    // setWeight("5");
+    // setLength("20");
+    // setWidth("15");
+    // setHeight("10");
+    // setPickup("Stockholm, SE");
+    // setDelivery("Helsinki, FI");
+    // setShowBookingConfirmation(true);
     handleBookNow();
   };
 
@@ -297,7 +297,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       const dimensions = `${length}x${width}x${height} cm`;
       const result = await generateLabel({
         shipmentId,
-        carrierName: bookingResult.carrier_name || "E-Parcel Nordic",
+        carrierName: bookingResult.carrier_name || "E-Parcel",
         trackingCode,
         senderAddress: pickup,
         recipientAddress: delivery,

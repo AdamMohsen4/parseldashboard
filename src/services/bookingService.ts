@@ -1,5 +1,5 @@
 
-import { generateShipmentId, generateTrackingCode, calculateTotalPrice, calculateEstimatedDelivery } from './bookingUtils';
+import { generateShipmentId, generateTrackingCode, calculateTotalPrice } from './bookingUtils';
 import { BookingRequest, BookingResponse, AddressDetails } from '@/types/booking';
 import { toast } from 'sonner';
 
@@ -32,9 +32,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     // Calculate total price
     const totalPrice = calculateTotalPrice(request.carrier.price, request.includeCompliance);
     
-    // Calculate estimated delivery date
-    const estimatedDelivery = calculateEstimatedDelivery(request.deliverySpeed);
-    
+   
     // Set cancellation deadline (24h from now)
     const cancellationDeadline = new Date();
     cancellationDeadline.setHours(cancellationDeadline.getHours() + 24);
@@ -51,7 +49,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       package_dimensions: `${request.dimensions.length}x${request.dimensions.width}x${request.dimensions.height}`,
       carrier_name: request.carrier.name,
       total_price: totalPrice,
-      estimated_delivery: estimatedDelivery,
       cancellation_deadline: cancellationDeadline.toISOString(),
       can_be_cancelled: true,
       delivery_speed: request.deliverySpeed,
