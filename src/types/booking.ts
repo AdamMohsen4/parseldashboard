@@ -42,3 +42,13 @@ export interface BookingRequest {
   vatNumber?: string;
   pickupSlotId: string;
 }
+
+export interface ApiKey {
+  id: string;
+  key: string;
+  name: string;
+  created: string;
+  lastUsed?: string;
+  permissions: string[];
+  active: boolean;
+}

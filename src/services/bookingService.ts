@@ -1,3 +1,4 @@
+
 import { toast } from "@/components/ui/use-toast";
 import { generateLabel } from "./labelService";
 import { schedulePickup } from "./pickupService";
@@ -71,8 +72,8 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       shipmentId,
       carrierName: request.carrier.name,
       trackingCode,
-      senderAddress: request.pickup,
-      recipientAddress: request.delivery,
+      senderAddress: `${request.pickup.name}, ${request.pickup.address}, ${request.pickup.postalCode}, ${request.pickup.city}, ${request.pickup.country}`,
+      recipientAddress: `${request.delivery.name}, ${request.delivery.address}, ${request.delivery.postalCode}, ${request.delivery.city}, ${request.delivery.country}`,
       packageDetails: {
         weight: request.weight,
         dimensions: `${request.dimensions.length}x${request.dimensions.width}x${request.dimensions.height} cm`
@@ -95,7 +96,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const pickupResult = await schedulePickup({
       shipmentId,
       carrierName: request.carrier.name,
-      pickupAddress: request.pickup,
+      pickupAddress: `${request.pickup.name}, ${request.pickup.address}, ${request.pickup.postalCode}, ${request.pickup.city}, ${request.pickup.country}`,
       slotId: request.pickupSlotId
     });
     

@@ -25,8 +25,8 @@ export const saveBookingToSupabase = async (
       dimension_length: request.dimensions.length,
       dimension_width: request.dimensions.width,
       dimension_height: request.dimensions.height,
-      pickup_address: request.pickup,
-      delivery_address: request.delivery,
+      pickup_address: JSON.stringify(request.pickup),
+      delivery_address: JSON.stringify(request.delivery),
       delivery_speed: request.deliverySpeed,
       include_compliance: request.includeCompliance,
       label_url: labelUrl,
@@ -42,7 +42,7 @@ export const saveBookingToSupabase = async (
     
     const { data, error } = await supabase
       .from('booking')
-      .insert({
+      .insert([{
         user_id: request.userId,
         tracking_code: trackingCode,
         carrier_name: request.carrier.name,
@@ -51,8 +51,8 @@ export const saveBookingToSupabase = async (
         dimension_length: request.dimensions.length,
         dimension_width: request.dimensions.width,
         dimension_height: request.dimensions.height,
-        pickup_address: request.pickup,
-        delivery_address: request.delivery,
+        pickup_address: JSON.stringify(request.pickup),
+        delivery_address: JSON.stringify(request.delivery),
         delivery_speed: request.deliverySpeed,
         include_compliance: request.includeCompliance,
         label_url: labelUrl,
@@ -64,7 +64,7 @@ export const saveBookingToSupabase = async (
         business_name: request.businessName,
         vat_number: request.vatNumber,
         cancellation_deadline: cancellationDeadline.toISOString()
-      })
+      }])
       .select()
       .maybeSingle();
       

@@ -1,4 +1,3 @@
-
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -14,9 +13,9 @@ import PriceCalendar from "./pages/PriceCalendar";
 
 // Lazy load less frequently used pages
 const ShipmentBookingPage = lazy(() => import("./pages/ShipmentBookingPage"));
-const ThreePLServicePage = lazy(() => import("./pages/ThreePLServicePage"));
+const ThreePLServicePage = lazy(() => import("./pages/ThreePLServicePage").then(module => ({ default: module })));
 const TrackingPage = lazy(() => import("./pages/TrackingPage"));
-const CompliancePage = lazy(() => import("./pages/CompliancePage"));
+const CompliancePage = lazy(() => import("./pages/CompliancePage").then(module => ({ default: module })));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage"));
 // const CollaboratePage = lazy(() => import("./pages/CollaboratePage"));
@@ -24,7 +23,7 @@ const SupportPage = lazy(() => import("./pages/SupportPage"));
 const IntegrationPage = lazy(() => import("./pages/IntegrationPage"));
 const TransportationPartnersPage = lazy(() => import("./pages/TransportationPartnersPage"));
 const ShipmentsPage = lazy(() => import("./pages/ShipmentsPage"));
-const WarehousePage = lazy(() => import("./pages/WarehousePage"));
+const WarehousePage = lazy(() => import("./pages/WarehousePage").then(module => ({ default: module })));
 
 // Loading fallback component
 const LoadingFallback = () => (
