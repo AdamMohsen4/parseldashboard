@@ -1,3 +1,4 @@
+
 export interface BookingResponse {
   success: boolean;
   message?: string;
@@ -10,7 +11,16 @@ export interface BookingResponse {
   canBeCancelled?: boolean;
 }
 
-// Update BookingRequest to include the pickup and delivery address objects
+export interface AddressDetails {
+  name: string;
+  address: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  phone: string;
+  email: string;
+}
+
 export interface BookingRequest {
   weight: string;
   dimensions: {
@@ -18,24 +28,8 @@ export interface BookingRequest {
     width: string;
     height: string;
   };
-  pickup: {
-    name: string;
-    address: string;
-    postalCode: string;
-    city: string;
-    country: string;
-    phone: string;
-    email: string;
-  };
-  delivery: {
-    name: string;
-    address: string;
-    postalCode: string;
-    city: string;
-    country: string;
-    phone: string;
-    email: string;
-  };
+  pickup: AddressDetails;
+  delivery: AddressDetails;
   carrier: {
     name: string;
     price: number;

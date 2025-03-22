@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { getCountryFlag, getCountryName } from '@/lib/utils';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
+import ShipmentVolume from './ShipmentVolume';
 
 interface BookingFormProps {
   onRatesCalculated: (rates: any[]) => void;
@@ -48,6 +49,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
   
   const [urgency, setUrgency] = useState<DeliveryUrgency>(3);
   const [packageType, setPackageType] = useState<string>("package");
+  const [selectedVolume, setSelectedVolume] = useState<string>("m");
   
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,13 +58,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
     try {
       setIsLoading(true);
       
-      // Validate form
-      if (dimensions.weight <= 0 || dimensions.length <= 0 || 
-          dimensions.width <= 0 || dimensions.height <= 0) {
-        toast.error('Please enter valid parcel dimensions');
-        return;
-      }
+      // Set dimensions based on selected package volume
+      const volumeDimensions = getVolumeDimensions(selectedVolume);
       
+      // Validate form
       if (!pickupLocation.city || !deliveryLocation.city) {
         toast.error('Please enter valid pickup and delivery locations');
         return;
@@ -70,7 +69,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       
       // Call API to calculate rates
       const rates = await API.getRates(
-        dimensions,
+        volumeDimensions,
         pickupLocation,
         deliveryLocation,
         urgency
@@ -90,6 +89,25 @@ const BookingForm: React.FC<BookingFormProps> = ({
     const temp = { ...pickupLocation };
     setPickupLocation({ ...deliveryLocation });
     setDeliveryLocation(temp);
+  };
+  
+  const getVolumeDimensions = (volume: string): ParcelDimensions => {
+    switch (volume) {
+      case 'xxs':
+        return { length: 35, width: 25, height: 3, weight: 2 };
+      case 's':
+        return { length: 42, width: 32, height: 11, weight: 25 };
+      case 'm':
+        return { length: 60, width: 36, height: 19, weight: 25 };
+      case 'l':
+        return { length: 60, width: 36, height: 37, weight: 25 };
+      case 'xl':
+        return { length: 100, width: 60, height: 40, weight: 25 };
+      case 'xxl':
+        return { length: 200, width: 150, height: 150, weight: 25 };
+      default:
+        return { length: 60, width: 36, height: 19, weight: 25 };
+    }
   };
   
   return (
@@ -276,81 +294,13 @@ const BookingForm: React.FC<BookingFormProps> = ({
         </div>
         
         <div className="border rounded-lg p-6">
-          <h3 className="text-lg font-medium mb-4">Ange sändningsdetaljer</h3>
+          {/* Replace the manual parcel input with ShipmentVolume component */}
+          <ShipmentVolume 
+            selectedVolume={selectedVolume}
+            onVolumeSelect={setSelectedVolume}
+          />
           
-          <div className="grid grid-cols-5 gap-4 mb-6">
-            <div className="space-y-2">
-              <Label>Antal</Label>
-              <Input
-                type="number"
-                min="1"
-                value="1"
-                className="text-center"
-                onChange={() => {}}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Vad skickar du</Label>
-              <Select value={packageType} onValueChange={setPackageType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select package type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="package">Paket</SelectItem>
-                  <SelectItem value="document">Dokument</SelectItem>
-                  <SelectItem value="pallet">Pall</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Längd</Label>
-              <Input
-                type="number"
-                min="1"
-                value={dimensions.length.toString()}
-                onChange={(e) => setDimensions({ ...dimensions, length: parseInt(e.target.value) || 0 })}
-                postfix="cm"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Bredd</Label>
-              <Input
-                type="number"
-                min="1"
-                value={dimensions.width.toString()}
-                onChange={(e) => setDimensions({ ...dimensions, width: parseInt(e.target.value) || 0 })}
-                postfix="cm"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Höjd</Label>
-              <Input
-                type="number"
-                min="1"
-                value={dimensions.height.toString()}
-                onChange={(e) => setDimensions({ ...dimensions, height: parseInt(e.target.value) || 0 })}
-                postfix="cm"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Vikt</Label>
-              <Input
-                type="number"
-                min="0.1"
-                step="0.1"
-                value={dimensions.weight.toString()}
-                onChange={(e) => setDimensions({ ...dimensions, weight: parseFloat(e.target.value) || 0 })}
-                postfix="kg"
-              />
-            </div>
-          </div>
-          
-          <div className="flex justify-between gap-4">
+          <div className="flex justify-between gap-4 mt-6">
             <Button
               variant="outline"
               className="flex items-center gap-2"
