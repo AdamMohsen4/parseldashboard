@@ -32,7 +32,8 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
       dimensions: 'max. 3 x 25 x 35 cm, 2 kg',
       deliveryTime: 'Framme inom 5 arbetsdagar',
       price: 5.90,
-      imageSrc: '/lovable-uploads/79302520-d7e5-401c-97a5-f55983f65418.png',
+      imageSrc: '/lovable-uploads/edfe51d6-29ea-4f27-8c28-80d7cbc2ae64.png',
+      badge: 'Levereras till brevlådan'
     },
     {
       id: 's',
@@ -40,7 +41,7 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
       dimensions: 'max. 11 x 32 x 42 cm, 25 kg',
       deliveryTime: 'Framme inom 1–3 arbetsdagar',
       price: 7.90,
-      imageSrc: '/lovable-uploads/79302520-d7e5-401c-97a5-f55983f65418.png',
+      imageSrc: '/lovable-uploads/edfe51d6-29ea-4f27-8c28-80d7cbc2ae64.png',
     },
     {
       id: 'm',
@@ -48,7 +49,7 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
       dimensions: 'max. 19 x 36 x 60 cm, 25 kg',
       deliveryTime: 'Framme inom 1–3 arbetsdagar',
       price: 9.90,
-      imageSrc: '/lovable-uploads/79302520-d7e5-401c-97a5-f55983f65418.png',
+      imageSrc: '/lovable-uploads/edfe51d6-29ea-4f27-8c28-80d7cbc2ae64.png',
     },
     {
       id: 'l',
@@ -56,7 +57,7 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
       dimensions: 'max. 37 x 36 x 60 cm, 25 kg',
       deliveryTime: 'Framme inom 1–3 arbetsdagar',
       price: 11.90,
-      imageSrc: '/lovable-uploads/79302520-d7e5-401c-97a5-f55983f65418.png',
+      imageSrc: '/lovable-uploads/edfe51d6-29ea-4f27-8c28-80d7cbc2ae64.png',
     },
     {
       id: 'xl',
@@ -64,7 +65,7 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
       dimensions: 'max. 100 x 60 x 40 cm, 25 kg',
       deliveryTime: 'Framme inom 1–3 arbetsdagar',
       price: 19.90,
-      imageSrc: '/lovable-uploads/79302520-d7e5-401c-97a5-f55983f65418.png',
+      imageSrc: '/lovable-uploads/edfe51d6-29ea-4f27-8c28-80d7cbc2ae64.png',
     },
     {
       id: 'xxl',
@@ -72,8 +73,7 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
       dimensions: 'Max 200 cm och längd + omkrets max 300 cm, max 25 kg',
       deliveryTime: 'Framme inom 1–3 arbetsdagar',
       price: 39.90,
-      imageSrc: '/lovable-uploads/79302520-d7e5-401c-97a5-f55983f65418.png',
-      badge: 'Levereras till brevlådan'
+      imageSrc: '/lovable-uploads/edfe51d6-29ea-4f27-8c28-80d7cbc2ae64.png',
     },
   ];
 

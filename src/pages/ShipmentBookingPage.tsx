@@ -19,6 +19,7 @@ import LabelLanguageSelector from "@/components/labels/LabelLanguageSelector";
 import { generateLabel } from "@/services/labelService";
 import { getCountryFlag, getCountryName } from "@/lib/utils";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import ShipmentVolume from "@/components/booking/ShipmentVolume";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 
@@ -43,7 +44,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [showBookingConfirmation, setShowBookingConfirmation] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
   const [bookingResult, setBookingResult] = useState<any>(null);
-  const [selectedCustomerType, setSelectedCustomerType] = useState<CustomerType>(customerType || null);
+  const [selectedCustomerType, setSelectedCustomerType] = useState<CustomerType>(customerType || "private");
   const [businessName, setBusinessName] = useState("");
   const [vatNumber, setVatNumber] = useState("");
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
@@ -63,6 +64,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [recipientEmail, setRecipientEmail] = useState("");
   const [recipientPhone, setRecipientPhone] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
+  const [selectedVolume, setSelectedVolume] = useState("m");
   
   useEffect(() => {
     const checkSavedBooking = async () => {
@@ -97,19 +99,16 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     checkSavedBooking();
   }, [isSignedIn, user]);
 
-  const showCustomerTypeSelection = !selectedCustomerType && location.pathname === "/shipment";
-
-  useEffect(() => {
-    if (customerType) {
-      setSelectedCustomerType(customerType);
-    }
-  }, [customerType]);
-
   const getCarrierPrice = () => {
-    switch (selectedCustomerType) {
-      case "business": return 9;
-      case "ecommerce": return 8;
-      default: return 10;
+    // Price based on selected volume
+    switch (selectedVolume) {
+      case 'xxs': return 5.90;
+      case 's': return 7.90;
+      case 'm': return 9.90;
+      case 'l': return 11.90;
+      case 'xl': return 19.90;
+      case 'xxl': return 39.90;
+      default: return 9.90;
     }
   };
 
@@ -121,12 +120,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     icon: "📦"
   };
 
-  const handleCustomerTypeSelect = (type: CustomerType) => {
-    if (type) {
-      navigate(`/shipment/${type}`);
-    }
-  };
-  
   const handleBookNow = async () => {
     if (!isSignedIn || !user) {
       document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click();
@@ -350,68 +343,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       setIsGeneratingLabel(false);
     }
   };
-
-  if (showCustomerTypeSelection) {
-    return (
-      <div className="min-h-screen bg-background">
-        <NavBar />
-
-        <div className="container mx-auto px-4 py-12">
-          <h1 className="text-3xl font-bold text-center mb-8">Select Customer Type</h1>
-          
-          <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card 
-              className="cursor-pointer hover:border-primary transition-colors"
-              onClick={() => handleCustomerTypeSelect("business")}
-            >
-              <CardHeader className="flex flex-col items-center">
-                <Briefcase className="h-12 w-12 text-primary mb-2" />
-                <CardTitle>Business</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-muted-foreground mb-4">
-                  For registered businesses shipping commercial goods
-                </p>
-                <p className="text-sm font-medium text-primary">€9 base rate</p>
-              </CardContent>
-            </Card>
-            
-            <Card 
-              className="cursor-pointer hover:border-primary transition-colors"
-              onClick={() => handleCustomerTypeSelect("private")}
-            >
-              <CardHeader className="flex flex-col items-center">
-                <User className="h-12 w-12 text-primary mb-2" />
-                <CardTitle>Private Customer</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-muted-foreground mb-4">
-                  For individuals shipping personal items
-                </p>
-                <p className="text-sm font-medium text-primary">€10 base rate</p>
-              </CardContent>
-            </Card>
-            
-            <Card 
-              className="cursor-pointer hover:border-primary transition-colors"
-              onClick={() => handleCustomerTypeSelect("ecommerce")}
-            >
-              <CardHeader className="flex flex-col items-center">
-                <ShoppingCart className="h-12 w-12 text-primary mb-2" />
-                <CardTitle>E-commerce Business</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-muted-foreground mb-4">
-                  For online retailers with regular shipments
-                </p>
-                <p className="text-sm font-medium text-primary">€8 base rate</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (bookingConfirmed) {
     return (
@@ -721,14 +652,18 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
             
             {currentStep === 2 && (
               <div>
-                {/* Package details component would go here */}
                 <div className="border rounded-lg">
                   <div className="bg-slate-700 text-white p-3 font-semibold">
                     Ange sändningsdetaljer
                   </div>
                   
                   <div className="p-6">
-                    {/* Package type selection would go here */}
+                    {/* Add ShipmentVolume component here */}
+                    <ShipmentVolume 
+                      selectedVolume={selectedVolume}
+                      onVolumeSelect={setSelectedVolume}
+                    />
+                    
                     <div className="flex justify-between gap-4 mt-6">
                       <Button
                         type="button"
