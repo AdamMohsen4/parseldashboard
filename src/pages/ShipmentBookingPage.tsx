@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -845,3 +846,115 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                         <p>{deliveryPostalCode}</p>
                         <p>{recipientAddress || "Helsinki"}</p>
                         <p>{getCountryName(deliveryCountry)}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between gap-4 mt-6">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handlePreviousStep}
+                    >
+                      Previous
+                    </Button>
+                    
+                    <Button
+                      type="button"
+                      onClick={handleNextStep}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      Continue
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {currentStep === 4 && (
+              <div>
+                <div className="border rounded-lg mb-8">
+                  <div className="bg-slate-700 text-white p-3 font-semibold">
+                    Bekräfta och boka
+                  </div>
+                  
+                  <div className="p-6 space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">Sändningsdetaljer</h3>
+                        <div className="space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Volym</span>
+                            <span className="font-medium">{selectedVolume.toUpperCase()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Leveransdatum</span>
+                            <span className="font-medium">{deliveryDate?.toLocaleDateString() || "Inte valt"}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Pris</span>
+                            <span className="font-medium">€{getCarrierPrice()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Carrier</span>
+                            <span className="font-medium">{carrier.name}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">Villkor</h3>
+                        <div className="space-y-4">
+                          <div className="flex items-start space-x-2">
+                            <Checkbox id="terms" className="mt-1" />
+                            <Label htmlFor="terms" className="text-sm">
+                              Jag accepterar <a href="#" className="text-primary hover:underline">villkoren</a> för denna tjänst.
+                            </Label>
+                          </div>
+                          
+                          <div className="flex items-start space-x-2">
+                            <Checkbox 
+                              id="compliance" 
+                              checked={compliance}
+                              onCheckedChange={(checked) => setCompliance(checked as boolean)}
+                              className="mt-1" 
+                            />
+                            <Label htmlFor="compliance" className="text-sm">
+                              Lägg till compliancekontroll (+€2.50) för att säkerställa att försändelsen uppfyller alla regler.
+                            </Label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="border-t pt-6 mt-6">
+                      <div className="flex justify-between">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handlePreviousStep}
+                        >
+                          Previous
+                        </Button>
+                        
+                        <Button
+                          type="submit"
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          disabled={isBooking || !deliveryDate}
+                        >
+                          {isBooking ? "Booking..." : "Book Now"}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ShipmentBookingPage;
