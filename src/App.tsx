@@ -1,3 +1,4 @@
+
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -64,6 +65,7 @@ const App = () => (
                   <ShipmentBookingPage />
                 </AuthWrapper>
               } />
+              {/* Commented out customer type specific routes
               <Route path="/shipment/business" element={
                 <AuthWrapper requireAuth>
                   <ShipmentBookingPage customerType="business" />
@@ -79,6 +81,7 @@ const App = () => (
                   <ShipmentBookingPage customerType="ecommerce" />
                 </AuthWrapper>
               } />
+              */}
               <Route path="/3pl" element={
                 <AuthWrapper requireAuth>
                   <ThreePLServicePage />

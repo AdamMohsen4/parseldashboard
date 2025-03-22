@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/AuthWrapper";
@@ -68,14 +67,13 @@ const NavBar = () => {
             path: "/shipment", 
             label: t('nav.shipment', 'Ship Package'), 
             icon: Package,
+            /* Commented out customer type sub-items
             subItems: [
-          
               { path: "/shipment/business", label: t('nav.shipment.business', 'Business'), icon: Briefcase},
               { path: "/shipment/private", label: t('nav.shipment.private', 'Private Customer'), icon: User, },
               { path: "/shipment/ecommerce", label: t('nav.shipment.ecommerce', 'E-commerce Business'), icon: ShoppingCart },
-            
-            
             ]
+            */
           },
          
           { path: "/tracking", label: t('nav.tracking'), icon: Truck},
@@ -100,9 +98,6 @@ const NavBar = () => {
             ]
           }
         ],
-
-        
-        
       },
       {
         name: t('nav.categories.workspace', 'Workspace'),

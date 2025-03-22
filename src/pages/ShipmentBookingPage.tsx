@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,13 +19,14 @@ import { generateLabel } from "@/services/labelService";
 import { getCountryFlag, getCountryName } from "@/lib/utils";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
-type CustomerType = "business" | "private" | "ecommerce" | null;
+// Comment out the customer type
+// type CustomerType = "business" | "private" | "ecommerce" | null;
 
 interface ShipmentBookingPageProps {
-  customerType?: CustomerType;
+  // customerType?: CustomerType;
 }
 
-const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
+const ShipmentBookingPage = (/* { customerType } */: ShipmentBookingPageProps) => {
   const { isSignedIn, user } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
@@ -43,9 +43,10 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [showBookingConfirmation, setShowBookingConfirmation] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
   const [bookingResult, setBookingResult] = useState<any>(null);
-  const [selectedCustomerType, setSelectedCustomerType] = useState<CustomerType>(customerType || null);
-  const [businessName, setBusinessName] = useState("");
-  const [vatNumber, setVatNumber] = useState("");
+  // Comment out customer type related state
+  // const [selectedCustomerType, setSelectedCustomerType] = useState<CustomerType>(customerType || null);
+  // const [businessName, setBusinessName] = useState("");
+  // const [vatNumber, setVatNumber] = useState("");
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [canCancelBooking, setCanCancelBooking] = useState(false);
   const [labelLanguage, setLabelLanguage] = useState("en");
@@ -97,35 +98,35 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     checkSavedBooking();
   }, [isSignedIn, user]);
 
-  const showCustomerTypeSelection = !selectedCustomerType && location.pathname === "/shipment";
+  // Comment out customer type selection check
+  // const showCustomerTypeSelection = !selectedCustomerType && location.pathname === "/shipment";
 
+  // Comment out useEffect for customer type
+  /*
   useEffect(() => {
     if (customerType) {
       setSelectedCustomerType(customerType);
     }
   }, [customerType]);
+  */
 
-  const getCarrierPrice = () => {
-    switch (selectedCustomerType) {
-      case "business": return 9;
-      case "ecommerce": return 8;
-      default: return 10;
-    }
-  };
-
+  // Fixed carrier price (no customer type differentiation)
   const carrier = {
     id: 1,
     name: "E-Parcel Nordic",
-    price: getCarrierPrice(),
+    price: 10,
     eta: "3 days",
     icon: "📦"
   };
 
+  // Comment out customer type selection handling
+  /*
   const handleCustomerTypeSelect = (type: CustomerType) => {
     if (type) {
       navigate(`/shipment/${type}`);
     }
   };
+  */
   
   const handleBookNow = async () => {
     if (!isSignedIn || !user) {
@@ -161,9 +162,9 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         deliverySpeed,
         includeCompliance: compliance,
         userId: user.id,
-        customerType: selectedCustomerType || "private",
-        businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
-        vatNumber: selectedCustomerType === "business" ? vatNumber : undefined,
+        customerType: "standard", // Use a default customer type
+        // businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
+        // vatNumber: selectedCustomerType === "business" ? vatNumber : undefined,
         pickupSlotId: "slot-1" // Default slot
       });
       
@@ -246,8 +247,8 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     setPickupCountry(deliveryCountry);
     
     setDelivery(tempPickup);
-    setDeliveryPostalCode(tempPickupPostal);
-    setDeliveryCountry(tempPickupCountry);
+    setDeliveryPostalCode(tempDeliveryPostal);
+    setDeliveryCountry(tempDeliveryCountry);
   };
 
   const handleNextStep = () => {
@@ -351,6 +352,8 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     }
   };
 
+  // Remove customer type selection UI section
+  /*
   if (showCustomerTypeSelection) {
     return (
       <div className="min-h-screen bg-background">
@@ -412,6 +415,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       </div>
     );
   }
+  */
 
   if (bookingConfirmed) {
     return (
@@ -865,73 +869,3 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                 
                 <div className="bg-slate-50 p-6 rounded-lg border mb-8">
                   <h3 className="text-lg font-medium mb-4">Sammanfattning</h3>
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="bg-slate-200 p-3 rounded-md">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-slate-700">
-                        <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M12 12L20 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M12 12V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M12 12L4 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-2 flex-1">
-                      <div>
-                        <p className="font-medium">Från</p>
-                        <p>{senderName}</p>
-                        <p>{pickupPostalCode}</p>
-                        <p>{senderAddress || "Stockholm"}</p>
-                        <p>{getCountryName(pickupCountry)}</p>
-                      </div>
-                      
-                      <div>
-                        <p className="font-medium">Till</p>
-                        <p>{recipientName}</p>
-                        <p>{deliveryPostalCode}</p>
-                        <p>{recipientAddress || "Helsinki"}</p>
-                        <p>{getCountryName(deliveryCountry)}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex justify-between gap-4">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={handlePreviousStep}
-                  >
-                    Previous
-                  </Button>
-                  
-                  <Button
-                    type="submit"
-                    disabled={isBooking}
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    {isBooking ? (
-                      <span className="flex items-center gap-2">
-                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Bearbetar...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        Bekräfta bokning
-                      </span>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ShipmentBookingPage;

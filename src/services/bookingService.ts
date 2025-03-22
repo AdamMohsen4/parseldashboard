@@ -1,3 +1,4 @@
+
 import { toast } from "@/components/ui/use-toast";
 import { generateLabel } from "./labelService";
 import { schedulePickup } from "./pickupService";
@@ -112,6 +113,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       };
     }
     
+    // Use a fixed price, no longer based on customer type
     const totalPrice = calculateTotalPrice(request.carrier.price, request.includeCompliance);
     const estimatedDelivery = calculateEstimatedDelivery(request.deliverySpeed);
     
