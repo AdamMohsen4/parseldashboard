@@ -9,7 +9,7 @@ import AuthWrapper from "./components/auth/AuthWrapper";
 import Index from "./pages/Index";
 import BookingPage from "./pages/BookingPage";
 import NotFound from "./pages/NotFound";
-import PriceCalendar from "./pages/PriceCalendar";
+// import PriceCalendar from "./pages/PriceCalendar";
 
 // Lazy load less frequently used pages
 const ShipmentBookingPage = lazy(() => import("./pages/ShipmentBookingPage"));
@@ -52,11 +52,11 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/book" element={<BookingPage />} />
-              <Route path="/price-calendar" element={
+              {/* <Route path="/price-calendar" element={
                 <AuthWrapper requireAuth>
                   <PriceCalendar />
                 </AuthWrapper>
-              } />
+              } /> */}
               
               {/* Protected routes */}
               <Route path="/shipment" element={
