@@ -20,14 +20,13 @@ import { generateLabel } from "@/services/labelService";
 import { getCountryFlag, getCountryName } from "@/lib/utils";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
-// Comment out the customer type
-// type CustomerType = "business" | "private" | "ecommerce" | null;
+type CustomerType = "business" | "private" | "ecommerce" | null;
 
 interface ShipmentBookingPageProps {
-  // customerType?: CustomerType;
+  customerType?: CustomerType;
 }
 
-const ShipmentBookingPage = (/* { customerType } */: ShipmentBookingPageProps) => {
+const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const { isSignedIn, user } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
@@ -44,10 +43,9 @@ const ShipmentBookingPage = (/* { customerType } */: ShipmentBookingPageProps) =
   const [showBookingConfirmation, setShowBookingConfirmation] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
   const [bookingResult, setBookingResult] = useState<any>(null);
-  // Comment out customer type related state
-  // const [selectedCustomerType, setSelectedCustomerType] = useState<CustomerType>(customerType || null);
-  // const [businessName, setBusinessName] = useState("");
-  // const [vatNumber, setVatNumber] = useState("");
+  const [selectedCustomerType, setSelectedCustomerType] = useState<CustomerType>(customerType || null);
+  const [businessName, setBusinessName] = useState("");
+  const [vatNumber, setVatNumber] = useState("");
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [canCancelBooking, setCanCancelBooking] = useState(false);
   const [labelLanguage, setLabelLanguage] = useState("en");
@@ -99,35 +97,35 @@ const ShipmentBookingPage = (/* { customerType } */: ShipmentBookingPageProps) =
     checkSavedBooking();
   }, [isSignedIn, user]);
 
-  // Comment out customer type selection check
-  // const showCustomerTypeSelection = !selectedCustomerType && location.pathname === "/shipment";
+  const showCustomerTypeSelection = !selectedCustomerType && location.pathname === "/shipment";
 
-  // Comment out useEffect for customer type
-  /*
   useEffect(() => {
     if (customerType) {
       setSelectedCustomerType(customerType);
     }
   }, [customerType]);
-  */
 
-  // Fixed carrier price (no customer type differentiation)
+  const getCarrierPrice = () => {
+    switch (selectedCustomerType) {
+      case "business": return 9;
+      case "ecommerce": return 8;
+      default: return 10;
+    }
+  };
+
   const carrier = {
     id: 1,
     name: "E-Parcel Nordic",
-    price: 10,
+    price: getCarrierPrice(),
     eta: "3 days",
     icon: "📦"
   };
 
-  // Comment out customer type selection handling
-  /*
   const handleCustomerTypeSelect = (type: CustomerType) => {
     if (type) {
       navigate(`/shipment/${type}`);
     }
   };
-  */
   
   const handleBookNow = async () => {
     if (!isSignedIn || !user) {
@@ -163,9 +161,9 @@ const ShipmentBookingPage = (/* { customerType } */: ShipmentBookingPageProps) =
         deliverySpeed,
         includeCompliance: compliance,
         userId: user.id,
-        customerType: "standard", // Use a default customer type
-        // businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
-        // vatNumber: selectedCustomerType === "business" ? vatNumber : undefined,
+        customerType: selectedCustomerType || "private",
+        businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
+        vatNumber: selectedCustomerType === "business" ? vatNumber : undefined,
         pickupSlotId: "slot-1" // Default slot
       });
       
@@ -353,8 +351,6 @@ const ShipmentBookingPage = (/* { customerType } */: ShipmentBookingPageProps) =
     }
   };
 
-  // Remove customer type selection UI section
-  /*
   if (showCustomerTypeSelection) {
     return (
       <div className="min-h-screen bg-background">
@@ -416,7 +412,6 @@ const ShipmentBookingPage = (/* { customerType } */: ShipmentBookingPageProps) =
       </div>
     );
   }
-  */
 
   if (bookingConfirmed) {
     return (
@@ -870,226 +865,65 @@ const ShipmentBookingPage = (/* { customerType } */: ShipmentBookingPageProps) =
                 
                 <div className="bg-slate-50 p-6 rounded-lg border mb-8">
                   <h3 className="text-lg font-medium mb-4">Sammanfattning</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="font-medium text-sm mb-2 text-slate-500">Från</h4>
-                      <div className="bg-white p-3 rounded border">
-                        <p className="font-medium">{senderName}</p>
-                        <p>{senderAddress}</p>
-                        <p>{pickupPostalCode}, Stockholm</p>
-                        <p>{getCountryName(pickupCountry)}</p>
-                      </div>
+                  
+                  <div className="flex items-start gap-4">
+                    <div className="bg-slate-200 p-3 rounded-md">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-slate-700">
+                        <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 12L20 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 12V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 12L4 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
                     </div>
                     
-                    <div>
-                      <h4 className="font-medium text-sm mb-2 text-slate-500">Till</h4>
-                      <div className="bg-white p-3 rounded border">
-                        <p className="font-medium">{recipientName}</p>
-                        <p>{recipientAddress}</p>
-                        <p>{deliveryPostalCode}, Helsinki</p>
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-2 flex-1">
+                      <div>
+                        <p className="font-medium">Från</p>
+                        <p>{senderName}</p>
+                        <p>{pickupPostalCode}</p>
+                        <p>{senderAddress || "Stockholm"}</p>
+                        <p>{getCountryName(pickupCountry)}</p>
+                      </div>
+                      
+                      <div>
+                        <p className="font-medium">Till</p>
+                        <p>{recipientName}</p>
+                        <p>{deliveryPostalCode}</p>
+                        <p>{recipientAddress || "Helsinki"}</p>
                         <p>{getCountryName(deliveryCountry)}</p>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="flex justify-between gap-4 mt-6">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handlePreviousStep}
-                    >
-                      Previous
-                    </Button>
-                    
-                    <Button
-                      type="button"
-                      onClick={handleNextStep}
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      Continue
-                    </Button>
-                  </div>
                 </div>
-              </div>
-            )}
-            
-            {currentStep === 4 && (
-              <div>
-                <div className="border rounded-lg mb-8">
-                  <div className="bg-slate-700 text-white p-3 font-semibold">
-                    Slutför bokning
-                  </div>
+                
+                <div className="flex justify-between gap-4">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handlePreviousStep}
+                  >
+                    Previous
+                  </Button>
                   
-                  <div className="p-6">
-                    <div className="mb-8">
-                      <h3 className="text-lg font-medium mb-4">Packetets detaljer</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="packageType">Pakettyp</Label>
-                            <select
-                              id="packageType"
-                              className="w-full h-10 px-3 rounded-md border border-input bg-background"
-                              value={packageType}
-                              onChange={(e) => setPackageType(e.target.value)}
-                            >
-                              <option value="package">Paket</option>
-                              <option value="document">Dokument</option>
-                              <option value="pallet">Pall</option>
-                            </select>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label htmlFor="weight">Vikt (kg)</Label>
-                            <Input
-                              id="weight"
-                              type="number"
-                              min="0"
-                              step="0.1"
-                              placeholder="Vikt i kg"
-                              value={weight}
-                              onChange={(e) => setWeight(e.target.value)}
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label>Dimensioner (cm)</Label>
-                            <div className="grid grid-cols-3 gap-2">
-                              <div>
-                                <Label htmlFor="length" className="text-xs">Längd</Label>
-                                <Input
-                                  id="length"
-                                  type="number"
-                                  min="0"
-                                  value={length}
-                                  onChange={(e) => setLength(e.target.value)}
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="width" className="text-xs">Bredd</Label>
-                                <Input
-                                  id="width"
-                                  type="number"
-                                  min="0"
-                                  value={width}
-                                  onChange={(e) => setWidth(e.target.value)}
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="height" className="text-xs">Höjd</Label>
-                                <Input
-                                  id="height"
-                                  type="number"
-                                  min="0"
-                                  value={height}
-                                  onChange={(e) => setHeight(e.target.value)}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label htmlFor="quantity">Antal</Label>
-                            <Input
-                              id="quantity"
-                              type="number"
-                              min="1"
-                              value={quantity}
-                              onChange={(e) => setQuantity(e.target.value)}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="mb-8">
-                      <h3 className="text-lg font-medium mb-4">Leverans och Service</h3>
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label>Leveranstid</Label>
-                          <RadioGroup
-                            value={deliverySpeed}
-                            onValueChange={setDeliverySpeed}
-                            className="flex flex-col space-y-1"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="economy" id="economy" />
-                              <Label htmlFor="economy" className="font-normal">Ekonomi (4-5 arbetsdagar) - €8</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="standard" id="standard" />
-                              <Label htmlFor="standard" className="font-normal">Standard (2-3 arbetsdagar) - €10</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="express" id="express" />
-                              <Label htmlFor="express" className="font-normal">Express (1-2 arbetsdagar) - €15</Label>
-                            </div>
-                          </RadioGroup>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2 pt-2">
-                          <Checkbox
-                            id="compliance"
-                            checked={compliance}
-                            onCheckedChange={(checked) => setCompliance(checked as boolean)}
-                          />
-                          <Label htmlFor="compliance" className="font-normal text-sm">
-                            Lägg till efterlevnadstjänst (+€2) - Hjälper dig med tullrelaterade dokument
-                          </Label>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-slate-50 p-4 rounded-lg border">
-                      <h3 className="font-medium mb-3">Sammanfattning av kostnad</h3>
-                      <div className="space-y-2 mb-4">
-                        <div className="flex justify-between">
-                          <span>Grundavgift ({carrier.name})</span>
-                          <span>€{carrier.price}</span>
-                        </div>
-                        {deliverySpeed === "express" && (
-                          <div className="flex justify-between">
-                            <span>Expressleverans</span>
-                            <span>+€5</span>
-                          </div>
-                        )}
-                        {compliance && (
-                          <div className="flex justify-between">
-                            <span>Efterlevnadstjänst</span>
-                            <span>+€2</span>
-                          </div>
-                        )}
-                        <div className="flex justify-between font-medium pt-2 border-t">
-                          <span>Totalt</span>
-                          <span>€{
-                            carrier.price +
-                            (deliverySpeed === "express" ? 5 : 0) +
-                            (compliance ? 2 : 0)
-                          }</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between gap-4 mt-6">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handlePreviousStep}
-                      >
-                        Previous
-                      </Button>
-                      
-                      <Button
-                        type="submit"
-                        disabled={isBooking}
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        {isBooking ? "Processing..." : "Book Shipment"}
-                      </Button>
-                    </div>
-                  </div>
+                  <Button
+                    type="submit"
+                    disabled={isBooking}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    {isBooking ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Bearbetar...
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        Bekräfta bokning
+                      </span>
+                    )}
+                  </Button>
                 </div>
               </div>
             )}

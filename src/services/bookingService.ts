@@ -1,4 +1,3 @@
-
 import { toast } from "@/components/ui/use-toast";
 import { generateLabel } from "./labelService";
 import { schedulePickup } from "./pickupService";
@@ -72,8 +71,8 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       shipmentId,
       carrierName: request.carrier.name,
       trackingCode,
-      senderAddress: `${request.pickup.name}, ${request.pickup.address}, ${request.pickup.postalCode}, ${request.pickup.city}, ${request.pickup.country}`,
-      recipientAddress: `${request.delivery.name}, ${request.delivery.address}, ${request.delivery.postalCode}, ${request.delivery.city}, ${request.delivery.country}`,
+      senderAddress: request.pickup,
+      recipientAddress: request.delivery,
       packageDetails: {
         weight: request.weight,
         dimensions: `${request.dimensions.length}x${request.dimensions.width}x${request.dimensions.height} cm`
@@ -96,7 +95,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const pickupResult = await schedulePickup({
       shipmentId,
       carrierName: request.carrier.name,
-      pickupAddress: `${request.pickup.name}, ${request.pickup.address}, ${request.pickup.postalCode}, ${request.pickup.city}, ${request.pickup.country}`,
+      pickupAddress: request.pickup,
       slotId: request.pickupSlotId
     });
     
@@ -113,7 +112,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       };
     }
     
-    // Use a fixed price, no longer based on customer type
     const totalPrice = calculateTotalPrice(request.carrier.price, request.includeCompliance);
     const estimatedDelivery = calculateEstimatedDelivery(request.deliverySpeed);
     
@@ -142,8 +140,8 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
           carrier: request.carrier,
           weight: request.weight,
           dimensions: request.dimensions,
-          pickup: JSON.stringify(request.pickup),
-          delivery: JSON.stringify(request.delivery),
+          pickup: request.pickup,
+          delivery: request.delivery,
           deliverySpeed: request.deliverySpeed,
           includeCompliance: request.includeCompliance,
           labelUrl: labelResult.labelUrl,

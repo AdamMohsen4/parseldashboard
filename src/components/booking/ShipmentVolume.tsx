@@ -1,6 +1,6 @@
 
 import React from 'react';
-import Card from '../common/Card';
+import { Card } from '../common/Card';
 import { useTranslation } from 'react-i18next';
 import Image from '../common/Image';
 

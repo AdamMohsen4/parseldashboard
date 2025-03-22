@@ -65,7 +65,6 @@ const App = () => (
                   <ShipmentBookingPage />
                 </AuthWrapper>
               } />
-              {/* Commented out customer type specific routes
               <Route path="/shipment/business" element={
                 <AuthWrapper requireAuth>
                   <ShipmentBookingPage customerType="business" />
@@ -81,7 +80,6 @@ const App = () => (
                   <ShipmentBookingPage customerType="ecommerce" />
                 </AuthWrapper>
               } />
-              */}
               <Route path="/3pl" element={
                 <AuthWrapper requireAuth>
                   <ThreePLServicePage />
