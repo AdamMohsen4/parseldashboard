@@ -1,6 +1,7 @@
+
 import { BookingRequest, BookingResponse } from '@/types/booking';
 import { calculateEstimatedDelivery, calculateTotalPrice, generateShipmentId, generateTrackingCode } from './bookingUtils';
-import { supabase } from './supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 export const getBookingByTrackingCode = async (trackingCode: string, userId: string): Promise<any> => {
   if (!supabase) {
