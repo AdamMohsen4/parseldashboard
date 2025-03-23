@@ -340,10 +340,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                   onSwapLocations={handleSwapLocations}
                 />
                 
-                <DeliveryOptions
-                  selectedVolume={selectedVolume}
-                  setSelectedVolume={setSelectedVolume}
-                />
+               
                 
                 <div className="flex justify-end">
                   <Button 
@@ -359,6 +356,14 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
             
             {currentStep === 2 && (
               <div>
+
+                <DeliveryOptions
+                  selectedVolume={selectedVolume}
+                  setSelectedVolume={setSelectedVolume}
+                />
+            
+
+                
                 <AddressDetails
                   senderName={senderName}
                   setSenderName={setSenderName}
