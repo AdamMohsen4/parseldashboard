@@ -33,6 +33,14 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     // Calculate total price
     const totalPrice = calculateTotalPrice(request.carrier.price, request.includeCompliance);
     
+    // Apply discount for pooled deliveries
+    if (request.poolingEnabled && request.deliveryDate) {
+      // 15% discount for pooled deliveries
+      const discountRate = 0.15;
+      const discount = totalPrice * discountRate;
+      totalPrice -= discount;
+    }
+    
     // Simulate generation of a label URL
     const labelUrl = `https://api.shipping.com/labels/${trackingCode}`;
     
@@ -50,6 +58,12 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     } else {
       estimatedDelivery.setDate(estimatedDelivery.getDate() + 5);
     }
+    
+    // If there's a specific delivery date selected, use that instead
+    if (request.poolingEnabled && request.deliveryDate) {
+      estimatedDelivery = new Date(request.deliveryDate);
+    }
+    
     const estimatedDeliveryStr = estimatedDelivery.toISOString();
    
     // Set cancellation deadline (24h from now)
@@ -76,7 +90,9 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       shipment_id: shipmentId,
       customerType: request.customerType || 'private',
       businessName: request.businessName,
-      vatNumber: request.vatNumber
+      vatNumber: request.vatNumber,
+      pooling_enabled: request.poolingEnabled || false,
+      delivery_date: request.deliveryDate
     };
     
     // Save booking (in memory for this demo)

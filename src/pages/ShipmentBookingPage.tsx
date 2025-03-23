@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,15 +12,19 @@ import { useUser } from "@clerk/clerk-react";
 import { bookShipment, cancelBooking } from "@/services/bookingService";
 import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Briefcase, Download, Package, ShoppingCart, Truck, User } from "lucide-react";
+import { Briefcase, Calendar, Download, Package, ShoppingCart, Truck, User } from "lucide-react";
 import { getBookingByTrackingCode } from "@/services/bookingDb";
 import LabelLanguageSelector from "@/components/labels/LabelLanguageSelector";
 import { generateLabel } from "@/services/labelService";
 import { getCountryFlag, getCountryName } from "@/lib/utils";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import ShipmentVolume from "@/components/booking/ShipmentVolume";
+import PriceCalendarView from "@/components/pricing/PriceCalendarView";
+import { DateRange, PricingDay, generateMockPricingData } from "@/utils/pricingUtils";
+import { addDays, format, isAfter, isBefore, startOfMonth } from "date-fns";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
+type DeliveryOption = "fast" | "cheap" | null;
 
 interface ShipmentBookingPageProps {
   customerType?: CustomerType;
@@ -66,6 +69,20 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [recipientAddress, setRecipientAddress] = useState("");
   const [selectedVolume, setSelectedVolume] = useState("m");
   
+  // New state for delivery options and calendar
+  const [deliveryOption, setDeliveryOption] = useState<DeliveryOption>(null);
+  const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<Date | null>(null);
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [pricingData, setPricingData] = useState<PricingDay[]>([]);
+  const [isCalendarLoading, setIsCalendarLoading] = useState(false);
+
+  // Define date range for the calendar (next 30 days)
+  const today = new Date();
+  const dateRange: DateRange = {
+    start: today,
+    end: addDays(today, 30)
+  };
+  
   useEffect(() => {
     const checkSavedBooking = async () => {
       if (isSignedIn && user) {
@@ -99,6 +116,19 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     checkSavedBooking();
   }, [isSignedIn, user]);
 
+  // Load pricing data when delivery option changes or current month changes
+  useEffect(() => {
+    if (deliveryOption === 'cheap') {
+      setIsCalendarLoading(true);
+      // Generate mock pricing data
+      setTimeout(() => {
+        const data = generateMockPricingData(currentMonth, dateRange);
+        setPricingData(data);
+        setIsCalendarLoading(false);
+      }, 800);
+    }
+  }, [deliveryOption, currentMonth]);
+
   const getCarrierPrice = () => {
     // Price based on selected volume
     switch (selectedVolume) {
@@ -123,6 +153,16 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const handleBookNow = async () => {
     if (!isSignedIn || !user) {
       document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click();
+      return;
+    }
+
+    // Validate delivery date when cheap delivery is selected
+    if (deliveryOption === 'cheap' && !selectedDeliveryDate) {
+      toast({
+        title: "Select Delivery Date",
+        description: "Please select a delivery date from the calendar",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -157,7 +197,9 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         customerType: selectedCustomerType || "private",
         businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
         vatNumber: selectedCustomerType === "business" ? vatNumber : undefined,
-        pickupSlotId: "slot-1" // Default slot
+        pickupSlotId: "slot-1", // Default slot
+        poolingEnabled: deliveryOption === 'cheap',
+        deliveryDate: selectedDeliveryDate ? selectedDeliveryDate.toISOString() : undefined
       });
       
       if (result.success) {
@@ -344,6 +386,28 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     }
   };
 
+  const isValidDeliveryDate = (date: Date): boolean => {
+    // Make sure the date is after today and within the date range
+    return isAfter(date, today) && isBefore(date, dateRange.end);
+  };
+
+  const handleDeliveryDateSelect = (date: Date) => {
+    if (isValidDeliveryDate(date)) {
+      setSelectedDeliveryDate(date);
+    }
+  };
+
+  // Check if a date is a low-cost delivery date
+  const isLowCostDeliveryDate = (date: Date): boolean => {
+    const dayPricing = pricingData.find(d => 
+      d.date.getDate() === date.getDate() && 
+      d.date.getMonth() === date.getMonth() && 
+      d.date.getFullYear() === date.getFullYear()
+    );
+    
+    return dayPricing?.loadFactor === 'low';
+  };
+
   if (bookingConfirmed) {
     return (
       <div className="min-h-screen bg-background">
@@ -376,6 +440,21 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     <p className="text-sm font-medium text-gray-500">Estimated Delivery</p>
                     <p className="text-lg font-medium">{carrier.eta}</p>
                   </div>
+                  {bookingResult?.poolingEnabled && bookingResult?.deliveryDate && (
+                    <div className="space-y-2 col-span-2">
+                      <p className="text-sm font-medium text-gray-500">Scheduled Delivery Date</p>
+                      <p className="text-lg font-medium">{new Date(bookingResult.deliveryDate).toLocaleDateString()}</p>
+                      <p className="text-sm text-green-600">
+                        <span className="inline-flex items-center">
+                          <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M16 10L12 14L8 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          Low-cost shipping date selected
+                        </span>
+                      </p>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="mt-6 border-t border-green-200 pt-6">
@@ -637,236 +716,61 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     </div>
                   </ResizablePanel>
                 </ResizablePanelGroup>
-                
-                <div className="flex justify-end">
-                  <Button 
-                    type="button" 
-                    onClick={handleNextStep}
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    Continue
-                  </Button>
-                </div>
-              </div>
-            )}
-            
-            {currentStep === 2 && (
-              <div>
-                <div className="border rounded-lg">
+
+                {/* Delivery options */}
+                <div className="border rounded-lg mb-8">
                   <div className="bg-slate-700 text-white p-3 font-semibold">
-                    Ange sändningsdetaljer
+                    Leverans Alternativ
                   </div>
                   
                   <div className="p-6">
-                    {/* Add ShipmentVolume component here */}
-                    <ShipmentVolume 
-                      selectedVolume={selectedVolume}
-                      onVolumeSelect={setSelectedVolume}
-                    />
-                    
-                    <div className="flex justify-between gap-4 mt-6">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handlePreviousStep}
-                      >
-                        Previous
-                      </Button>
-                      
-                      <Button
-                        type="button"
-                        onClick={handleNextStep}
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        Continue
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {currentStep === 3 && (
-              <div>
-                <div className="border rounded-lg mb-8">
-                  <div className="bg-slate-700 text-white p-3 font-semibold">
-                    Avsändare
-                  </div>
-                  
-                  <div className="p-6 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="senderName">Namn</Label>
-                        <Input
-                          id="senderName"
-                          placeholder="Avsändarens namn"
-                          value={senderName}
-                          onChange={(e) => setSenderName(e.target.value)}
-                          required
-                        />
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div 
+                          className={`border rounded-md p-4 cursor-pointer transition-all ${deliveryOption === 'fast' ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'hover:border-primary/50'}`}
+                          onClick={() => setDeliveryOption('fast')}
+                        >
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${deliveryOption === 'fast' ? 'border-primary' : 'border-gray-300'}`}>
+                              {deliveryOption === 'fast' && <div className="w-3 h-3 rounded-full bg-primary"></div>}
+                            </div>
+                            <h3 className="font-medium text-lg">Fast Delivery</h3>
+                          </div>
+                          <div className="pl-8">
+                            <p className="text-sm text-gray-600">Standard leveranstid, leverans inom 3-5 arbetsdagar.</p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Truck className="h-4 w-4 text-primary" />
+                              <span className="text-sm font-semibold">Snabb och pålitlig</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div 
+                          className={`border rounded-md p-4 cursor-pointer transition-all ${deliveryOption === 'cheap' ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'hover:border-primary/50'}`}
+                          onClick={() => setDeliveryOption('cheap')}
+                        >
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${deliveryOption === 'cheap' ? 'border-primary' : 'border-gray-300'}`}>
+                              {deliveryOption === 'cheap' && <div className="w-3 h-3 rounded-full bg-primary"></div>}
+                            </div>
+                            <h3 className="font-medium text-lg">Cheap Delivery</h3>
+                          </div>
+                          <div className="pl-8">
+                            <p className="text-sm text-gray-600">Miljövänlig och billigare leverans. Välj ett datum som passar dig.</p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Calendar className="h-4 w-4 text-green-600" />
+                              <span className="text-sm font-semibold text-green-600">Spara pengar och miljön</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       
-                      <div className="space-y-2">
-                        <Label htmlFor="senderPhone">Telefon</Label>
-                        <Input
-                          id="senderPhone"
-                          placeholder="Telefonnummer"
-                          value={senderPhone}
-                          onChange={(e) => setSenderPhone(e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="senderEmail">E-post</Label>
-                      <Input
-                        id="senderEmail"
-                        type="email"
-                        placeholder="E-postadress"
-                        value={senderEmail}
-                        onChange={(e) => setSenderEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="senderAddress">Adress</Label>
-                      <Input
-                        id="senderAddress"
-                        placeholder="Gatunamn, husnummer"
-                        value={senderAddress}
-                        onChange={(e) => setSenderAddress(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="border rounded-lg mb-8">
-                  <div className="bg-slate-700 text-white p-3 font-semibold">
-                    Mottagare
-                  </div>
-                  
-                  <div className="p-6 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="recipientName">Namn</Label>
-                        <Input
-                          id="recipientName"
-                          placeholder="Mottagarens namn"
-                          value={recipientName}
-                          onChange={(e) => setRecipientName(e.target.value)}
-                          required
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="recipientPhone">Telefon</Label>
-                        <Input
-                          id="recipientPhone"
-                          placeholder="Telefonnummer"
-                          value={recipientPhone}
-                          onChange={(e) => setRecipientPhone(e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="recipientEmail">E-post</Label>
-                      <Input
-                        id="recipientEmail"
-                        type="email"
-                        placeholder="E-postadress"
-                        value={recipientEmail}
-                        onChange={(e) => setRecipientEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="recipientAddress">Adress</Label>
-                      <Input
-                        id="recipientAddress"
-                        placeholder="Gatunamn, husnummer"
-                        value={recipientAddress}
-                        onChange={(e) => setRecipientAddress(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-slate-50 p-6 rounded-lg border mb-8">
-                  <h3 className="text-lg font-medium mb-4">Sammanfattning</h3>
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="bg-slate-200 p-3 rounded-md">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-slate-700">
-                        <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M12 12L20 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M12 12V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M12 12L4 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-2 flex-1">
-                      <div>
-                        <p className="font-medium">Från</p>
-                        <p>{senderName}</p>
-                        <p>{pickupPostalCode}</p>
-                        <p>{senderAddress || "Stockholm"}</p>
-                        <p>{getCountryName(pickupCountry)}</p>
-                      </div>
-                      
-                      <div>
-                        <p className="font-medium">Till</p>
-                        <p>{recipientName}</p>
-                        <p>{deliveryPostalCode}</p>
-                        <p>{recipientAddress || "Helsinki"}</p>
-                        <p>{getCountryName(deliveryCountry)}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex justify-between gap-4">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={handlePreviousStep}
-                  >
-                    Previous
-                  </Button>
-                  
-                  <Button
-                    type="submit"
-                    disabled={isBooking}
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    {isBooking ? (
-                      <span className="flex items-center gap-2">
-                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Bearbetar...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        Bekräfta bokning
-                      </span>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ShipmentBookingPage;
+                      {deliveryOption === 'cheap' && (
+                        <div className="mt-4">
+                          <div className="border-t pt-4">
+                            <h3 className="font-medium mb-3">Välj ett leveransdatum (gröna dagar är billigare)</h3>
+                            <div className="bg-white rounded-lg border p-1">
+                              <PriceCalendarView
+                                currentMonth={currentMonth}
+                                setCurrentMonth={setCurrentMonth}
+                                pricingData={pricing
