@@ -353,17 +353,39 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                 </div>
               </div>
             )}
-            
-            {currentStep === 2 && (
-              <div>
 
-                <DeliveryOptions
+          {currentStep === 2 && (
+              <div>
+                   <DeliveryOptions
                   selectedVolume={selectedVolume}
                   setSelectedVolume={setSelectedVolume}
                 />
-            
 
-                
+                <div className="flex justify-between gap-4 mt-6">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handlePreviousStep}
+                  >
+                    Previous
+                  </Button>
+                  
+                  <Button 
+                    type="button" 
+                    onClick={handleNextStep}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    Continue
+                  </Button>
+                </div>
+              </div>
+          )}
+            
+        
+            
+          {currentStep === 3 && (
+              <div>
+       
                 <AddressDetails
                   senderName={senderName}
                   setSenderName={setSenderName}
