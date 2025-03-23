@@ -53,9 +53,9 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/compliance" className="text-muted-foreground hover:text-primary transition-colors">
+                {/* <Link to="/compliance" className="text-muted-foreground hover:text-primary transition-colors">
                   Compliance Tools
-                </Link>
+                </Link> */}
               </li>
             </ul>
           </div>
@@ -74,11 +74,11 @@ const Footer: React.FC = () => {
                   Help Center
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
                   API Documentation
                 </a>
-              </li>
+              </li> */}
               <li>
                 <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
                   Carrier Information

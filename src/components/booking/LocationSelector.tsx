@@ -182,7 +182,11 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           </div>
         </div>
       </ResizablePanel>
+
+      
     </ResizablePanelGroup>
+    
+
   );
 };
 

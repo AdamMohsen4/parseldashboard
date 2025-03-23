@@ -68,14 +68,14 @@ const NavBar = () => {
             path: "/shipment", 
             label: t('nav.shipment', 'Ship Package'), 
             icon: Package,
-            subItems: [
+            // subItems: [
           
-              { path: "/shipment/business", label: t('nav.shipment.business', 'Business'), icon: Briefcase},
-              { path: "/shipment/private", label: t('nav.shipment.private', 'Private Customer'), icon: User, },
-              { path: "/shipment/ecommerce", label: t('nav.shipment.ecommerce', 'E-commerce Business'), icon: ShoppingCart },
+            //   { path: "/shipment/business", label: t('nav.shipment.business', 'Business'), icon: Briefcase},
+            //   { path: "/shipment/private", label: t('nav.shipment.private', 'Private Customer'), icon: User, },
+            //   { path: "/shipment/ecommerce", label: t('nav.shipment.ecommerce', 'E-commerce Business'), icon: ShoppingCart },
             
             
-            ]
+            // ]
           },
          
           { path: "/tracking", label: t('nav.tracking'), icon: Truck},
