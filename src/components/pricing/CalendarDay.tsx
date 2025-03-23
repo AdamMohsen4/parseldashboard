@@ -1,67 +1,66 @@
 
 import React from "react";
-import { PricingDay, DateRange } from "@/utils/pricingUtils";
-import { isSameMonth, isWithinInterval } from "date-fns";
+import { isSameMonth, isWithinInterval, format } from "date-fns";
+import { PricingDay, DateRange, getPricingForDay, formatPrice } from "@/utils/pricingUtils";
 
 interface CalendarDayProps {
   date: Date;
   currentMonth: Date;
   pricingData: PricingDay[];
   dateRange: DateRange;
-  isSelected?: boolean;
 }
 
-const CalendarDay: React.FC<CalendarDayProps> = ({
-  date,
-  currentMonth,
+const CalendarDay: React.FC<CalendarDayProps> = ({ 
+  date, 
+  currentMonth, 
   pricingData,
-  dateRange,
-  isSelected = false
+  dateRange 
 }) => {
-  // Check if the date is in the current month
-  const isCurrentMonth = isSameMonth(date, currentMonth);
+  const pricing = getPricingForDay(pricingData, date);
+  const isInDateRange = isWithinInterval(date, dateRange);
   
-  // Check if the date is within the valid date range
-  const isInRange = isWithinInterval(date, {
-    start: dateRange.start,
-    end: dateRange.end
-  });
+  // Base classes
+  let dayClasses = "h-10 w-full p-0 font-normal flex flex-col items-center justify-center rounded hover:bg-gray-50 relative";
   
-  // Find pricing data for this date
-  const dayPricing = pricingData.find(d => 
-    d.date.getDate() === date.getDate() && 
-    d.date.getMonth() === date.getMonth() && 
-    d.date.getFullYear() === date.getFullYear()
-  );
-  
-  // Determine the color based on the load factor
-  let bgColor = "bg-white";
-  let textColor = isCurrentMonth ? "text-gray-700" : "text-gray-400";
-  let priceIndicator = null;
-  
-  if (isInRange && dayPricing) {
-    if (dayPricing.loadFactor === 'low') {
-      bgColor = "bg-green-100";
-      priceIndicator = <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-green-500 rounded-full"></div>;
-    } else if (dayPricing.loadFactor === 'medium') {
-      bgColor = "bg-yellow-50";
-      priceIndicator = <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-yellow-500 rounded-full"></div>;
-    } else if (dayPricing.loadFactor === 'high') {
-      bgColor = "bg-red-50";
-      priceIndicator = <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-red-500 rounded-full"></div>;
+  // For days in current month
+  if (isSameMonth(date, currentMonth)) {
+    if (isInDateRange && pricing) {
+      // Add color based on load factor
+      const colorClasses = {
+        low: "bg-green-50 hover:bg-green-100 border-green-200 text-green-800",
+        medium: "bg-yellow-50 hover:bg-yellow-100 border-yellow-200 text-yellow-800",
+        high: "bg-red-50 hover:bg-red-100 border-red-200 text-red-800"
+      };
+      
+      if (pricing.basePrice > 0) {
+        dayClasses += ` ${colorClasses[pricing.loadFactor]} border-b-2`;
+      } else {
+        dayClasses += " text-gray-400";
+      }
+    } else {
+      dayClasses += " text-gray-400";
     }
+  } else {
+    // For days outside current month
+    dayClasses += " text-gray-300 opacity-50";
   }
   
-  // If selected, change colors
-  if (isSelected) {
-    bgColor = "bg-primary";
-    textColor = "text-white";
-  }
+  // Adjust label size if we have a date
+  const dateLabelClass = pricing && pricing.basePrice > 0 ? "text-xs font-normal" : "text-sm";
   
   return (
-    <div className={`relative flex items-center justify-center w-full h-full rounded-md ${bgColor}`}>
-      <span className={`text-sm font-medium ${textColor}`}>{date.getDate()}</span>
-      {priceIndicator}
+    <div className={dayClasses}>
+      <span className={dateLabelClass}>{format(date, 'd')}</span>
+      {isInDateRange && pricing && pricing.basePrice > 0 && (
+        <span className="text-[11px] font-medium">
+          {formatPrice(pricing.basePrice)}
+        </span>
+      )}
+      {isInDateRange && pricing && pricing.basePrice > 0 && pricing.loadFactor === 'low' && (
+        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
+          <div className="w-5 h-0.5 border-b border-dashed border-green-500"></div>
+        </div>
+      )}
     </div>
   );
 };
