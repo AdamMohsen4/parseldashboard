@@ -2,6 +2,7 @@
 import { generateShipmentId, generateTrackingCode, calculateTotalPrice } from './bookingUtils';
 import { BookingRequest, BookingResponse, AddressDetails } from '@/types/booking';
 import { toast } from 'sonner';
+import { saveBookingToSupabase } from './bookingDb';
 
 // Store bookings in memory (in a real app this would be a database call)
 const bookings: Record<string, any> = {};
@@ -32,6 +33,24 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     // Calculate total price
     const totalPrice = calculateTotalPrice(request.carrier.price, request.includeCompliance);
     
+    // Simulate generation of a label URL
+    const labelUrl = `https://api.shipping.com/labels/${trackingCode}`;
+    
+    // Set pickup time (current time + 2 hours)
+    const pickupTime = new Date();
+    pickupTime.setHours(pickupTime.getHours() + 2);
+    const pickupTimeStr = pickupTime.toISOString();
+    
+    // Set estimated delivery date (depends on delivery speed)
+    const estimatedDelivery = new Date();
+    if (request.deliverySpeed === 'express') {
+      estimatedDelivery.setDate(estimatedDelivery.getDate() + 1);
+    } else if (request.deliverySpeed === 'standard') {
+      estimatedDelivery.setDate(estimatedDelivery.getDate() + 3);
+    } else {
+      estimatedDelivery.setDate(estimatedDelivery.getDate() + 5);
+    }
+    const estimatedDeliveryStr = estimatedDelivery.toISOString();
    
     // Set cancellation deadline (24h from now)
     const cancellationDeadline = new Date();
@@ -63,21 +82,29 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     // Save booking (in memory for this demo)
     bookings[trackingCode] = booking;
     
-    // In a real app, this would be a database call
-    try {
-      console.log('Saving booking data to "database":', booking);
-      // await saveBookingToDatabase(booking);
-      
-      // For demonstration purposes, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Store booking in localStorage (for demo purposes)
-      const userBookings = JSON.parse(localStorage.getItem(`bookings_${request.userId}`) || '[]');
-      userBookings.push(booking);
-      localStorage.setItem(`bookings_${request.userId}`, JSON.stringify(userBookings));
-    } catch (error) {
-      console.error('Error saving booking:', error);
+    // Add additional call to save to Supabase
+    const savedToSupabase = await saveBookingToSupabase(
+      request,
+      trackingCode,
+      labelUrl,
+      pickupTimeStr,
+      totalPrice,
+      estimatedDeliveryStr,
+      cancellationDeadline
+    );
+    
+    if (!savedToSupabase) {
+      console.error('Failed to save booking to Supabase');
+      // We'll still continue with the flow, but log the error
     }
+    
+    // For demonstration purposes, simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Store booking in localStorage (for demo purposes)
+    const userBookings = JSON.parse(localStorage.getItem(`bookings_${request.userId}`) || '[]');
+    userBookings.push(booking);
+    localStorage.setItem(`bookings_${request.userId}`, JSON.stringify(userBookings));
     
     // Return success response
     return {
