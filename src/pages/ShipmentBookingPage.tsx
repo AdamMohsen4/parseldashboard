@@ -10,7 +10,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
-import { bookShipment, cancelBooking } from "@/services/bookingService";
+ import { bookShipment, cancelBooking } from "@/services/bookingService";
 import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Briefcase, Download, Package, ShoppingCart, Truck, User } from "lucide-react";
@@ -22,6 +22,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/componen
 import ShipmentVolume from "@/components/booking/ShipmentVolume";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
+type DeliveryOption = "fast" | "cheap" | null;
 
 interface ShipmentBookingPageProps {
   customerType?: CustomerType;
