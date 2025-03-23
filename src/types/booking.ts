@@ -41,8 +41,6 @@ export interface BookingRequest {
   businessName?: string;
   vatNumber?: string;
   pickupSlotId: string;
-  poolingEnabled?: boolean;
-  deliveryDate?: string;
 }
 
 export interface ApiKey {

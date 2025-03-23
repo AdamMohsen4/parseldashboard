@@ -31,15 +31,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const trackingCode = generateTrackingCode();
     
     // Calculate total price
-    let totalPrice = calculateTotalPrice(request.carrier.price, request.includeCompliance);
-    
-    // Apply discount for pooled deliveries
-    if (request.poolingEnabled && request.deliveryDate) {
-      // 15% discount for pooled deliveries
-      const discountRate = 0.15;
-      const discount = totalPrice * discountRate;
-      totalPrice -= discount;
-    }
+    const totalPrice = calculateTotalPrice(request.carrier.price, request.includeCompliance);
     
     // Simulate generation of a label URL
     const labelUrl = `https://api.shipping.com/labels/${trackingCode}`;
@@ -50,7 +42,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const pickupTimeStr = pickupTime.toISOString();
     
     // Set estimated delivery date (depends on delivery speed)
-    let estimatedDelivery = new Date();
+    const estimatedDelivery = new Date();
     if (request.deliverySpeed === 'express') {
       estimatedDelivery.setDate(estimatedDelivery.getDate() + 1);
     } else if (request.deliverySpeed === 'standard') {
@@ -58,12 +50,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     } else {
       estimatedDelivery.setDate(estimatedDelivery.getDate() + 5);
     }
-    
-    // If there's a specific delivery date selected, use that instead
-    if (request.poolingEnabled && request.deliveryDate) {
-      estimatedDelivery = new Date(request.deliveryDate);
-    }
-    
     const estimatedDeliveryStr = estimatedDelivery.toISOString();
    
     // Set cancellation deadline (24h from now)
@@ -90,9 +76,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       shipment_id: shipmentId,
       customerType: request.customerType || 'private',
       businessName: request.businessName,
-      vatNumber: request.vatNumber,
-      pooling_enabled: request.poolingEnabled || false,
-      delivery_date: request.deliveryDate
+      vatNumber: request.vatNumber
     };
     
     // Save booking (in memory for this demo)
