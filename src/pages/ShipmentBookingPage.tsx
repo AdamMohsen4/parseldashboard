@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +5,7 @@ import { toast } from "sonner";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
- import { bookShipment, cancelBooking } from "@/services/bookingService";
+import { bookShipment, cancelBooking } from "@/services/bookingService";
 import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Briefcase, Download, Package, ShoppingCart, Truck, User } from "lucide-react";
@@ -19,6 +18,7 @@ import DeliveryOptions from "@/components/booking/DeliveryOptions";
 import AddressDetails from "@/components/booking/AddressDetails";
 import { AddressDetails as AddressDetailsType } from "@/types/booking";
 import BookingSummary from "@/components/booking/BookingSummary";
+import PaymentForm from "@/components/booking/PaymentForm";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 type DeliveryOption = "fast" | "cheap" | null;
@@ -97,7 +97,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   }, [isSignedIn, user]);
 
   const getCarrierPrice = () => {
-    // Price based on selected volume
     switch (selectedVolume) {
       case 'xxs': return 5.90;
       case 's': return 7.90;
@@ -118,6 +117,11 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   };
 
   const handleBookNow = async () => {
+    if (currentStep < 4) {
+      handleNextStep();
+      return;
+    }
+
     if (!isSignedIn || !user) {
       document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click();
       return;
@@ -232,7 +236,12 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleBookNow();
+    
+    if (currentStep < 4) {
+      handleNextStep();
+    } else {
+      handleBookNow();
+    }
   };
 
   const handleGenerateLabel = async () => {
@@ -340,8 +349,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                   onSwapLocations={handleSwapLocations}
                 />
                 
-               
-                
                 <div className="flex justify-end">
                   <Button 
                     type="button" 
@@ -354,9 +361,9 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
               </div>
             )}
 
-          {currentStep === 2 && (
+            {currentStep === 2 && (
               <div>
-                   <DeliveryOptions
+                <DeliveryOptions
                   selectedVolume={selectedVolume}
                   setSelectedVolume={setSelectedVolume}
                 />
@@ -379,13 +386,10 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                   </Button>
                 </div>
               </div>
-          )}
+            )}
             
-        
-            
-          {currentStep === 3 && (
+            {currentStep === 3 && (
               <div>
-       
                 <AddressDetails
                   senderName={senderName}
                   setSenderName={setSenderName}
@@ -430,25 +434,23 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                   </Button>
                   
                   <Button
-                    type="submit"
-                    disabled={isBooking}
+                    type="button"
+                    onClick={handleNextStep}
                     className="bg-green-600 hover:bg-green-700 text-white"
                   >
-                    {isBooking ? (
-                      <span className="flex items-center gap-2">
-                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Bearbetar...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        Bekräfta bokning
-                      </span>
-                    )}
+                    Continue to Payment
                   </Button>
                 </div>
+              </div>
+            )}
+
+            {currentStep === 4 && (
+              <div>
+                <PaymentForm 
+                  totalPrice={getCarrierPrice()}
+                  onPaymentComplete={handleBookNow}
+                  onCancel={handlePreviousStep}
+                />
               </div>
             )}
           </form>
@@ -459,3 +461,4 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 };
 
 export default ShipmentBookingPage;
+

@@ -22,22 +22,22 @@ const BookingSteps: React.FC<BookingStepsProps> = ({ currentStep }) => {
         <span className={`text-sm ${currentStep >= 2 ? 'font-medium' : 'text-muted-foreground'}`}>Package Details</span>
 
         <div className="flex-1 flex items-center gap-4">
-        <div className="flex-1 h-px bg-border"></div>
-        
-        <div className={`flex h-8 w-8 items-center justify-center rounded-full ${currentStep >= 3? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-          <span className="text-xs font-bold">3</span>
+          <div className="flex-1 h-px bg-border"></div>
+          
+          <div className={`flex h-8 w-8 items-center justify-center rounded-full ${currentStep >= 3? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+            <span className="text-xs font-bold">3</span>
+          </div>
+          <span className={`text-sm ${currentStep >= 3 ? 'font-medium' : 'text-muted-foreground'}`}>Address</span>
         </div>
-        <span className={`text-sm ${currentStep >= 3 ? 'font-medium' : 'text-muted-foreground'}`}>Address</span>
-      </div>
 
-      <div className="flex-1 flex items-center gap-4">
-        <div className="flex-1 h-px bg-border"></div>
-        
-        <div className={`flex h-8 w-8 items-center justify-center rounded-full ${currentStep >= 4? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-          <span className="text-xs font-bold">4</span>
+        <div className="flex-1 flex items-center gap-4">
+          <div className="flex-1 h-px bg-border"></div>
+          
+          <div className={`flex h-8 w-8 items-center justify-center rounded-full ${currentStep >= 4? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+            <span className="text-xs font-bold">4</span>
+          </div>
+          <span className={`text-sm ${currentStep >= 4 ? 'font-medium' : 'text-muted-foreground'}`}>Payment</span>
         </div>
-        <span className={`text-sm ${currentStep >= 4 ? 'font-medium' : 'text-muted-foreground'}`}>Payment</span>
-      </div>
       </div>
     </div>
   );

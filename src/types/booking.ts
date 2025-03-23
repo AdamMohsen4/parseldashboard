@@ -43,6 +43,13 @@ export interface BookingRequest {
   pickupSlotId: string;
   poolingEnabled?: boolean;
   deliveryDate?: string;
+  paymentMethod?: 'card' | 'invoice';
+  paymentDetails?: {
+    cardNumber?: string;
+    expiryDate?: string;
+    cardholderName?: string;
+    invoiceEmail?: string;
+  };
 }
 
 export interface ApiKey {
