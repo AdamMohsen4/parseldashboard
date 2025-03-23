@@ -20,6 +20,8 @@ interface PriceCalendarViewProps {
   pricingData: PricingDay[];
   isLoading: boolean;
   dateRange: DateRange;
+  selectedDate?: Date | null;
+  onSelectDate?: (date: Date) => void;
 }
 
 const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
@@ -27,9 +29,17 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
   setCurrentMonth,
   pricingData,
   isLoading,
-  dateRange
+  dateRange,
+  selectedDate,
+  onSelectDate
 }) => {
   const { t } = useTranslation();
+
+  const handleDayClick = (day: Date) => {
+    if (onSelectDate) {
+      onSelectDate(day);
+    }
+  };
 
   return (
     <Card className="h-full bg-white border border-gray-100 shadow-sm">
@@ -61,6 +71,8 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
               onMonthChange={setCurrentMonth}
               className="mx-auto rounded-md border-0 w-full max-w-[90%] pointer-events-auto flex flex-col items-center"
               showOutsideDays
+              onDayClick={handleDayClick}
+              selected={selectedDate || undefined}
               components={{
                 Day: ({ date, ...props }) => (
                   <div {...props}>
@@ -70,6 +82,11 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
                         currentMonth={currentMonth}
                         pricingData={pricingData}
                         dateRange={dateRange}
+                        isSelected={selectedDate ? 
+                          date.getDate() === selectedDate.getDate() && 
+                          date.getMonth() === selectedDate.getMonth() && 
+                          date.getFullYear() === selectedDate.getFullYear() 
+                          : false}
                       />
                     )}
                   </div>
