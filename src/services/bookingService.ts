@@ -31,7 +31,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const trackingCode = generateTrackingCode();
     
     // Calculate total price
-    const totalPrice = calculateTotalPrice(request.carrier.price, request.includeCompliance);
+    let totalPrice = calculateTotalPrice(request.carrier.price, request.includeCompliance);
     
     // Apply discount for pooled deliveries
     if (request.poolingEnabled && request.deliveryDate) {
@@ -50,7 +50,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const pickupTimeStr = pickupTime.toISOString();
     
     // Set estimated delivery date (depends on delivery speed)
-    const estimatedDelivery = new Date();
+    let estimatedDelivery = new Date();
     if (request.deliverySpeed === 'express') {
       estimatedDelivery.setDate(estimatedDelivery.getDate() + 1);
     } else if (request.deliverySpeed === 'standard') {
