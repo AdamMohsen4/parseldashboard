@@ -16,28 +16,28 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-10", className)} // Increased padding
+      className={cn("p-4", className)} 
       classNames={{
-        months: "flex flex-col sm:flex-row space-y-12 sm:space-x-12 sm:space-y-0", // Increased spacing
-        month: "space-y-14", // Increased spacing
-        caption: "flex justify-center pt-8 relative items-center", // Increased padding
-        caption_label: "text-2xl font-bold", // Increased font size
-        nav: "space-x-5 flex items-center", // Increased spacing
+        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0", 
+        month: "space-y-4", 
+        caption: "flex justify-center pt-1 relative items-center", 
+        caption_label: "text-sm font-medium", 
+        nav: "space-x-1 flex items-center", 
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
-          "h-14 w-14 bg-transparent p-0 opacity-50 hover:opacity-100" // Increased button size
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100" 
         ),
-        nav_button_previous: "absolute left-5", // Adjusted position
-        nav_button_next: "absolute right-5", // Adjusted position
-        table: "w-full border-collapse space-y-5", // Increased spacing
+        nav_button_previous: "absolute left-1", 
+        nav_button_next: "absolute right-1", 
+        table: "w-full border-collapse space-y-1", 
         head_row: "flex",
         head_cell:
-          "text-muted-foreground rounded-md w-16 font-medium text-xl", // Increased font size and cell width
-        row: "flex w-full mt-6", // Increased spacing
-        cell: "h-16 w-16 text-center text-2xl p-0 relative", // Increased cell size and font size
+          "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]", 
+        row: "flex w-full mt-0.5", 
+        cell: "h-9 w-9 text-center text-sm p-0 relative", 
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-16 w-16 p-0 font-bold aria-selected:opacity-100" // Increased day size and font weight
+          "h-9 w-9 p-0 font-normal aria-selected:opacity-100" 
         ),
         day_range_end: "day-range-end",
         day_selected:
@@ -52,8 +52,8 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ..._props }) => <ChevronLeft className="h-10 w-10" />, // Increased icon size
-        IconRight: ({ ..._props }) => <ChevronRight className="h-10 w-10" />, // Increased icon size
+        IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />, 
+        IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />, 
       }}
       {...props}
     />
