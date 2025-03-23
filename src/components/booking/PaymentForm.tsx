@@ -4,14 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   CreditCard, 
   CheckCircle2, 
   AlertCircle, 
   Calendar, 
   LockKeyhole,
-  ChevronsUpDown
+  Smartphone,
+  Building2,
+  ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -26,16 +29,24 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   onPaymentComplete,
   onCancel
 }) => {
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'invoice'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'swish' | 'ebanking' | 'card'>('swish');
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
   const [cardholderName, setCardholderName] = useState('');
+  const [swishNumber, setSwishNumber] = useState('');
+  const [bankName, setBankName] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!termsAccepted) {
+      toast.error('You must accept the terms and conditions to continue');
+      return;
+    }
+
     // Simple validation
     if (paymentMethod === 'card') {
       if (!cardNumber || !expiryDate || !cvv || !cardholderName) {
@@ -58,6 +69,22 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       // Basic CVV validation (3-4 digits)
       if (!/^\d{3,4}$/.test(cvv)) {
         toast.error('Please enter a valid CVV code');
+        return;
+      }
+    } else if (paymentMethod === 'swish') {
+      if (!swishNumber) {
+        toast.error('Please enter your Swish number');
+        return;
+      }
+      
+      // Basic Swish number validation (10 digits)
+      if (!/^\d{10}$/.test(swishNumber.replace(/\s/g, ''))) {
+        toast.error('Please enter a valid Swish number (10 digits)');
+        return;
+      }
+    } else if (paymentMethod === 'ebanking') {
+      if (!bankName) {
+        toast.error('Please select your bank');
         return;
       }
     }
@@ -108,27 +135,104 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       </div>
       
       <div className="p-6">
-        <Tabs defaultValue="card" onValueChange={(v) => setPaymentMethod(v as 'card' | 'invoice')}>
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="card" className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4" />
-              <span>Kreditkort</span>
-            </TabsTrigger>
-            <TabsTrigger value="invoice" className="flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 5L2 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M19 5V19C19 19.5304 18.7893 20.0391 18.4142 20.4142C18.0391 20.7893 17.5304 21 17 21H7C6.46957 21 5.96086 20.7893 5.58579 20.4142C5.21071 20.0391 5 19.5304 5 19V5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M9 5V3C9 2.46957 9.21071 1.96086 9.58579 1.58579C9.96086 1.21071 10.4696 1 11 1H13C13.5304 1 14.0391 1.21071 14.4142 1.58579C14.7893 1.96086 15 2.46957 15 3V5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M10 12L14 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span>Faktura</span>
-            </TabsTrigger>
-          </TabsList>
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-4">Payment methods</h2>
           
-          <TabsContent value="card">
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <RadioGroup 
+              defaultValue="swish" 
+              value={paymentMethod}
+              onValueChange={(value) => setPaymentMethod(value as 'swish' | 'ebanking' | 'card')}
+              className="gap-3"
+            >
+              <div className={`flex items-center space-x-2 border p-4 rounded-md ${paymentMethod === 'swish' ? 'border-primary' : 'border-gray-200'}`}>
+                <RadioGroupItem value="swish" id="swish" />
+                <Label htmlFor="swish" className="flex items-center gap-2 cursor-pointer flex-1">
+                  <Smartphone className="h-5 w-5 text-blue-600" />
+                  <span>Swish</span>
+                </Label>
+              </div>
+              
+              <div className={`flex items-center space-x-2 border p-4 rounded-md ${paymentMethod === 'ebanking' ? 'border-primary' : 'border-gray-200'}`}>
+                <RadioGroupItem value="ebanking" id="ebanking" />
+                <Label htmlFor="ebanking" className="flex items-center gap-2 cursor-pointer flex-1">
+                  <Building2 className="h-5 w-5 text-blue-600" />
+                  <span>eBanking</span>
+                </Label>
+              </div>
+              
+              <div className={`flex items-center space-x-2 border p-4 rounded-md ${paymentMethod === 'card' ? 'border-primary' : 'border-gray-200'}`}>
+                <RadioGroupItem value="card" id="card" />
+                <Label htmlFor="card" className="flex items-center gap-2 cursor-pointer flex-1">
+                  <CreditCard className="h-5 w-5 text-blue-600" />
+                  <span>Card payment</span>
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+          
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {paymentMethod === 'swish' && (
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="cardNumber">Kortnummer</Label>
+                <Label htmlFor="swishNumber">Swish Number</Label>
+                <div className="relative">
+                  <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+                  <Input
+                    id="swishNumber"
+                    type="tel"
+                    value={swishNumber}
+                    onChange={(e) => setSwishNumber(e.target.value.replace(/\D/g, ''))}
+                    placeholder="07X XXX XX XX"
+                    className="pl-10"
+                    maxLength={10}
+                  />
+                </div>
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-md flex items-start gap-3 text-sm text-blue-700">
+                <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium">Swish Information</p>
+                  <p>You will receive a Swish payment request to your mobile phone. Accept the payment in your Swish app to complete the transaction.</p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {paymentMethod === 'ebanking' && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="bankSelection">Select Your Bank</Label>
+                <RadioGroup 
+                  value={bankName}
+                  onValueChange={setBankName}
+                  className="grid grid-cols-2 gap-3"
+                >
+                  {['Nordea', 'SEB', 'Handelsbanken', 'Swedbank', 'Danske Bank', 'Länsförsäkringar'].map((bank) => (
+                    <div key={bank} className={`flex items-center space-x-2 border p-3 rounded-md ${bankName === bank ? 'border-primary' : 'border-gray-200'}`}>
+                      <RadioGroupItem value={bank} id={`bank-${bank}`} />
+                      <Label htmlFor={`bank-${bank}`} className="cursor-pointer">{bank}</Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-md flex items-start gap-3 text-sm text-blue-700">
+                <ExternalLink className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium">Bank Information</p>
+                  <p>You will be redirected to your bank's website to complete the payment.</p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {paymentMethod === 'card' && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="cardNumber">Card Number</Label>
                 <div className="relative">
                   <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
                   <Input
@@ -144,7 +248,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="expiryDate">Utgångsdatum</Label>
+                  <Label htmlFor="expiryDate">Expiry Date</Label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
                     <Input
@@ -175,7 +279,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="cardholderName">Kortinnehavarens namn</Label>
+                <Label htmlFor="cardholderName">Cardholder Name</Label>
                 <Input
                   id="cardholderName"
                   value={cardholderName}
@@ -187,122 +291,67 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               <div className="bg-blue-50 p-4 rounded-md flex items-start gap-3 text-sm text-blue-700">
                 <LockKeyhole className="h-5 w-5 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium">Säker betalning</p>
-                  <p>All betalningsinformation är krypterad och säker.</p>
+                  <p className="font-medium">Secure Payment</p>
+                  <p>All payment information is encrypted and secure.</p>
                 </div>
-              </div>
-              
-              <div className="flex justify-between gap-4 mt-6">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={onCancel}
-                >
-                  Previous
-                </Button>
-                
-                <Button 
-                  type="submit"
-                  disabled={isProcessing}
-                  className="bg-green-600 hover:bg-green-700 text-white min-w-[150px]"
-                >
-                  {isProcessing ? (
-                    <div className="flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      Pay {totalPrice.toFixed(2)}€
-                    </div>
-                  )}
-                </Button>
-              </div>
-            </form>
-          </TabsContent>
-          
-          <TabsContent value="invoice">
-            <div className="space-y-4">
-              <div className="bg-amber-50 p-4 rounded-md flex items-start gap-3 text-sm text-amber-700">
-                <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Faktura information</p>
-                  <p>En faktura kommer att skickas till din e-postadress inom 24 timmar efter leverans.</p>
-                </div>
-              </div>
-              
-              <div className="mt-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">E-post för faktura</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="john@example.com"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Telefonnummer</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="+46 123 456 789"
-                    />
-                  </div>
-                </div>
-
-                <div className="bg-green-50 p-4 rounded-md flex items-start gap-3 text-sm text-green-700">
-                  <CheckCircle2 className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium">14 dagars betalningstid</p>
-                    <p>Du har 14 dagar på dig att betala fakturan från det datum du tar emot den.</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex justify-between gap-4 mt-6">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={onCancel}
-                >
-                  Previous
-                </Button>
-                
-                <Button 
-                  onClick={handleSubmit}
-                  disabled={isProcessing}
-                  className="bg-green-600 hover:bg-green-700 text-white min-w-[150px]"
-                >
-                  {isProcessing ? (
-                    <div className="flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21 5L2 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M19 5V19C19 19.5304 18.7893 20.0391 18.4142 20.4142C18.0391 20.7893 17.5304 21 17 21H7C6.46957 21 5.96086 20.7893 5.58579 20.4142C5.21071 20.0391 5 19.5304 5 19V5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M9 5V3C9 2.46957 9.21071 1.96086 9.58579 1.58579C9.96086 1.21071 10.4696 1 11 1H13C13.5304 1 14.0391 1.21071 14.4142 1.58579C14.7893 1.96086 15 2.46957 15 3V5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M10 12L14 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      Pay with Invoice
-                    </div>
-                  )}
-                </Button>
               </div>
             </div>
-          </TabsContent>
-        </Tabs>
+          )}
+          
+          <div className="mt-6 flex items-start gap-2">
+            <Checkbox 
+              id="terms" 
+              checked={termsAccepted}
+              onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+            />
+            <div className="grid gap-1.5 leading-none">
+              <Label
+                htmlFor="terms"
+                className="text-sm text-muted-foreground"
+              >
+                I accept the {' '}
+                <a href="#" className="text-blue-600 hover:underline">terms and conditions</a> and I have read the {' '}
+                <a href="#" className="text-blue-600 hover:underline">privacy statement</a>
+              </Label>
+            </div>
+          </div>
+          
+          <div className="mt-4 space-y-2 text-sm text-gray-600">
+            <ul className="list-disc ml-5 space-y-1">
+              <li>Domestic parcel services</li>
+              <li>Letter services and international parcels</li>
+              <li>General delivery conditions</li>
+            </ul>
+          </div>
+          
+          <div className="flex justify-between gap-4 mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onCancel}
+            >
+              Previous
+            </Button>
+            
+            <Button 
+              type="submit"
+              disabled={isProcessing}
+              className="bg-orange-500 hover:bg-orange-600 text-white min-w-[150px]"
+            >
+              {isProcessing ? (
+                <div className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </div>
+              ) : (
+                `Pay (${totalPrice.toFixed(2)}€)`
+              )}
+            </Button>
+          </div>
+        </form>
       </div>
     </Card>
   );
