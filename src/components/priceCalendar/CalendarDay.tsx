@@ -46,7 +46,7 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
         high: "bg-red-50 hover:bg-red-100 border-red-200 text-red-800"
       };
       
-      if (pricing.basePrice > 0) {
+      if (pricing.basePrice > 0 && pricing.loadFactor == "low") {
         dayClasses += ` ${colorClasses[pricing.loadFactor]} border-b-2 cursor-pointer`;
       } else {
         dayClasses += " text-gray-400";
@@ -60,7 +60,7 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
   }
   
   // Add selected state
-  if (isSelected) {
+  if (isSelected && pricing.loadFactor == "low") {
     dayClasses += " ring-2 ring-green-600 ring-offset-1";
   }
   
@@ -72,12 +72,12 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
       <span className={dateLabelClass}>{format(date, 'd')}</span>
       {isInDateRange && pricing && pricing.basePrice > 0 && (
         <span className="text-[11px] font-medium">
-          {formatPrice(pricing.basePrice)}
+         {/* {formatPrice(pricing.basePrice)} */}
         </span>
       )}
       {isInDateRange && pricing && pricing.basePrice > 0 && pricing.loadFactor === 'low' && (
         <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-          <div className="w-5 h-0.5 border-b border-dashed border-green-500"></div>
+        
         </div>
       )}
     </div>

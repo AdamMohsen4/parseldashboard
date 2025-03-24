@@ -39,7 +39,7 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
     <Card className="h-full bg-white border border-gray-100 shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="flex items-center space-x-2">
-          <h4 className="text-sm font-medium">Price Calendar</h4>
+          <h4 className="text-sm font-medium"></h4>
         </div>
         <TooltipProvider>
           <Tooltip>

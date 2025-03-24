@@ -78,7 +78,7 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
           <div 
             key={pkg.id}
             className={`
-              relative rounded-lg overflow-hidden cursor-pointer transition-all duration-200
+              relative rounded-lg overflow-hidden cursor-pointer 
               ${selectedVolume === pkg.id 
                 ? 'border-2 border-primary shadow-md' 
                 : 'border border-gray-200 hover:border-gray-300 hover:shadow-sm'}
@@ -145,7 +145,7 @@ const ShipmentVolume: React.FC<ShipmentVolumeProps> = ({
           </div>
         </div>
         
-        <button className="mt-4 border border-blue-500 text-blue-500 hover:bg-orange-50 rounded-full py-2 px-6 transition-colors">
+        <button className="mt-4 border border-blue-500 text-blue-500 hover:bg-blue-50 rounded-full py-2 px-6 transition-colors">
           Visa lämpliga storlekar
         </button>
       </div>
