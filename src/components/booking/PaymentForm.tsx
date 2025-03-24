@@ -39,9 +39,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   
-  // The merchant Swish number that will receive the payment
-  const merchantSwishNumber = "+46735765336";
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -94,27 +91,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     
     setIsProcessing(true);
     
-    if (paymentMethod === 'swish') {
-      // Simulate Swish payment to the specified merchant
-      toast.info(`Initiating Swish payment to ${merchantSwishNumber}`);
-      
-      // In a real implementation, this would be a request to your backend
-      // which would then use the Swish API to create a payment request
-      
-      // For demo purposes, we'll just simulate a delay
-      setTimeout(() => {
-        setIsProcessing(false);
-        toast.success(`Payment of ${totalPrice.toFixed(2)}€ successfully sent to E-Parcel via Swish`);
-        onPaymentComplete();
-      }, 2000);
-    } else {
-      // Simulate other payment processing
-      setTimeout(() => {
-        setIsProcessing(false);
-        toast.success('Payment processed successfully!');
-        onPaymentComplete();
-      }, 2000);
-    }
+    // Simulate payment processing
+    setTimeout(() => {
+      setIsProcessing(false);
+      toast.success('Payment processed successfully!');
+      onPaymentComplete();
+    }, 2000);
   };
   
   // Format card number with spaces every 4 digits
@@ -194,7 +176,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           {paymentMethod === 'swish' && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="swishNumber">Your Swish Number</Label>
+                <Label htmlFor="swishNumber">Swish Number</Label>
                 <div className="relative">
                   <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
                   <Input
@@ -214,7 +196,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 <div>
                   <p className="font-medium">Swish Information</p>
                   <p>You will receive a Swish payment request to your mobile phone. Accept the payment in your Swish app to complete the transaction.</p>
-                  <p className="mt-2">Payment will be sent to: <strong>{merchantSwishNumber}</strong> (E-Parcel Nordic)</p>
                 </div>
               </div>
             </div>
