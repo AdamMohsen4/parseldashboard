@@ -195,10 +195,10 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
                       <p className="text-sm text-muted-foreground">Created At</p>
                       <p>{formatDate(selectedShipment.created_at)}</p>
                     </div>
-                    <div>
+                    {/* <div>
                       <p className="text-sm text-muted-foreground">Carrier</p>
                       <p>{selectedShipment.carrier_name || "E-Parsel Nordic"}</p>
-                    </div>
+                    </div> */}
                     <div>
                       <p className="text-sm text-muted-foreground">Customer Type</p>
                       <p className="capitalize">{selectedShipment.customer_type || "Private"}</p>
