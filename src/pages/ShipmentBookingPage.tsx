@@ -354,7 +354,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 
   const handleDeliveryDateSelect = (date: Date) => {
     setSelectedDeliveryDate(date);
-    toast.success(`Delivery date selected: ${date.toLocaleDateString()}`);
+    // toast.success(`Pickup date selected: ${date.toLocaleDateString()}`);
   };
 
   if (bookingConfirmed) {

@@ -3,6 +3,7 @@ import React from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Info } from "lucide-react";
+import { CalendarPrice} from "@/components/ui/calendarPrice";
 import { Button } from "@/components/ui/button";
 import { PricingDay, DateRange } from "@/utils/pricingUtils";
 import { useTranslation } from "react-i18next";
@@ -49,7 +50,7 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
               </Button>
             </TooltipTrigger>
             <TooltipContent className="max-w-xs">
-              <p>{t('shipping.priceCalendarInfo', 'Shipping rates vary based on demand. Green indicates lower prices, yellow for medium, and red for premium rates.')}</p>
+              <p>{t('shipping.priceCalendarInfo', 'Shipping rates vary based on demand.')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -61,7 +62,7 @@ const PriceCalendarView: React.FC<PriceCalendarViewProps> = ({
           </div>
         ) : (
           <div className="flex justify-center items-center transform origin-center pb-8">
-            <Calendar
+            <CalendarPrice 
               mode="single"
               month={currentMonth}
               onMonthChange={setCurrentMonth}
