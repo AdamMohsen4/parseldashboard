@@ -22,7 +22,7 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
 }) => {
   const pricing = getPricingForDay(pricingData, date);
   const isInDateRange = isWithinInterval(date, dateRange);
-  const isSelectable = isInDateRange && pricing && pricing.basePrice > 0;
+  const isSelectable = isInDateRange && pricing && pricing.basePrice > 0 && pricing.loadFactor === 'low';
   
   // Handle click on a day
   const handleClick = (e: React.MouseEvent) => {
