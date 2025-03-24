@@ -8,7 +8,7 @@ import { useUser } from "@clerk/clerk-react";
 import { bookShipment, cancelBooking } from "@/services/bookingService";
 import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Briefcase, Download, Package, ShoppingCart, Truck, User } from "lucide-react";
+import { Briefcase, Calendar, DollarSign, Download, Package, ShoppingCart, Truck, User, Zap } from "lucide-react";
 import { getBookingByTrackingCode } from "@/services/bookingDb";
 import { generateLabel } from "@/services/labelService";
 import BookingConfirmation from "@/components/booking/BookingConfirmation";
@@ -19,6 +19,9 @@ import AddressDetails from "@/components/booking/AddressDetails";
 import { AddressDetails as AddressDetailsType } from "@/types/booking";
 import BookingSummary from "@/components/booking/BookingSummary";
 import PaymentForm from "@/components/booking/PaymentForm";
+import PriceCalendarView from "@/components/priceCalendar/PriceCalendarView";
+import { generateMockPricingData, DateRange } from "@/utils/pricingUtils";
+import { addWeeks, startOfDay } from "date-fns";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 type DeliveryOption = "fast" | "cheap" | null;
@@ -62,6 +65,20 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [recipientPhone, setRecipientPhone] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
   const [selectedVolume, setSelectedVolume] = useState("m");
+  const [selectedDeliveryOption, setSelectedDeliveryOption] = useState<DeliveryOption>(null);
+  const [showPriceCalendar, setShowPriceCalendar] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [pricingData, setPricingData] = useState([]);
+  const [isCalendarLoading, setIsCalendarLoading] = useState(false);
+  const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<Date | null>(null);
+  
+  const today = startOfDay(new Date());
+  const threeWeeksFromNow = addWeeks(today, 3);
+  
+  const dateRange: DateRange = {
+    start: today,
+    end: threeWeeksFromNow
+  };
   
   useEffect(() => {
     const checkSavedBooking = async () => {
@@ -95,6 +112,22 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     
     checkSavedBooking();
   }, [isSignedIn, user]);
+
+  useEffect(() => {
+    if (showPriceCalendar) {
+      loadPriceCalendarData();
+    }
+  }, [showPriceCalendar, currentMonth]);
+
+  const loadPriceCalendarData = () => {
+    setIsCalendarLoading(true);
+    
+    setTimeout(() => {
+      const data = generateMockPricingData(currentMonth, dateRange);
+      setPricingData(data);
+      setIsCalendarLoading(false);
+    }, 600);
+  };
 
   const getCarrierPrice = () => {
     switch (selectedVolume) {
@@ -300,6 +333,27 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     }
   };
 
+  const handleDeliveryOptionSelect = (option: DeliveryOption) => {
+    setSelectedDeliveryOption(option);
+    
+    if (option === 'fast') {
+      setDeliverySpeed('express');
+      setShowPriceCalendar(false);
+      setSelectedDeliveryDate(null);
+      toast.success("Fast delivery selected - Your package will arrive in 1-2 business days");
+    } else if (option === 'cheap') {
+      setDeliverySpeed('economy');
+      setShowPriceCalendar(true);
+      toast.success("Cheap delivery selected - Please choose a delivery date");
+      loadPriceCalendarData();
+    }
+  };
+
+  const handleDeliveryDateSelect = (date: Date) => {
+    setSelectedDeliveryDate(date);
+    toast.success(`Delivery date selected: ${date.toLocaleDateString()}`);
+  };
+
   if (bookingConfirmed) {
     return (
       <div className="min-h-screen bg-background">
@@ -349,11 +403,75 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                   onSwapLocations={handleSwapLocations}
                 />
                 
-                <div className="flex justify-end">
+                <div className="mt-8 border rounded-lg shadow-sm">
+                  <div className="bg-slate-700 text-white p-3 font-semibold">
+                    Select Delivery Option
+                  </div>
+                  <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Button
+                      onClick={() => handleDeliveryOptionSelect('fast')}
+                      type="button"
+                      className={`h-24 text-left p-4 ${selectedDeliveryOption === 'fast' ? 'bg-green-600 hover:bg-green-700' : 'bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50'}`}
+                    >
+                      <div className="flex flex-col items-start">
+                        <div className="flex items-center mb-2">
+                          <Zap className="h-5 w-5 mr-2 text-yellow-500" />
+                          <span className="font-semibold text-lg">Fast Delivery</span>
+                        </div>
+                        <span className="text-sm">Arrives in 1-2 business days</span>
+                      </div>
+                    </Button>
+                    
+                    <Button
+                      onClick={() => handleDeliveryOptionSelect('cheap')}
+                      type="button"
+                      className={`h-24 text-left p-4 ${selectedDeliveryOption === 'cheap' ? 'bg-green-600 hover:bg-green-700' : 'bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50'}`}
+                    >
+                      <div className="flex flex-col items-start">
+                        <div className="flex items-center mb-2">
+                          <DollarSign className="h-5 w-5 mr-2 text-green-500" />
+                          <span className="font-semibold text-lg">Cheap Delivery</span>
+                        </div>
+                        <span className="text-sm">Save money by selecting a specific date</span>
+                      </div>
+                    </Button>
+                  </div>
+                  
+                  {showPriceCalendar && (
+                    <div className="px-6 pb-6">
+                      <div className="mt-4 mb-2 flex items-center">
+                        <Calendar className="h-5 w-5 mr-2 text-blue-500" />
+                        <h3 className="font-medium">Select delivery date to get the best price</h3>
+                      </div>
+                      <div className="border rounded-lg shadow-sm bg-white">
+                        <PriceCalendarView
+                          currentMonth={currentMonth}
+                          setCurrentMonth={setCurrentMonth}
+                          pricingData={pricingData}
+                          isLoading={isCalendarLoading}
+                          dateRange={dateRange}
+                          onDateSelect={handleDeliveryDateSelect}
+                          selectedDate={selectedDeliveryDate}
+                        />
+                      </div>
+                      {selectedDeliveryDate && (
+                        <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+                          <p className="text-green-800">
+                            <span className="font-medium">Delivery date selected: </span> 
+                            {selectedDeliveryDate.toLocaleDateString()}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex justify-end mt-6">
                   <Button 
                     type="button" 
                     onClick={handleNextStep}
                     className="bg-green-600 hover:bg-green-700 text-white"
+                    disabled={selectedDeliveryOption === 'cheap' && !selectedDeliveryDate}
                   >
                     Continue
                   </Button>
@@ -461,4 +579,3 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 };
 
 export default ShipmentBookingPage;
-
