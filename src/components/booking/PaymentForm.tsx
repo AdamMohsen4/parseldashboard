@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
   CreditCard, 
+  CheckCircle2, 
   AlertCircle, 
   Calendar, 
   LockKeyhole,
@@ -19,11 +20,7 @@ import { toast } from 'sonner';
 
 interface PaymentFormProps {
   totalPrice: number;
-  onPaymentComplete: (paymentData: {
-    method: 'swish' | 'ebanking' | 'card';
-    details: any;
-    termsAccepted: boolean;
-  }) => void;
+  onPaymentComplete: () => void;
   onCancel: () => void;
 }
 
@@ -37,105 +34,86 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
   const [cardholderName, setCardholderName] = useState('');
-  const [swishNumber, setSwishNumber] = useState('46735765336');
+  const [swishNumber, setSwishNumber] = useState('');
   const [bankName, setBankName] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
   
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!termsAccepted) {
-      newErrors.terms = 'You must accept the terms and conditions';
-    }
-
-    if (paymentMethod === 'card') {
-      if (!cardNumber.trim()) {
-        newErrors.cardNumber = 'Card number is required';
-      } else if (cardNumber.replace(/\s/g, '').length !== 16 || !/^\d+$/.test(cardNumber.replace(/\s/g, ''))) {
-        newErrors.cardNumber = 'Please enter a valid 16-digit card number';
-      }
-      
-      if (!expiryDate.trim()) {
-        newErrors.expiryDate = 'Expiry date is required';
-      } else if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
-        newErrors.expiryDate = 'Please enter a valid expiry date (MM/YY)';
-      }
-      
-      if (!cvv.trim()) {
-        newErrors.cvv = 'CVV is required';
-      } else if (!/^\d{3,4}$/.test(cvv)) {
-        newErrors.cvv = 'Please enter a valid CVV (3-4 digits)';
-      }
-      
-      if (!cardholderName.trim()) {
-        newErrors.cardholderName = 'Cardholder name is required';
-      }
-    } else if (paymentMethod === 'swish') {
-      if (!swishNumber.trim()) {
-        newErrors.swishNumber = 'Swish number is required';
-      } else if (!/^\d{8,12}$/.test(swishNumber.replace(/\s/g, ''))) {
-        newErrors.swishNumber = 'Please enter a valid Swish number';
-      }
-    } else if (paymentMethod === 'ebanking') {
-      if (!bankName) {
-        newErrors.bankName = 'Please select your bank';
-      }
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  // The merchant Swish number that will receive the payment
+  const merchantSwishNumber = "+46735765336";
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    if (!termsAccepted) {
+      toast.error('You must accept the terms and conditions to continue');
       return;
     }
 
-    setIsProcessing(true);
-    
-    try {
-      // Prepare payment details based on selected method
-      let details = {};
-      
-      switch (paymentMethod) {
-        case 'card':
-          details = {
-            cardNumber,
-            expiryDate,
-            cvv,
-            cardholderName
-          };
-          break;
-        case 'swish':
-          details = {
-            swishNumber
-          };
-          break;
-        case 'ebanking':
-          details = {
-            bankName
-          };
-          break;
+    // Simple validation
+    if (paymentMethod === 'card') {
+      if (!cardNumber || !expiryDate || !cvv || !cardholderName) {
+        toast.error('Please fill in all card details');
+        return;
       }
       
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Basic card number validation (16 digits)
+      if (cardNumber.replace(/\s/g, '').length !== 16 || !/^\d+$/.test(cardNumber.replace(/\s/g, ''))) {
+        toast.error('Please enter a valid card number');
+        return;
+      }
       
-      toast.success('Payment processed successfully!');
-      onPaymentComplete({
-        method: paymentMethod,
-        details,
-        termsAccepted
-      });
-    } catch (error) {
-      console.error('Payment processing error:', error);
-      toast.error('Payment failed. Please try again.');
-    } finally {
-      setIsProcessing(false);
+      // Basic expiry date validation (MM/YY)
+      if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
+        toast.error('Please enter a valid expiry date (MM/YY)');
+        return;
+      }
+      
+      // Basic CVV validation (3-4 digits)
+      if (!/^\d{3,4}$/.test(cvv)) {
+        toast.error('Please enter a valid CVV code');
+        return;
+      }
+    } else if (paymentMethod === 'swish') {
+      if (!swishNumber) {
+        toast.error('Please enter your Swish number');
+        return;
+      }
+      
+      // Basic Swish number validation (10 digits)
+      if (!/^\d{10}$/.test(swishNumber.replace(/\s/g, ''))) {
+        toast.error('Please enter a valid Swish number (10 digits)');
+        return;
+      }
+    } else if (paymentMethod === 'ebanking') {
+      if (!bankName) {
+        toast.error('Please select your bank');
+        return;
+      }
+    }
+    
+    setIsProcessing(true);
+    
+    if (paymentMethod === 'swish') {
+      // Simulate Swish payment to the specified merchant
+      toast.info(`Initiating Swish payment to ${merchantSwishNumber}`);
+      
+      // In a real implementation, this would be a request to your backend
+      // which would then use the Swish API to create a payment request
+      
+      // For demo purposes, we'll just simulate a delay
+      setTimeout(() => {
+        setIsProcessing(false);
+        toast.success(`Payment of ${totalPrice.toFixed(2)}€ successfully sent to E-Parcel via Swish`);
+        onPaymentComplete();
+      }, 2000);
+    } else {
+      // Simulate other payment processing
+      setTimeout(() => {
+        setIsProcessing(false);
+        toast.success('Payment processed successfully!');
+        onPaymentComplete();
+      }, 2000);
     }
   };
   
@@ -171,7 +149,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   return (
     <Card className="border rounded-lg mb-8">
       <div className="bg-slate-700 text-white p-3 font-semibold">
-        Payment - {totalPrice.toFixed(2)}€
+        Betalning - {totalPrice.toFixed(2)}€
       </div>
       
       <div className="p-6">
@@ -182,10 +160,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             <RadioGroup 
               defaultValue="swish" 
               value={paymentMethod}
-              onValueChange={(value) => {
-                setPaymentMethod(value as 'swish' | 'ebanking' | 'card');
-                setErrors({});
-              }}
+              onValueChange={(value) => setPaymentMethod(value as 'swish' | 'ebanking' | 'card')}
               className="gap-3"
             >
               <div className={`flex items-center space-x-2 border p-4 rounded-md ${paymentMethod === 'swish' ? 'border-primary' : 'border-gray-200'}`}>
@@ -219,7 +194,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           {paymentMethod === 'swish' && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="swishNumber">Swish Number</Label>
+                <Label htmlFor="swishNumber">Your Swish Number</Label>
                 <div className="relative">
                   <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
                   <Input
@@ -228,13 +203,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     value={swishNumber}
                     onChange={(e) => setSwishNumber(e.target.value.replace(/\D/g, ''))}
                     placeholder="07X XXX XX XX"
-                    className={`pl-10 ${errors.swishNumber ? 'border-red-500' : ''}`}
-                    maxLength={12}
+                    className="pl-10"
+                    maxLength={10}
                   />
                 </div>
-                {errors.swishNumber && (
-                  <p className="text-red-500 text-sm mt-1">{errors.swishNumber}</p>
-                )}
               </div>
 
               <div className="bg-blue-50 p-4 rounded-md flex items-start gap-3 text-sm text-blue-700">
@@ -242,7 +214,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 <div>
                   <p className="font-medium">Swish Information</p>
                   <p>You will receive a Swish payment request to your mobile phone. Accept the payment in your Swish app to complete the transaction.</p>
-                  <p className="mt-2 font-medium">Payment will be sent to: +46 735 765 336</p>
+                  <p className="mt-2">Payment will be sent to: <strong>{merchantSwishNumber}</strong> (E-Parcel Nordic)</p>
                 </div>
               </div>
             </div>
@@ -264,9 +236,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     </div>
                   ))}
                 </RadioGroup>
-                {errors.bankName && (
-                  <p className="text-red-500 text-sm mt-1">{errors.bankName}</p>
-                )}
               </div>
 
               <div className="bg-blue-50 p-4 rounded-md flex items-start gap-3 text-sm text-blue-700">
@@ -290,13 +259,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     value={cardNumber}
                     onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
                     placeholder="4111 1111 1111 1111"
-                    className={`pl-10 ${errors.cardNumber ? 'border-red-500' : ''}`}
+                    className="pl-10"
                     maxLength={19}
                   />
                 </div>
-                {errors.cardNumber && (
-                  <p className="text-red-500 text-sm mt-1">{errors.cardNumber}</p>
-                )}
               </div>
               
               <div className="grid grid-cols-2 gap-4">
@@ -309,13 +275,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                       value={expiryDate}
                       onChange={(e) => setExpiryDate(formatExpiryDate(e.target.value))}
                       placeholder="MM/YY"
-                      className={`pl-10 ${errors.expiryDate ? 'border-red-500' : ''}`}
+                      className="pl-10"
                       maxLength={5}
                     />
                   </div>
-                  {errors.expiryDate && (
-                    <p className="text-red-500 text-sm mt-1">{errors.expiryDate}</p>
-                  )}
                 </div>
                 
                 <div className="space-y-2">
@@ -327,13 +290,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                       value={cvv}
                       onChange={(e) => setCvv(e.target.value.replace(/\D/g, ''))}
                       placeholder="123"
-                      className={`pl-10 ${errors.cvv ? 'border-red-500' : ''}`}
+                      className="pl-10"
                       maxLength={4}
                     />
                   </div>
-                  {errors.cvv && (
-                    <p className="text-red-500 text-sm mt-1">{errors.cvv}</p>
-                  )}
                 </div>
               </div>
               
@@ -344,11 +304,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                   value={cardholderName}
                   onChange={(e) => setCardholderName(e.target.value)}
                   placeholder="John Doe"
-                  className={errors.cardholderName ? 'border-red-500' : ''}
                 />
-                {errors.cardholderName && (
-                  <p className="text-red-500 text-sm mt-1">{errors.cardholderName}</p>
-                )}
               </div>
               
               <div className="bg-blue-50 p-4 rounded-md flex items-start gap-3 text-sm text-blue-700">
@@ -370,16 +326,21 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             <div className="grid gap-1.5 leading-none">
               <Label
                 htmlFor="terms"
-                className={`text-sm ${errors.terms ? 'text-red-500' : 'text-muted-foreground'}`}
+                className="text-sm text-muted-foreground"
               >
                 I accept the {' '}
                 <a href="#" className="text-blue-600 hover:underline">terms and conditions</a> and I have read the {' '}
                 <a href="#" className="text-blue-600 hover:underline">privacy statement</a>
               </Label>
-              {errors.terms && (
-                <p className="text-red-500 text-sm mt-1">{errors.terms}</p>
-              )}
             </div>
+          </div>
+          
+          <div className="mt-4 space-y-2 text-sm text-gray-600">
+            <ul className="list-disc ml-5 space-y-1">
+              <li>Domestic parcel services</li>
+              <li>Letter services and international parcels</li>
+              <li>General delivery conditions</li>
+            </ul>
           </div>
           
           <div className="flex justify-between gap-4 mt-6">
@@ -405,7 +366,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                   Processing...
                 </div>
               ) : (
-                `Pay ${totalPrice.toFixed(2)}€`
+                `Pay (${totalPrice.toFixed(2)}€)`
               )}
             </Button>
           </div>
