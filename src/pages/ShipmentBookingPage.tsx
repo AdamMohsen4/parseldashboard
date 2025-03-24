@@ -412,11 +412,11 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     onClick={() => handleDeliveryOptionSelect('fast')}
                     type="button"
                     className={`h-20 text-left p-4 rounded-lg border transition-all duration-200 
-                      ${selectedDeliveryOption === 'fast' ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                      ${selectedDeliveryOption === 'fast' ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
                   >
                     <div className="flex flex-col items-start space-y-1">
                       <span className="font-medium text-base">Fast Delivery</span>
-                      <span className="text-sm text-gray-600">Arrives in 2-4 business days</span>
+                      <span className="text-sm text-black-600">Arrives in 2-4 business days</span>
                     </div>
                   </Button>
 
@@ -424,11 +424,11 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     onClick={() => handleDeliveryOptionSelect('cheap')}
                     type="button"
                     className={`h-20 text-left p-4 rounded-lg border transition-all duration-200 
-                      ${selectedDeliveryOption === 'cheap' ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                      ${selectedDeliveryOption === 'cheap' ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
                   >
                     <div className="flex flex-col items-start space-y-1">
                       <span className="font-medium text-base">Cheap Delivery</span>
-                      <span className="text-sm text-gray-600">Save money by selecting a specific date</span>
+                      <span className="text-sm text-black-600">Save money by selecting a specific date</span>
                     </div>
                   </Button>
                 </div>
@@ -451,8 +451,8 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                         />
                       </div>
                       {selectedDeliveryDate && (
-                        <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
-                          <p className="text-green-800">
+                        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                          <p className="text-blue-800">
                             <span className="font-medium">Delivery date selected: </span> 
                             {selectedDeliveryDate.toLocaleDateString()}
                           </p>

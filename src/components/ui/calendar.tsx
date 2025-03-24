@@ -16,49 +16,46 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-4", className)} 
+  
       classNames={{
-        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0", 
+        months: "flex flex-col sm:flex-row gap-4", 
         month: "space-y-4", 
-        caption: "flex justify-center pt-1 relative items-center", 
-        caption_label: "text-sm font-medium", 
-        nav: "space-x-1 flex items-center", 
+        caption: "flex justify-between items-center py-2 px-4 bg-gray-100 rounded-md", 
+        caption_label: "text-sm font-semibold", 
+        nav: "flex items-center space-x-2", 
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100" 
+          "h-8 w-8 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-all"
         ),
-        nav_button_previous: "absolute left-1", 
-        nav_button_next: "absolute right-1", 
-        table: "w-full border-collapse space-y-1", 
-        head_row: "flex",
-        head_cell:
-          "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]", 
-        row: "flex w-full mt-0.5", 
-        cell: "h-9 w-9 text-center text-sm p-0 relative", 
+        nav_button_previous: "", 
+        nav_button_next: "", 
+        table: "w-full border-collapse", 
+        head_row: "flex", 
+        head_cell: "text-gray-600 font-medium w-9 text-xs uppercase", 
+        row: "flex w-full", 
+        cell: "h-10 w-10 text-center text-sm relative", 
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal aria-selected:opacity-100" 
+          "h-10 w-10 p-0 font-medium rounded-md transition-all hover:bg-gray-200"
         ),
-        day_range_end: "day-range-end",
-        day_selected:
-          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent text-accent-foreground",
-        day_outside:
-          "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
-        day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
-        day_hidden: "invisible",
+        day_range_end: "rounded-r-md", 
+        day_selected: "bg-primary text-white font-bold hover:bg-primary-dark", 
+        day_today: "border border-primary text-primary font-bold", 
+        day_outside: "text-gray-400 opacity-50", 
+        day_disabled: "text-gray-300 opacity-50 cursor-not-allowed", 
+        day_range_middle: "bg-gray-100 text-gray-700", 
+        day_hidden: "invisible", 
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />, 
-        IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />, 
+        IconLeft: ({ ..._props }) => <ChevronLeft className="h-5 w-5 text-gray-600" />, 
+        IconRight: ({ ..._props }) => <ChevronRight className="h-5 w-5 text-gray-600" />, 
       }}
       {...props}
     />
   );
 }
+
 Calendar.displayName = "Calendar";
 
 export { Calendar };
