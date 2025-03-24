@@ -14,8 +14,9 @@ const BookingSteps: React.FC<BookingStepsProps> = ({ currentStep }) => {
       <h2 className={`text-sm ${currentStep >= 1 ? 'font-medium' : 'text-muted-foreground'}`}>Overview</h2>
       
       <div className="flex-1 flex items-center gap-4">
-        <div className="flex-1 h-px bg-border"></div>
-        
+        <div className="flex-1 h-px bg-border"></div> 
+      </div>
+      
         <div className={`flex h-8 w-8 items-center justify-center rounded-full ${currentStep >= 2 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
           <span className="text-xs font-bold">2</span>
         </div>
@@ -23,22 +24,29 @@ const BookingSteps: React.FC<BookingStepsProps> = ({ currentStep }) => {
 
         <div className="flex-1 flex items-center gap-4">
           <div className="flex-1 h-px bg-border"></div>
-          
+        </div>
           <div className={`flex h-8 w-8 items-center justify-center rounded-full ${currentStep >= 3? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
             <span className="text-xs font-bold">3</span>
           </div>
           <span className={`text-sm ${currentStep >= 3 ? 'font-medium' : 'text-muted-foreground'}`}>Address</span>
-        </div>
-
+      
         <div className="flex-1 flex items-center gap-4">
           <div className="flex-1 h-px bg-border"></div>
-          
+        </div>
+        
           <div className={`flex h-8 w-8 items-center justify-center rounded-full ${currentStep >= 4? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
             <span className="text-xs font-bold">4</span>
           </div>
           <span className={`text-sm ${currentStep >= 4 ? 'font-medium' : 'text-muted-foreground'}`}>Payment</span>
+        
+          <div className="flex-1 flex items-center gap-4">
+          <div className="flex-1 h-px bg-border"></div>
         </div>
-      </div>
+        <div className={`flex h-8 w-8 items-center justify-center rounded-full ${currentStep >= 5? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+            <span className="text-xs font-bold">4</span>
+          </div>
+          <span className={`text-sm ${currentStep >= 5 ? 'font-medium' : 'text-muted-foreground'}`}>Booking Completed</span>
+
     </div>
   );
 };

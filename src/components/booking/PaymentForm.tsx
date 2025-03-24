@@ -337,7 +337,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             <Button 
               type="submit"
               disabled={isProcessing}
-              className="bg-orange-500 hover:bg-orange-600 text-white min-w-[150px]"
+              className="bg-green-600 hover:bg-green-700 text-white min-w-[7rem]"
             >
               {isProcessing ? (
                 <div className="flex items-center gap-2">

@@ -22,6 +22,9 @@ import PaymentForm from "@/components/booking/PaymentForm";
 import PriceCalendarView from "@/components/priceCalendar/PriceCalendarView";
 import { generateMockPricingData, DateRange } from "@/utils/pricingUtils";
 import { addWeeks, startOfDay } from "date-fns";
+import LabelGenerator from "@/components/labels/LabelGenerator";
+import { trackShipment } from "@/services/shipmentService";
+import { get } from "http";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 type DeliveryOption = "fast" | "cheap" | null;
@@ -563,10 +566,32 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                 <PaymentForm 
                   totalPrice={getCarrierPrice()}
                   onPaymentComplete={handleBookNow}
+                  
                   onCancel={handlePreviousStep}
                 />
+
               </div>
             )}
+
+            {/* {currentStep === 5 && (
+              <div>
+                <BookingConfirmation bookingResult={undefined} carrier={{
+                  name: recipientName,
+                  eta: "3 days",
+                  price: getCarrierPrice()
+                }} canCancelBooking={false} labelLanguage={""} setLabelLanguage={function (language: string): void {
+                  labelLanguage
+                } } isGeneratingLabel={false} handleGenerateLabel={function (): void {
+                  LabelGenerator
+                } } handleCancelBooking={function (): void {
+                   cancelBooking
+                } } onBookAnother={function (): void {
+                  setBookingConfirmed
+                } }
+                />
+                
+              </div>
+            )} */}
           </form>
         </div>
       </div>
