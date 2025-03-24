@@ -8,7 +8,7 @@ import { useUser } from "@clerk/clerk-react";
 import { bookShipment, cancelBooking } from "@/services/bookingService";
 import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Briefcase, Download, Package, ShoppingCart, Truck, User, DollarSign, Zap } from "lucide-react";
+import { Briefcase, Download, Package, ShoppingCart, Truck, User } from "lucide-react";
 import { getBookingByTrackingCode } from "@/services/bookingDb";
 import { generateLabel } from "@/services/labelService";
 import BookingConfirmation from "@/components/booking/BookingConfirmation";
@@ -300,22 +300,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     }
   };
 
-  const handleFastShipping = () => {
-    setDeliverySpeed("express");
-    toast.success("Fast shipping selected");
-    if (currentStep === 1) {
-      handleNextStep();
-    }
-  };
-
-  const handleCheapShipping = () => {
-    setDeliverySpeed("standard");
-    toast.success("Economic shipping selected");
-    if (currentStep === 1) {
-      handleNextStep();
-    }
-  };
-
   if (bookingConfirmed) {
     return (
       <div className="min-h-screen bg-background">
@@ -470,32 +454,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
               </div>
             )}
           </form>
-          
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Button 
-              onClick={handleFastShipping}
-              className="flex items-center justify-center gap-2 p-6 h-auto bg-blue-600 hover:bg-blue-700"
-              size="lg"
-            >
-              <Zap className="h-6 w-6" />
-              <div className="flex flex-col items-start">
-                <span className="text-lg font-semibold">Fast Shipping</span>
-                <span className="text-xs">Delivery in 1-2 days</span>
-              </div>
-            </Button>
-            
-            <Button 
-              onClick={handleCheapShipping}
-              className="flex items-center justify-center gap-2 p-6 h-auto bg-green-600 hover:bg-green-700"
-              size="lg"
-            >
-              <DollarSign className="h-6 w-6" />
-              <div className="flex flex-col items-start">
-                <span className="text-lg font-semibold">Cheap Shipping</span>
-                <span className="text-xs">Economical option, 3-5 days</span>
-              </div>
-            </Button>
-          </div>
         </div>
       </div>
     </div>
@@ -503,3 +461,4 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 };
 
 export default ShipmentBookingPage;
+
