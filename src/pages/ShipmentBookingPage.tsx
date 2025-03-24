@@ -407,35 +407,31 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                   <div className="bg-slate-700 text-white p-3 font-semibold">
                     Select Delivery Option
                   </div>
-                  <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Button
-                      onClick={() => handleDeliveryOptionSelect('fast')}
-                      type="button"
-                      className={`h-24 text-left p-4 ${selectedDeliveryOption === 'fast' ? 'bg-green-600 hover:bg-green-700' : 'bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50'}`}
-                    >
-                      <div className="flex flex-col items-start">
-                        <div className="flex items-center mb-2">
-                          <Zap className="h-5 w-5 mr-2 text-yellow-500" />
-                          <span className="font-semibold text-lg">Fast Delivery</span>
-                        </div>
-                        <span className="text-sm">Arrives in 1-2 business days</span>
-                      </div>
-                    </Button>
-                    
-                    <Button
-                      onClick={() => handleDeliveryOptionSelect('cheap')}
-                      type="button"
-                      className={`h-24 text-left p-4 ${selectedDeliveryOption === 'cheap' ? 'bg-green-600 hover:bg-green-700' : 'bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50'}`}
-                    >
-                      <div className="flex flex-col items-start">
-                        <div className="flex items-center mb-2">
-                          <DollarSign className="h-5 w-5 mr-2 text-green-500" />
-                          <span className="font-semibold text-lg">Cheap Delivery</span>
-                        </div>
-                        <span className="text-sm">Save money by selecting a specific date</span>
-                      </div>
-                    </Button>
-                  </div>
+                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button
+                    onClick={() => handleDeliveryOptionSelect('fast')}
+                    type="button"
+                    className={`h-20 text-left p-4 rounded-lg border transition-all duration-200 
+                      ${selectedDeliveryOption === 'fast' ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                  >
+                    <div className="flex flex-col items-start space-y-1">
+                      <span className="font-medium text-base">Fast Delivery</span>
+                      <span className="text-sm text-gray-600">Arrives in 2-4 business days</span>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => handleDeliveryOptionSelect('cheap')}
+                    type="button"
+                    className={`h-20 text-left p-4 rounded-lg border transition-all duration-200 
+                      ${selectedDeliveryOption === 'cheap' ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                  >
+                    <div className="flex flex-col items-start space-y-1">
+                      <span className="font-medium text-base">Cheap Delivery</span>
+                      <span className="text-sm text-gray-600">Save money by selecting a specific date</span>
+                    </div>
+                  </Button>
+                </div>
                   
                   {showPriceCalendar && (
                     <div className="px-6 pb-6">
