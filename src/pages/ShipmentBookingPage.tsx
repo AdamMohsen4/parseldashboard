@@ -354,7 +354,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 
   const handleDeliveryDateSelect = (date: Date) => {
     setSelectedDeliveryDate(date);
-    // toast.success(`Pickup date selected: ${date.toLocaleDateString()}`);
+    toast.success(`Delivery date selected: ${date.toLocaleDateString()}`);
   };
 
   if (bookingConfirmed) {
@@ -415,7 +415,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     onClick={() => handleDeliveryOptionSelect('fast')}
                     type="button"
                     className={`h-20 text-left p-4 rounded-lg border transition-all duration-200 
-                      ${selectedDeliveryOption === 'fast' ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                      ${selectedDeliveryOption === 'fast' ? ' text-white' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
                   >
                     <div className="flex flex-col items-start space-y-1">
                       <span className="font-medium text-base">Fast Delivery</span>
@@ -427,7 +427,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     onClick={() => handleDeliveryOptionSelect('cheap')}
                     type="button"
                     className={`h-20 text-left p-4 rounded-lg border transition-all duration-200 
-                      ${selectedDeliveryOption === 'cheap' ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                      ${selectedDeliveryOption === 'cheap' ? 'text-white' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
                   >
                     <div className="flex flex-col items-start space-y-1">
                       <span className="font-medium text-base">Cheap Delivery</span>

@@ -41,7 +41,7 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
     if (isInDateRange && pricing) {
       // Add color based on load factor
       const colorClasses = {
-        low: "bg-green-50 hover:bg-green-100 border-green-200 text-green-800",
+        low: "bg-green-50 hover:bg-green-100 border-green-200 text-black",
         medium: "bg-yellow-50 hover:bg-yellow-100 border-yellow-200 text-yellow-800",
         high: "bg-red-50 hover:bg-red-100 border-red-200 text-red-800"
       };
@@ -61,7 +61,7 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
   
   // Add selected state
   if (isSelected && pricing.loadFactor == "low") {
-    dayClasses += " ring-2 ring-green-600 ring-offset-1";
+    dayClasses += " ring-2 ring-green-600";
   }
   
   // Adjust label size if we have a date
