@@ -76,7 +76,10 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       shipment_id: shipmentId,
       customerType: request.customerType || 'private',
       businessName: request.businessName,
-      vatNumber: request.vatNumber
+      vatNumber: request.vatNumber,
+      payment_method: request.paymentMethod,
+      payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
+      terms_accepted: request.termsAccepted
     };
     
     // Save booking (in memory for this demo)

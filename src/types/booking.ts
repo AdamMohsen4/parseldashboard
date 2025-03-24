@@ -47,6 +47,7 @@ export interface BookingRequest {
   paymentDetails?: {
     cardNumber?: string;
     expiryDate?: string;
+    cvv?: string;
     cardholderName?: string;
     swishNumber?: string;
     bankName?: string;

@@ -22,6 +22,7 @@ import PaymentForm from "@/components/booking/PaymentForm";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 type DeliveryOption = "fast" | "cheap" | null;
+type PaymentMethod = 'swish' | 'ebanking' | 'card';
 
 interface ShipmentBookingPageProps {
   customerType?: CustomerType;
@@ -62,7 +63,10 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [recipientPhone, setRecipientPhone] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
   const [selectedVolume, setSelectedVolume] = useState("m");
-  
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('swish');
+  const [paymentDetails, setPaymentDetails] = useState<any>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
   useEffect(() => {
     const checkSavedBooking = async () => {
       if (isSignedIn && user) {
@@ -162,7 +166,10 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         customerType: selectedCustomerType || "private",
         businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
         vatNumber: selectedCustomerType === "business" ? vatNumber : undefined,
-        pickupSlotId: "slot-1" // Default slot
+        pickupSlotId: "slot-1",
+        paymentMethod,
+        paymentDetails,
+        termsAccepted
       });
       
       if (result.success) {
@@ -242,6 +249,18 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     } else {
       handleBookNow();
     }
+  };
+
+  const handlePaymentComplete = (paymentData: {
+    paymentMethod: PaymentMethod;
+    paymentDetails: any;
+    termsAccepted: boolean;
+  }) => {
+    setPaymentMethod(paymentData.paymentMethod);
+    setPaymentDetails(paymentData.paymentDetails);
+    setTermsAccepted(paymentData.termsAccepted);
+    
+    handleBookNow();
   };
 
   const handleGenerateLabel = async () => {
@@ -448,7 +467,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
               <div>
                 <PaymentForm 
                   totalPrice={getCarrierPrice()}
-                  onPaymentComplete={handleBookNow}
+                  onPaymentComplete={handlePaymentComplete}
                   onCancel={handlePreviousStep}
                 />
               </div>
@@ -461,4 +480,3 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 };
 
 export default ShipmentBookingPage;
-
