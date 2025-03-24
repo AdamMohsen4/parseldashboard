@@ -16,30 +16,36 @@ export const saveBookingToSupabase = async (
   cancellationDeadline: Date
 ) => {
   try {
-    console.log("Saving booking to Supabase with payload:", {
-      user_id: request.userId,
-      tracking_code: trackingCode,
-      carrier_name: request.carrier.name,
-      carrier_price: request.carrier.price,
-      weight: request.weight,
-      dimension_length: request.dimensions.length,
-      dimension_width: request.dimensions.width,
-      dimension_height: request.dimensions.height,
-      pickup_address: request.pickup,
-      delivery_address: request.delivery,
-      delivery_speed: request.deliverySpeed,
-      include_compliance: request.includeCompliance,
-      label_url: labelUrl,
-      pickup_time: pickupTime,
-      total_price: totalPrice,
-      status: 'pending',
-      customer_type: request.customerType || 'private',
-      business_name: request.businessName,
-      vat_number: request.vatNumber,
-      cancellation_deadline: cancellationDeadline.toISOString()
-    });
+    console.log("Saving booking to Supabase with tracking code:", trackingCode);
     
-    // FIX: Changed from inserting an array to inserting a single object
+    // Prepare payment details for storage
+    let paymentDetails = {};
+    
+    switch (request.paymentMethod) {
+      case 'card':
+        paymentDetails = {
+          method: 'card',
+          cardholderName: request.paymentDetails.cardholderName,
+          // Only store last 4 digits for security reasons
+          cardNumber: request.paymentDetails.cardNumber ? 
+            `**** **** **** ${request.paymentDetails.cardNumber.slice(-4)}` : 
+            null
+        };
+        break;
+      case 'swish':
+        paymentDetails = {
+          method: 'swish',
+          swishNumber: request.paymentDetails.swishNumber
+        };
+        break;
+      case 'ebanking':
+        paymentDetails = {
+          method: 'ebanking',
+          bankName: request.paymentDetails.bankName
+        };
+        break;
+    }
+    
     const { data, error } = await supabase
       .from('booking')
       .insert({
@@ -51,8 +57,8 @@ export const saveBookingToSupabase = async (
         dimension_length: request.dimensions.length,
         dimension_width: request.dimensions.width,
         dimension_height: request.dimensions.height,
-        pickup_address: JSON.stringify(request.pickup), // Convert object to string for storage
-        delivery_address: JSON.stringify(request.delivery), // Convert object to string for storage
+        pickup_address: JSON.stringify(request.pickup),
+        delivery_address: JSON.stringify(request.delivery),
         delivery_speed: request.deliverySpeed,
         include_compliance: request.includeCompliance,
         label_url: labelUrl,
@@ -62,7 +68,10 @@ export const saveBookingToSupabase = async (
         customer_type: request.customerType || 'private',
         business_name: request.businessName,
         vat_number: request.vatNumber,
-        cancellation_deadline: cancellationDeadline.toISOString()
+        cancellation_deadline: cancellationDeadline.toISOString(),
+        estimated_delivery: estimatedDelivery,
+        payment_method: request.paymentMethod,
+        payment_details: JSON.stringify(paymentDetails)
       })
       .select()
       .maybeSingle();
@@ -135,44 +144,13 @@ export const fetchBookingsFromSupabase = async (userId: string, limit?: number) 
   }
 };
 
-export const findBookingByOrderNumber = async (userId: string, orderNumber: string) => {
+export const getBookingByTrackingCode = async (trackingCode: string, userId: string) => {
   try {
-    const cacheKey = `booking-order-${userId}-${orderNumber}`;
-    
-    // Check cache first
-    const cachedData = bookingsCache.get(cacheKey);
-    if (cachedData && (Date.now() - cachedData.timestamp < CACHE_EXPIRY)) {
-      console.log("Returning booking from cache");
-      return cachedData.data;
-    }
-    
-    const { data, error } = await supabase
-      .from('booking')
-      .select('*')
-      .eq('user_id', userId)
-      .ilike('business_name', `%${orderNumber}%`)
-      .maybeSingle();
-    
-    if (error) {
-      console.error("Error finding booking by order number:", error);
+    if (!trackingCode || !userId) {
+      console.error("Missing required parameters");
       return null;
     }
     
-    // Store in cache
-    bookingsCache.set(cacheKey, {
-      data: data,
-      timestamp: Date.now()
-    });
-    
-    return data;
-  } catch (error) {
-    console.error("Error in findBookingByOrderNumber:", error);
-    return null;
-  }
-};
-
-export const getBookingByTrackingCode = async (trackingCode: string, userId: string) => {
-  try {
     const cacheKey = `booking-tracking-${userId}-${trackingCode}`;
     
     // Check cache first
@@ -206,3 +184,5 @@ export const getBookingByTrackingCode = async (trackingCode: string, userId: str
     return null;
   }
 };
+
+// We can remove findBookingByOrderNumber as it seems unnecessary for the core functionality

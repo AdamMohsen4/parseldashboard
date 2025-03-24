@@ -40,18 +40,16 @@ export interface BookingRequest {
   customerType?: string;
   businessName?: string;
   vatNumber?: string;
-  pickupSlotId: string;
-  poolingEnabled?: boolean;
-  deliveryDate?: string;
-  paymentMethod?: 'swish' | 'ebanking' | 'card';
-  paymentDetails?: {
+  paymentMethod: 'swish' | 'ebanking' | 'card';
+  paymentDetails: {
     cardNumber?: string;
     expiryDate?: string;
+    cvv?: string;
     cardholderName?: string;
     swishNumber?: string;
     bankName?: string;
   };
-  termsAccepted?: boolean;
+  termsAccepted: boolean;
 }
 
 export interface ApiKey {

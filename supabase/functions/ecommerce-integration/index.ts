@@ -19,6 +19,7 @@ interface EcommerceShipmentRequest {
   customerPhone?: string;
   productDescription?: string;
   includeCompliance?: boolean;
+  paymentMethod?: string;
 }
 
 const corsHeaders = {
@@ -99,12 +100,20 @@ serve(async (req) => {
       // Calculate delivery date (3 days from now)
       const deliveryDate = new Date();
       deliveryDate.setDate(deliveryDate.getDate() + 3);
-      const estimatedDelivery = deliveryDate.toISOString().split("T")[0];
+      const estimatedDelivery = deliveryDate.toISOString();
       
       // Calculate price
       const basePrice = 8; // E-commerce rate
       const compliancePrice = requestData.includeCompliance ? 2 : 0;
       const totalPrice = basePrice + compliancePrice;
+      
+      // Set cancellation deadline (24h from now)
+      const cancellationDeadline = new Date();
+      cancellationDeadline.setHours(cancellationDeadline.getHours() + 24);
+      
+      // Default payment method for ecommerce is invoice
+      const paymentMethod = requestData.paymentMethod || 'invoice';
+      const paymentDetails = { method: paymentMethod };
       
       // Save booking to database
       const { error: bookingError } = await supabaseAdmin
@@ -128,7 +137,10 @@ serve(async (req) => {
           status: "pending",
           estimated_delivery: estimatedDelivery,
           customer_type: "ecommerce",
-          business_name: requestData.orderNumber // Store order number in business_name
+          business_name: requestData.orderNumber, // Store order number in business_name
+          cancellation_deadline: cancellationDeadline.toISOString(),
+          payment_method: paymentMethod,
+          payment_details: JSON.stringify(paymentDetails)
         });
       
       if (bookingError) {
