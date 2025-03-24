@@ -22,6 +22,7 @@ import PaymentForm from "@/components/booking/PaymentForm";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 type DeliveryOption = "fast" | "cheap" | null;
+type PaymentMethod = 'swish' | 'ebanking' | 'card';
 
 interface ShipmentBookingPageProps {
   customerType?: CustomerType;
@@ -62,7 +63,8 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [recipientPhone, setRecipientPhone] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
   const [selectedVolume, setSelectedVolume] = useState("m");
-  
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('swish');
+
   useEffect(() => {
     const checkSavedBooking = async () => {
       if (isSignedIn && user) {
@@ -162,7 +164,8 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         customerType: selectedCustomerType || "private",
         businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
         vatNumber: selectedCustomerType === "business" ? vatNumber : undefined,
-        pickupSlotId: "slot-1" // Default slot
+        pickupSlotId: "slot-1",
+        paymentMethod: paymentMethod
       });
       
       if (result.success) {
@@ -298,6 +301,10 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     } finally {
       setIsGeneratingLabel(false);
     }
+  };
+
+  const handlePaymentComplete = () => {
+    handleBookNow();
   };
 
   if (bookingConfirmed) {
@@ -448,7 +455,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
               <div>
                 <PaymentForm 
                   totalPrice={getCarrierPrice()}
-                  onPaymentComplete={handleBookNow}
+                  onPaymentComplete={handlePaymentComplete}
                   onCancel={handlePreviousStep}
                 />
               </div>
@@ -461,4 +468,3 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 };
 
 export default ShipmentBookingPage;
-

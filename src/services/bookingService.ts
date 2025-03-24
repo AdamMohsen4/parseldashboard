@@ -56,6 +56,15 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const cancellationDeadline = new Date();
     cancellationDeadline.setHours(cancellationDeadline.getHours() + 24);
     
+    // Log payment method if available
+    if (request.paymentMethod) {
+      console.log(`Payment processed via ${request.paymentMethod}`);
+      
+      if (request.paymentMethod === 'swish') {
+        console.log('Swish payment to merchant: +46735765336');
+      }
+    }
+    
     // Create booking record
     const booking = {
       id: shipmentId,
@@ -76,7 +85,9 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       shipment_id: shipmentId,
       customerType: request.customerType || 'private',
       businessName: request.businessName,
-      vatNumber: request.vatNumber
+      vatNumber: request.vatNumber,
+      paymentMethod: request.paymentMethod,
+      paymentCompleted: true
     };
     
     // Save booking (in memory for this demo)
