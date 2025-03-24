@@ -36,10 +36,7 @@ export const saveBookingToSupabase = async (
       customer_type: request.customerType || 'private',
       business_name: request.businessName,
       vat_number: request.vatNumber,
-      cancellation_deadline: cancellationDeadline.toISOString(),
-      payment_method: request.paymentMethod,
-      payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
-      terms_accepted: request.termsAccepted
+      cancellation_deadline: cancellationDeadline.toISOString()
     });
     
     // FIX: Changed from inserting an array to inserting a single object
@@ -65,10 +62,7 @@ export const saveBookingToSupabase = async (
         customer_type: request.customerType || 'private',
         business_name: request.businessName,
         vat_number: request.vatNumber,
-        cancellation_deadline: cancellationDeadline.toISOString(),
-        payment_method: request.paymentMethod,
-        payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
-        terms_accepted: request.termsAccepted || false
+        cancellation_deadline: cancellationDeadline.toISOString()
       })
       .select()
       .maybeSingle();

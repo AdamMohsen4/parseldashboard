@@ -20,18 +20,7 @@ import { toast } from 'sonner';
 
 interface PaymentFormProps {
   totalPrice: number;
-  onPaymentComplete: (paymentData: {
-    paymentMethod: 'swish' | 'ebanking' | 'card';
-    paymentDetails: {
-      cardNumber?: string;
-      expiryDate?: string;
-      cvv?: string;
-      cardholderName?: string;
-      swishNumber?: string;
-      bankName?: string;
-    };
-    termsAccepted: boolean;
-  }) => void;
+  onPaymentComplete: () => void;
   onCancel: () => void;
 }
 
@@ -45,7 +34,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
   const [cardholderName, setCardholderName] = useState('');
-  const [swishNumber, setSwishNumber] = useState('+46735765336');
+  const [swishNumber, setSwishNumber] = useState('');
   const [bankName, setBankName] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -88,9 +77,9 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         return;
       }
       
-      // Basic Swish number validation
-      if (!/^\+?\d{10,12}$/.test(swishNumber.replace(/\s/g, ''))) {
-        toast.error('Please enter a valid Swish number');
+      // Basic Swish number validation (10 digits)
+      if (!/^\d{10}$/.test(swishNumber.replace(/\s/g, ''))) {
+        toast.error('Please enter a valid Swish number (10 digits)');
         return;
       }
     } else if (paymentMethod === 'ebanking') {
@@ -102,38 +91,11 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     
     setIsProcessing(true);
     
-    // Create the payment details object based on the payment method
-    const paymentDetails: {
-      cardNumber?: string;
-      expiryDate?: string;
-      cvv?: string;
-      cardholderName?: string;
-      swishNumber?: string;
-      bankName?: string;
-    } = {};
-    
-    if (paymentMethod === 'card') {
-      paymentDetails.cardNumber = cardNumber.replace(/\s/g, '');
-      paymentDetails.expiryDate = expiryDate;
-      paymentDetails.cvv = cvv;
-      paymentDetails.cardholderName = cardholderName;
-    } else if (paymentMethod === 'swish') {
-      paymentDetails.swishNumber = swishNumber;
-    } else if (paymentMethod === 'ebanking') {
-      paymentDetails.bankName = bankName;
-    }
-    
     // Simulate payment processing
     setTimeout(() => {
       setIsProcessing(false);
       toast.success('Payment processed successfully!');
-      
-      // Call the onPaymentComplete function with the payment data
-      onPaymentComplete({
-        paymentMethod,
-        paymentDetails,
-        termsAccepted
-      });
+      onPaymentComplete();
     }, 2000);
   };
   
@@ -221,9 +183,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     id="swishNumber"
                     type="tel"
                     value={swishNumber}
-                    onChange={(e) => setSwishNumber(e.target.value)}
-                    placeholder="+46 73 576 53 36"
+                    onChange={(e) => setSwishNumber(e.target.value.replace(/\D/g, ''))}
+                    placeholder="07X XXX XX XX"
                     className="pl-10"
+                    maxLength={10}
                   />
                 </div>
               </div>
