@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
 import { bookShipment, cancelBooking } from "@/services/bookingService";
-import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Briefcase, Calendar, DollarSign, Download, Package, ShoppingCart, Truck, User, Zap } from "lucide-react";
 import { getBookingByTrackingCode } from "@/services/bookingDb";
 import { generateLabel } from "@/services/labelService";
@@ -146,10 +143,10 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 
   const carrier = {
     id: 1,
-    name: "E-Parcel Nordic",
+    name: "",
     price: getCarrierPrice(),
-    eta: "3 days",
-    icon: "📦"
+    eta: "",
+    icon: ""
   };
 
   const handleBookNow = async () => {
@@ -273,7 +270,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (currentStep < 4) {
+    if (currentStep < 3) {
       handleNextStep();
     } else {
       handleBookNow();
@@ -343,18 +340,18 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       setDeliverySpeed('express');
       setShowPriceCalendar(false);
       setSelectedDeliveryDate(null);
-      toast.success("Fast delivery selected - Your package will arrive in 1-2 business days");
+      // toast.success("Fast delivery selected - Your package will arrive in 1-2 business days");
     } else if (option === 'cheap') {
       setDeliverySpeed('economy');
       setShowPriceCalendar(true);
-      toast.success("Cheap delivery selected - Please choose a delivery date");
+      // toast.success("Cheap delivery selected - Please choose a delivery date");
       loadPriceCalendarData();
     }
   };
 
   const handleDeliveryDateSelect = (date: Date) => {
     setSelectedDeliveryDate(date);
-    toast.success(`Delivery date selected: ${date.toLocaleDateString()}`);
+    // toast.success(`Delivery date selected: ${date.toLocaleDateString()}`);
   };
 
   if (bookingConfirmed) {
@@ -566,12 +563,13 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                 <PaymentForm 
                   totalPrice={getCarrierPrice()}
                   onPaymentComplete={handleBookNow}
-                  
+                  onSubmit={handleSubmit} 
                   onCancel={handlePreviousStep}
                 />
 
               </div>
             )}
+          
 
             {/* {currentStep === 5 && (
               <div>

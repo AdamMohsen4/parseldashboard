@@ -18,18 +18,19 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
 
 interface PaymentFormProps {
   totalPrice: number;
   onPaymentComplete: () => void;
   onCancel: () => void;
+  onSubmit: (data: any) => void;
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({ 
   totalPrice,
   onPaymentComplete,
-  onCancel
-}) => {
+  onCancel}) => {
   const [paymentMethod, setPaymentMethod] = useState<'swish' | 'ebanking' | 'card'>('swish');
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');

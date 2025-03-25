@@ -47,7 +47,7 @@ class Batch:
 def fetch_shipments():
     """Fetch shipment data from Supabase."""
     response = supabase.table("booking").select("*").execute()
-
+    print("Fetched data from Supabase." + str(response.data))
     if not response.data:
         print("No shipments found or error in fetching data.")
         return []
