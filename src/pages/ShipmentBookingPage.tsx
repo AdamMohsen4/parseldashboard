@@ -18,7 +18,7 @@ import DeliveryOptions from "@/components/booking/DeliveryOptions";
 import AddressDetails from "@/components/booking/AddressDetails";
 import { AddressDetails as AddressDetailsType } from "@/types/booking";
 import BookingSummary from "@/components/booking/BookingSummary";
-import PaymentForm from "@/components/booking/PaymentForm";
+import PaymentForm, { PaymentData } from "@/components/booking/PaymentForm";
 import PriceCalendarView from "@/components/priceCalendar/PriceCalendarView";
 import { generateMockPricingData, DateRange } from "@/utils/pricingUtils";
 import { addWeeks, startOfDay } from "date-fns";
@@ -74,6 +74,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [pricingData, setPricingData] = useState([]);
   const [isCalendarLoading, setIsCalendarLoading] = useState(false);
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<Date | null>(null);
+  const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
   
   const today = startOfDay(new Date());
   const threeWeeksFromNow = addWeeks(today, 3);
@@ -152,6 +153,11 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     icon: "📦"
   };
 
+  const handlePaymentComplete = (data: PaymentData) => {
+    setPaymentData(data);
+    handleBookNow();
+  };
+
   const handleBookNow = async () => {
     if (currentStep < 4) {
       handleNextStep();
@@ -160,6 +166,11 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 
     if (!isSignedIn || !user) {
       document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click();
+      return;
+    }
+
+    if (!paymentData) {
+      toast.error("Payment information is missing");
       return;
     }
 
@@ -198,7 +209,17 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         customerType: selectedCustomerType || "private",
         businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
         vatNumber: selectedCustomerType === "business" ? vatNumber : undefined,
-        pickupSlotId: "slot-1" // Default slot
+        pickupSlotId: "slot-1", // Default slot
+        paymentMethod: paymentData.paymentMethod,
+        paymentDetails: {
+          cardNumber: paymentData.cardNumber,
+          expiryDate: paymentData.expiryDate,
+          cardholderName: paymentData.cardholderName,
+          swishNumber: paymentData.swishNumber,
+          bankName: paymentData.bankName
+        },
+        termsAccepted: paymentData.termsAccepted,
+        deliveryDate: selectedDeliveryDate ? selectedDeliveryDate.toISOString() : undefined
       });
       
       if (result.success) {
@@ -565,33 +586,11 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
               <div>
                 <PaymentForm 
                   totalPrice={getCarrierPrice()}
-                  onPaymentComplete={handleBookNow}
-                  
+                  onPaymentComplete={handlePaymentComplete}
                   onCancel={handlePreviousStep}
                 />
-
               </div>
             )}
-
-            {/* {currentStep === 5 && (
-              <div>
-                <BookingConfirmation bookingResult={undefined} carrier={{
-                  name: recipientName,
-                  eta: "3 days",
-                  price: getCarrierPrice()
-                }} canCancelBooking={false} labelLanguage={""} setLabelLanguage={function (language: string): void {
-                  labelLanguage
-                } } isGeneratingLabel={false} handleGenerateLabel={function (): void {
-                  LabelGenerator
-                } } handleCancelBooking={function (): void {
-                   cancelBooking
-                } } onBookAnother={function (): void {
-                  setBookingConfirmed
-                } }
-                />
-                
-              </div>
-            )} */}
           </form>
         </div>
       </div>

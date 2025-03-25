@@ -21,8 +21,19 @@ import { toast } from 'sonner';
 
 interface PaymentFormProps {
   totalPrice: number;
-  onPaymentComplete: () => void;
+  onPaymentComplete: (paymentData: PaymentData) => void;
   onCancel: () => void;
+}
+
+export interface PaymentData {
+  paymentMethod: 'swish' | 'ebanking' | 'card';
+  cardNumber?: string;
+  expiryDate?: string;
+  cvv?: string;
+  cardholderName?: string;
+  swishNumber?: string;
+  bankName?: string;
+  termsAccepted: boolean;
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({ 
@@ -92,11 +103,29 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     
     setIsProcessing(true);
     
+    // Collect payment data
+    const paymentData: PaymentData = {
+      paymentMethod,
+      termsAccepted,
+    };
+
+    // Add method-specific data
+    if (paymentMethod === 'card') {
+      paymentData.cardNumber = cardNumber;
+      paymentData.expiryDate = expiryDate;
+      paymentData.cvv = cvv;
+      paymentData.cardholderName = cardholderName;
+    } else if (paymentMethod === 'swish') {
+      paymentData.swishNumber = swishNumber;
+    } else if (paymentMethod === 'ebanking') {
+      paymentData.bankName = bankName;
+    }
+    
     // Simulate payment processing
     setTimeout(() => {
       setIsProcessing(false);
       toast.success('Payment processed successfully!');
-      onPaymentComplete();
+      onPaymentComplete(paymentData);
     }, 2000);
   };
   
