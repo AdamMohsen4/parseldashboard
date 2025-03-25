@@ -28,8 +28,8 @@ export interface BookingRequest {
     width: string;
     height: string;
   };
-  pickup: AddressDetails;
-  delivery: AddressDetails;
+  pickup: AddressDetails | string;
+  delivery: AddressDetails | string;
   carrier: {
     name: string;
     price: number;

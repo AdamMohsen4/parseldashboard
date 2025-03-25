@@ -1,4 +1,3 @@
-
 import { generateShipmentId, generateTrackingCode, calculateTotalPrice } from './bookingUtils';
 import { BookingRequest, BookingResponse, AddressDetails } from '@/types/booking';
 import { toast } from 'sonner';
@@ -9,10 +8,11 @@ const bookings: Record<string, any> = {};
 
 export const bookShipment = async (request: BookingRequest): Promise<BookingResponse> => {
   try {
-    console.log('Booking shipment with request:', request);
+    console.log('Booking shipment with request:', JSON.stringify(request, null, 2));
     
     // Basic validation
     if (!request.pickup || !request.delivery) {
+      console.error('Missing pickup or delivery addresses');
       return {
         success: false,
         message: 'Pickup and delivery addresses are required',
@@ -20,6 +20,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     }
     
     if (!request.userId) {
+      console.error('Missing user ID');
       return {
         success: false,
         message: 'User ID is required',
@@ -56,14 +57,26 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const cancellationDeadline = new Date();
     cancellationDeadline.setHours(cancellationDeadline.getHours() + 24);
     
+    // Ensure pickup and delivery are properly formatted
+    const pickupAddress = typeof request.pickup === 'string' 
+      ? request.pickup 
+      : JSON.stringify(request.pickup);
+      
+    const deliveryAddress = typeof request.delivery === 'string' 
+      ? request.delivery 
+      : JSON.stringify(request.delivery);
+    
+    console.log('Formatted pickup address:', pickupAddress);
+    console.log('Formatted delivery address:', deliveryAddress);
+    
     // Create booking record
     const booking = {
       id: shipmentId,
       tracking_code: trackingCode,
       user_id: request.userId,
       status: 'pending',
-      sender_address: typeof request.pickup === 'string' ? request.pickup : JSON.stringify(request.pickup),
-      recipient_address: typeof request.delivery === 'string' ? request.delivery : JSON.stringify(request.delivery),
+      sender_address: pickupAddress,
+      recipient_address: deliveryAddress,
       package_weight: request.weight,
       package_dimensions: `${request.dimensions.length}x${request.dimensions.width}x${request.dimensions.height}`,
       carrier_name: request.carrier.name,
@@ -87,13 +100,13 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     bookings[trackingCode] = booking;
     
     console.log("About to save to Supabase with data:", {
-      request,
-      trackingCode,
-      labelUrl,
-      pickupTimeStr,
-      totalPrice,
-      estimatedDeliveryStr,
-      cancellationDeadline
+      id: shipmentId,
+      user_id: request.userId,
+      tracking_code: trackingCode,
+      pickup_address: pickupAddress,
+      delivery_address: deliveryAddress,
+      carrier_name: request.carrier.name,
+      total_price: totalPrice
     });
     
     // Add additional call to save to Supabase
@@ -115,6 +128,8 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
         message: 'Failed to save booking to database',
       };
     }
+    
+    console.log('Successfully saved to Supabase!');
     
     // For demonstration purposes, simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
