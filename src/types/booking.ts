@@ -21,6 +21,8 @@ export interface AddressDetails {
   email: string;
 }
 
+export type AddressDetailsType = AddressDetails;
+
 export interface BookingRequest {
   weight: string;
   dimensions: {
