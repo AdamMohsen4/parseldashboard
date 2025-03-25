@@ -21,8 +21,6 @@ export interface AddressDetails {
   email: string;
 }
 
-export type AddressDetailsType = AddressDetails;
-
 export interface BookingRequest {
   weight: string;
   dimensions: {
@@ -30,8 +28,8 @@ export interface BookingRequest {
     width: string;
     height: string;
   };
-  pickup: AddressDetails | string;
-  delivery: AddressDetails | string;
+  pickup: AddressDetails;
+  delivery: AddressDetails;
   carrier: {
     name: string;
     price: number;

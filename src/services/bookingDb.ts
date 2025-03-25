@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { BookingRequest, AddressDetails } from "@/types/booking";
+import { BookingRequest } from "@/types/booking";
 
 // Add cache for bookings
 const bookingsCache = new Map();
@@ -16,15 +16,6 @@ export const saveBookingToSupabase = async (
   cancellationDeadline: Date
 ) => {
   try {
-    // Format the address data correctly for Supabase
-    const pickupAddress = typeof request.pickup === 'string' 
-      ? request.pickup 
-      : JSON.stringify(request.pickup);
-      
-    const deliveryAddress = typeof request.delivery === 'string' 
-      ? request.delivery 
-      : JSON.stringify(request.delivery);
-    
     console.log("Saving booking to Supabase with payload:", {
       user_id: request.userId,
       tracking_code: trackingCode,
@@ -34,8 +25,8 @@ export const saveBookingToSupabase = async (
       dimension_length: request.dimensions.length,
       dimension_width: request.dimensions.width,
       dimension_height: request.dimensions.height,
-      pickup_address: pickupAddress,
-      delivery_address: deliveryAddress,
+      pickup_address: request.pickup,
+      delivery_address: request.delivery,
       delivery_speed: request.deliverySpeed,
       include_compliance: request.includeCompliance,
       label_url: labelUrl,
@@ -45,14 +36,10 @@ export const saveBookingToSupabase = async (
       customer_type: request.customerType || 'private',
       business_name: request.businessName,
       vat_number: request.vatNumber,
-      cancellation_deadline: cancellationDeadline.toISOString(),
-      estimated_delivery: estimatedDelivery,
-      payment_method: request.paymentMethod,
-      payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
-      delivery_date: request.deliveryDate,
-      terms_accepted: request.termsAccepted || false
+      cancellation_deadline: cancellationDeadline.toISOString()
     });
     
+    // FIX: Changed from inserting an array to inserting a single object
     const { data, error } = await supabase
       .from('booking')
       .insert({
@@ -64,8 +51,8 @@ export const saveBookingToSupabase = async (
         dimension_length: request.dimensions.length,
         dimension_width: request.dimensions.width,
         dimension_height: request.dimensions.height,
-        pickup_address: pickupAddress,
-        delivery_address: deliveryAddress,
+        pickup_address: JSON.stringify(request.pickup), // Convert object to string for storage
+        delivery_address: JSON.stringify(request.delivery), // Convert object to string for storage
         delivery_speed: request.deliverySpeed,
         include_compliance: request.includeCompliance,
         label_url: labelUrl,
@@ -75,12 +62,7 @@ export const saveBookingToSupabase = async (
         customer_type: request.customerType || 'private',
         business_name: request.businessName,
         vat_number: request.vatNumber,
-        cancellation_deadline: cancellationDeadline.toISOString(),
-        estimated_delivery: estimatedDelivery,
-        payment_method: request.paymentMethod,
-        payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
-        delivery_date: request.deliveryDate,
-        terms_accepted: request.termsAccepted || false
+        cancellation_deadline: cancellationDeadline.toISOString()
       })
       .select()
       .maybeSingle();

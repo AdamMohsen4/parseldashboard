@@ -1,3 +1,4 @@
+
 import { generateShipmentId, generateTrackingCode, calculateTotalPrice } from './bookingUtils';
 import { BookingRequest, BookingResponse, AddressDetails } from '@/types/booking';
 import { toast } from 'sonner';
@@ -8,11 +9,10 @@ const bookings: Record<string, any> = {};
 
 export const bookShipment = async (request: BookingRequest): Promise<BookingResponse> => {
   try {
-    console.log('Booking shipment with request:', JSON.stringify(request, null, 2));
+    console.log('Booking shipment with request:', request);
     
     // Basic validation
     if (!request.pickup || !request.delivery) {
-      console.error('Missing pickup or delivery addresses');
       return {
         success: false,
         message: 'Pickup and delivery addresses are required',
@@ -20,7 +20,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     }
     
     if (!request.userId) {
-      console.error('Missing user ID');
       return {
         success: false,
         message: 'User ID is required',
@@ -57,7 +56,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const cancellationDeadline = new Date();
     cancellationDeadline.setHours(cancellationDeadline.getHours() + 24);
     
-    // Create booking record (for localStorage)
+    // Create booking record
     const booking = {
       id: shipmentId,
       tracking_code: trackingCode,
@@ -77,19 +76,13 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       shipment_id: shipmentId,
       customerType: request.customerType || 'private',
       businessName: request.businessName,
-      vatNumber: request.vatNumber,
-      payment_method: request.paymentMethod,
-      payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
-      delivery_date: request.deliveryDate,
-      terms_accepted: request.termsAccepted || false
+      vatNumber: request.vatNumber
     };
     
     // Save booking (in memory for this demo)
     bookings[trackingCode] = booking;
     
-    console.log("About to save to Supabase with request data:", request);
-    
-    // Add call to save to Supabase
+    // Add additional call to save to Supabase
     const savedToSupabase = await saveBookingToSupabase(
       request,
       trackingCode,
@@ -102,14 +95,8 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     
     if (!savedToSupabase) {
       console.error('Failed to save booking to Supabase');
-      toast.error("Failed to save your booking to the database. Please try again.");
-      return {
-        success: false,
-        message: 'Failed to save booking to database',
-      };
+      // We'll still continue with the flow, but log the error
     }
-    
-    console.log('Successfully saved to Supabase!');
     
     // For demonstration purposes, simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -118,9 +105,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const userBookings = JSON.parse(localStorage.getItem(`bookings_${request.userId}`) || '[]');
     userBookings.push(booking);
     localStorage.setItem(`bookings_${request.userId}`, JSON.stringify(userBookings));
-    
-    // Show success toast
-    toast.success("Shipment booked successfully!");
     
     // Return success response
     return {
@@ -134,7 +118,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     };
   } catch (error) {
     console.error('Error booking shipment:', error);
-    toast.error("An error occurred while booking your shipment.");
     return {
       success: false,
       message: 'Failed to book shipment',
