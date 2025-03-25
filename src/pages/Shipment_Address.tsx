@@ -4,14 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
 import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Briefcase, Package, User } from "lucide-react";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
@@ -146,7 +144,7 @@ const ShipmentAddressPage = ({ customerType }: ShipmentAddressPageProps) => {
                   <GooglePlacesAutocomplete
                     id="pickup"
                     value={pickup}
-                    onChange={setPickup}
+                    onPlaceSelect={setPickup}
                     placeholder="Enter pickup address"
                     required
                   />
@@ -157,7 +155,7 @@ const ShipmentAddressPage = ({ customerType }: ShipmentAddressPageProps) => {
                   <GooglePlacesAutocomplete
                     id="delivery"
                     value={delivery}
-                    onChange={setDelivery}
+                    onPlaceSelect={setDelivery}
                     placeholder="Enter delivery address"
                     required
                   />
