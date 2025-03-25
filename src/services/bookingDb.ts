@@ -1,5 +1,6 @@
+
 import { supabase } from "@/integrations/supabase/client";
-import { BookingRequest } from "@/types/booking";
+import { BookingRequest, AddressDetails } from "@/types/booking";
 
 // Add cache for bookings
 const bookingsCache = new Map();
@@ -15,7 +16,7 @@ export const saveBookingToSupabase = async (
   cancellationDeadline: Date
 ) => {
   try {
-    // Ensure we handle both string and object addresses correctly
+    // Format the address data correctly for Supabase
     const pickupAddress = typeof request.pickup === 'string' 
       ? request.pickup 
       : JSON.stringify(request.pickup);
@@ -23,7 +24,7 @@ export const saveBookingToSupabase = async (
     const deliveryAddress = typeof request.delivery === 'string' 
       ? request.delivery 
       : JSON.stringify(request.delivery);
-      
+    
     console.log("Saving booking to Supabase with payload:", {
       user_id: request.userId,
       tracking_code: trackingCode,
@@ -45,6 +46,7 @@ export const saveBookingToSupabase = async (
       business_name: request.businessName,
       vat_number: request.vatNumber,
       cancellation_deadline: cancellationDeadline.toISOString(),
+      estimated_delivery: estimatedDelivery,
       payment_method: request.paymentMethod,
       payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
       delivery_date: request.deliveryDate,
@@ -74,6 +76,7 @@ export const saveBookingToSupabase = async (
         business_name: request.businessName,
         vat_number: request.vatNumber,
         cancellation_deadline: cancellationDeadline.toISOString(),
+        estimated_delivery: estimatedDelivery,
         payment_method: request.paymentMethod,
         payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
         delivery_date: request.deliveryDate,

@@ -57,26 +57,14 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const cancellationDeadline = new Date();
     cancellationDeadline.setHours(cancellationDeadline.getHours() + 24);
     
-    // Ensure pickup and delivery are properly formatted
-    const pickupAddress = typeof request.pickup === 'string' 
-      ? request.pickup 
-      : JSON.stringify(request.pickup);
-      
-    const deliveryAddress = typeof request.delivery === 'string' 
-      ? request.delivery 
-      : JSON.stringify(request.delivery);
-    
-    console.log('Formatted pickup address:', pickupAddress);
-    console.log('Formatted delivery address:', deliveryAddress);
-    
-    // Create booking record
+    // Create booking record (for localStorage)
     const booking = {
       id: shipmentId,
       tracking_code: trackingCode,
       user_id: request.userId,
       status: 'pending',
-      sender_address: pickupAddress,
-      recipient_address: deliveryAddress,
+      sender_address: typeof request.pickup === 'string' ? request.pickup : JSON.stringify(request.pickup),
+      recipient_address: typeof request.delivery === 'string' ? request.delivery : JSON.stringify(request.delivery),
       package_weight: request.weight,
       package_dimensions: `${request.dimensions.length}x${request.dimensions.width}x${request.dimensions.height}`,
       carrier_name: request.carrier.name,
@@ -99,17 +87,9 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     // Save booking (in memory for this demo)
     bookings[trackingCode] = booking;
     
-    console.log("About to save to Supabase with data:", {
-      id: shipmentId,
-      user_id: request.userId,
-      tracking_code: trackingCode,
-      pickup_address: pickupAddress,
-      delivery_address: deliveryAddress,
-      carrier_name: request.carrier.name,
-      total_price: totalPrice
-    });
+    console.log("About to save to Supabase with request data:", request);
     
-    // Add additional call to save to Supabase
+    // Add call to save to Supabase
     const savedToSupabase = await saveBookingToSupabase(
       request,
       trackingCode,
