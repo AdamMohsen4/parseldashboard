@@ -34,7 +34,7 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
   };
   
   // Base classes
-  let dayClasses = "h-10 w-full p-0 font-normal flex flex-col items-center justify-center rounded hover:bg-gray-50 relative cursor-default";
+  let dayClasses = "h-16 w-full p-0 font-normal flex flex-col items-center justify-center rounded hover:bg-gray-50 relative cursor-default";
   
   // For days in current month
   if (isSameMonth(date, currentMonth)) {
