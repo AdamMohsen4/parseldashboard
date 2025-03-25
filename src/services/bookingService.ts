@@ -79,11 +79,22 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       vatNumber: request.vatNumber,
       payment_method: request.paymentMethod,
       payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
-      delivery_date: request.deliveryDate
+      delivery_date: request.deliveryDate,
+      terms_accepted: request.termsAccepted || false
     };
     
     // Save booking (in memory for this demo)
     bookings[trackingCode] = booking;
+    
+    console.log("About to save to Supabase with data:", {
+      request,
+      trackingCode,
+      labelUrl,
+      pickupTimeStr,
+      totalPrice,
+      estimatedDeliveryStr,
+      cancellationDeadline
+    });
     
     // Add additional call to save to Supabase
     const savedToSupabase = await saveBookingToSupabase(
@@ -98,7 +109,11 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     
     if (!savedToSupabase) {
       console.error('Failed to save booking to Supabase');
-      // We'll still continue with the flow, but log the error
+      toast.error("Failed to save your booking to the database. Please try again.");
+      return {
+        success: false,
+        message: 'Failed to save booking to database',
+      };
     }
     
     // For demonstration purposes, simulate API call
@@ -108,6 +123,9 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const userBookings = JSON.parse(localStorage.getItem(`bookings_${request.userId}`) || '[]');
     userBookings.push(booking);
     localStorage.setItem(`bookings_${request.userId}`, JSON.stringify(userBookings));
+    
+    // Show success toast
+    toast.success("Shipment booked successfully!");
     
     // Return success response
     return {
@@ -121,6 +139,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     };
   } catch (error) {
     console.error('Error booking shipment:', error);
+    toast.error("An error occurred while booking your shipment.");
     return {
       success: false,
       message: 'Failed to book shipment',

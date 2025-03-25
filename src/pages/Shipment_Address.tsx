@@ -35,11 +35,32 @@ const ShipmentAddressPage = ({ customerType }: ShipmentAddressPageProps) => {
       return;
     }
     
+    // Convert string addresses to AddressDetails objects since that's what Supabase expects
+    const pickupAddress = {
+      name: user?.fullName || "",
+      address: pickup,
+      postalCode: "",
+      city: "",
+      country: "",
+      phone: user?.primaryPhoneNumber?.phoneNumber || "",
+      email: user?.primaryEmailAddress?.emailAddress || ""
+    };
+    
+    const deliveryAddress = {
+      name: "",
+      address: delivery,
+      postalCode: "",
+      city: "",
+      country: "",
+      phone: "",
+      email: ""
+    };
+    
     // Navigate to the main shipment page with the address data
     navigate("/shipment", { 
       state: { 
-        pickup, 
-        delivery,
+        pickup: pickupAddress, 
+        delivery: deliveryAddress,
         customerType: selectedCustomerType,
         businessName: selectedCustomerType === "business" ? businessName : undefined,
         vatNumber: selectedCustomerType === "business" ? vatNumber : undefined

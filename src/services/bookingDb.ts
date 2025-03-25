@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { BookingRequest } from "@/types/booking";
 
@@ -24,8 +25,8 @@ export const saveBookingToSupabase = async (
       dimension_length: request.dimensions.length,
       dimension_width: request.dimensions.width,
       dimension_height: request.dimensions.height,
-      pickup_address: request.pickup,
-      delivery_address: request.delivery,
+      pickup_address: typeof request.pickup === 'string' ? request.pickup : JSON.stringify(request.pickup),
+      delivery_address: typeof request.delivery === 'string' ? request.delivery : JSON.stringify(request.delivery),
       delivery_speed: request.deliverySpeed,
       include_compliance: request.includeCompliance,
       label_url: labelUrl,
@@ -42,7 +43,10 @@ export const saveBookingToSupabase = async (
       terms_accepted: request.termsAccepted
     });
     
-    // FIX: Changed from inserting an array to inserting a single object
+    // Ensure we handle both string and object addresses correctly
+    const pickupAddress = typeof request.pickup === 'string' ? request.pickup : JSON.stringify(request.pickup);
+    const deliveryAddress = typeof request.delivery === 'string' ? request.delivery : JSON.stringify(request.delivery);
+    
     const { data, error } = await supabase
       .from('booking')
       .insert({
@@ -54,8 +58,8 @@ export const saveBookingToSupabase = async (
         dimension_length: request.dimensions.length,
         dimension_width: request.dimensions.width,
         dimension_height: request.dimensions.height,
-        pickup_address: JSON.stringify(request.pickup), // Convert object to string for storage
-        delivery_address: JSON.stringify(request.delivery), // Convert object to string for storage
+        pickup_address: pickupAddress,
+        delivery_address: deliveryAddress,
         delivery_speed: request.deliverySpeed,
         include_compliance: request.includeCompliance,
         label_url: labelUrl,
@@ -69,7 +73,7 @@ export const saveBookingToSupabase = async (
         payment_method: request.paymentMethod,
         payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
         delivery_date: request.deliveryDate,
-        terms_accepted: request.termsAccepted
+        terms_accepted: request.termsAccepted || false
       })
       .select()
       .maybeSingle();
