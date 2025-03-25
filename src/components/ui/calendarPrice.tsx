@@ -33,7 +33,7 @@ function CalendarPrice({
         head_row: "bg-primary",
         head_cell:
           "text-slate-500 font-semibold text-xs uppercase py-3 text-white",
-        row: "table-row border-b last:border-b-0 border-slate-200",
+        row: "table-row border-b last:border-b-0 border-primary",
         // Increase row height
         cell: "table-cell h-20 text-center text-sm relative",
         // Increase the size of the day buttons
@@ -46,7 +46,7 @@ function CalendarPrice({
         day_today: "border border-primary text-primary font-semibold",
         day_outside: "text-slate-400 opacity-60",
         day_disabled: "text-slate-300 opacity-50 cursor-not-allowed",
-        day_range_middle: "bg-slate-100 text-slate-700",
+        day_range_middle: "bg-slate-800 text-slate-700",
         day_hidden: "invisible",
         ...classNames,
       }}
