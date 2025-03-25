@@ -1,6 +1,7 @@
+
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster as Sonner } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -9,21 +10,15 @@ import AuthWrapper from "./components/auth/AuthWrapper";
 import Index from "./pages/Index";
 import BookingPage from "./pages/BookingPage";
 import NotFound from "./pages/NotFound";
-// import PriceCalendar from "./pages/PriceCalendar";
 
 // Lazy load less frequently used pages
 const ShipmentBookingPage = lazy(() => import("./pages/ShipmentBookingPage"));
-// const ThreePLServicePage = lazy(() => import("./pages/ThreePLServicePage").then(module => ({ default: module })));
 const TrackingPage = lazy(() => import("./pages/TrackingPage"));
-// const CompliancePage = lazy(() => import("./pages/CompliancePage").then(module => ({ default: module })));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage"));
-// const CollaboratePage = lazy(() => import("./pages/CollaboratePage"));
 const SupportPage = lazy(() => import("./pages/SupportPage"));
-// const IntegrationPage = lazy(() => import("./pages/IntegrationPage"));
 const TransportationPartnersPage = lazy(() => import("./pages/TransportationPartnersPage"));
 const ShipmentsPage = lazy(() => import("./pages/ShipmentsPage"));
-// const WarehousePage = lazy(() => import("./pages/WarehousePage").then(module => ({ default: module })));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -52,11 +47,6 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/book" element={<BookingPage />} />
-              {/* <Route path="/price-calendar" element={
-                <AuthWrapper requireAuth>
-                  <PriceCalendar />
-                </AuthWrapper>
-              } /> */}
               
               {/* Protected routes */}
               <Route path="/shipment" element={
@@ -79,31 +69,16 @@ const App = () => (
                   <ShipmentBookingPage customerType="ecommerce" />
                 </AuthWrapper>
               } />
-              {/* <Route path="/3pl" element={
-                <AuthWrapper requireAuth>
-                  <ThreePLServicePage />
-                </AuthWrapper>
-              } /> */}
               <Route path="/tracking" element={
                 <AuthWrapper requireAuth>
                   <TrackingPage />
                 </AuthWrapper>
               } />
-              {/* <Route path="/compliance" element={
-                <AuthWrapper requireAuth>
-                  <CompliancePage />
-                </AuthWrapper>
-              } /> */}
               <Route path="/transportation-partners" element={
                 <AuthWrapper requireAuth>
                   <TransportationPartnersPage />
                 </AuthWrapper>
               } />
-              {/* <Route path="/warehouse" element={
-                <AuthWrapper requireAuth>
-                  <WarehousePage />
-                </AuthWrapper>
-              } /> */}
               <Route path="/dashboard" element={
                 <AuthWrapper requireAuth>
                   <DashboardPage />
@@ -119,21 +94,11 @@ const App = () => (
                   <AdminDashboardPage />
                 </AuthWrapper>
               } />
-              {/* <Route path="/collaborate" element={
-                <AuthWrapper requireAuth>
-                  <CollaboratePage />
-                </AuthWrapper>
-              } /> */}
               <Route path="/support" element={
                 <AuthWrapper requireAuth>
                   <SupportPage />
                 </AuthWrapper>
               } />
-              {/* <Route path="/integration" element={
-                <AuthWrapper requireAuth>
-                  <IntegrationPage />
-                </AuthWrapper>
-              } /> */}
               
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
