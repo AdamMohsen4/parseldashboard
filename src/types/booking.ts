@@ -1,4 +1,3 @@
-
 export interface BookingResponse {
   success: boolean;
   message?: string;
@@ -34,12 +33,9 @@ export interface BookingRequest {
     name: string;
     price: number;
   };
-  deliverySpeed: string;
   includeCompliance: boolean;
   userId: string;
   customerType?: string;
-  businessName?: string;
-  vatNumber?: string;
   pickupSlotId: string;
   poolingEnabled?: boolean;
   deliveryDate?: string;

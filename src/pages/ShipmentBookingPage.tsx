@@ -198,12 +198,9 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         pickup: pickupAddress,
         delivery: deliveryAddress,
         carrier: { name: carrier.name, price: carrier.price },
-        deliverySpeed,
         includeCompliance: compliance,
         userId: user.id,
         customerType: selectedCustomerType || "private",
-        businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
-        vatNumber: selectedCustomerType === "business" ? vatNumber : undefined,
         pickupSlotId: "slot-1",
         poolingEnabled: selectedDeliveryOption === 'cheap',
         deliveryDate: selectedDeliveryDate ? selectedDeliveryDate.toISOString() : undefined,
@@ -359,25 +356,22 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     }
   };
 
-  const handleDeliveryOptionSelect = (option: DeliveryOption) => {
+  const handleDeliveryOptionSelect = async (option: DeliveryOption) => {
     setSelectedDeliveryOption(option);
     
     if (option === 'fast') {
       setDeliverySpeed('express');
       setShowPriceCalendar(false);
       setSelectedDeliveryDate(null);
-      // toast.success("Fast delivery selected - Your package will arrive in 1-2 business days");
     } else if (option === 'cheap') {
       setDeliverySpeed('economy');
       setShowPriceCalendar(true);
-      // toast.success("Cheap delivery selected - Please choose a delivery date");
       loadPriceCalendarData();
     }
   };
 
-  const handleDeliveryDateSelect = (date: Date) => {
+  const handleDeliveryDateSelect = async (date: Date) => {
     setSelectedDeliveryDate(date);
-    // toast.success(`Delivery date selected: ${date.toLocaleDateString()}`);
   };
 
   if (bookingConfirmed) {
@@ -616,14 +610,16 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                           phone: recipientPhone,
                           email: recipientEmail
                         }),
-                        delivery_speed: selectedDeliveryOption === 'fast' ? 'express' : 'standard',
                         pickup_time: new Date().toISOString(),
                         total_price: getCarrierPrice(),
                         status: 'pending',
                         customer_type: selectedCustomerType || 'private',
-                        business_name: businessName || null,
-                        vat_number: vatNumber || null,
-                        cancellation_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+                        cancellation_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+                        pooling_enabled: selectedDeliveryOption === 'cheap' ? 'yes' : 'no',
+                        delivery_date: selectedDeliveryDate ? selectedDeliveryDate.toISOString() : null,
+                        payment_method: paymentInfo?.paymentMethod,
+                        payment_details: paymentInfo,
+                        terms_accepted: paymentInfo?.termsAccepted
                       };
 
                       const { error } = await supabase

@@ -19,19 +19,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const pickupTime = new Date();
     pickupTime.setHours(pickupTime.getHours() + 2);
     
-    const estimatedDelivery = new Date();
-    if (request.deliverySpeed === 'express') {
-      estimatedDelivery.setDate(estimatedDelivery.getDate() + 1);
-    } else if (request.deliverySpeed === 'standard') {
-      estimatedDelivery.setDate(estimatedDelivery.getDate() + 3);
-    } else {
-      estimatedDelivery.setDate(estimatedDelivery.getDate() + 5);
-    }
-    
-    if (request.deliveryDate) {
-      estimatedDelivery.setTime(new Date(request.deliveryDate).getTime());
-    }
-    
     const cancellationDeadline = new Date();
     cancellationDeadline.setHours(cancellationDeadline.getHours() + 24);
     
@@ -42,7 +29,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
         labelUrl,
         pickupTime.toISOString(),
         totalPrice,
-        estimatedDelivery.toISOString(),
+        request.deliveryDate || new Date().toISOString(),
         cancellationDeadline
       );
       
@@ -66,13 +53,10 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       total_price: totalPrice,
       cancellation_deadline: cancellationDeadline.toISOString(),
       can_be_cancelled: true,
-      delivery_speed: request.deliverySpeed,
       compliance_included: request.includeCompliance,
       created_at: new Date().toISOString(),
       shipment_id: shipmentId,
       customerType: request.customerType || 'private',
-      businessName: request.businessName,
-      vatNumber: request.vatNumber,
       poolingEnabled: request.poolingEnabled,
       deliveryDate: request.deliveryDate,
       paymentMethod: request.paymentMethod,
