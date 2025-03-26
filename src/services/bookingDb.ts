@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { BookingRequest } from "@/types/booking";
 
@@ -15,32 +16,36 @@ export const saveBookingToSupabase = async (
   cancellationDeadline: Date
 ) => {
   try {
-    // Create booking payload with detailed logging to track data
+    console.log("SAVE BOOKING DEBUG - Request:", JSON.stringify(request, null, 2));
+    console.log("SAVE BOOKING DEBUG - TrackingCode:", trackingCode);
+    console.log("SAVE BOOKING DEBUG - UserId:", request.userId);
+    
+    // Create booking payload with detailed logging
     const bookingPayload = {
       user_id: request.userId,
       tracking_code: trackingCode,
-      carrier_price: request.carrier.price,
+      carrier_price: parseFloat(request.carrier.price.toString()), // Ensure numeric format
       weight: request.weight,
       dimension_length: request.dimensions.length,
       dimension_width: request.dimensions.width,
       dimension_height: request.dimensions.height,
-      pickup_address: JSON.stringify(request.pickup), // Convert object to string for storage
-      delivery_address: JSON.stringify(request.delivery), // Convert object to string for storage
+      pickup_address: typeof request.pickup === 'string' ? request.pickup : JSON.stringify(request.pickup),
+      delivery_address: typeof request.delivery === 'string' ? request.delivery : JSON.stringify(request.delivery),
       delivery_speed: request.deliverySpeed,
       label_url: labelUrl,
       pickup_time: pickupTime,
       total_price: totalPrice,
       status: 'pending',
       customer_type: request.customerType || 'private',
-      business_name: request.businessName,
-      vat_number: request.vatNumber,
+      business_name: request.businessName || null,
+      vat_number: request.vatNumber || null,
       cancellation_deadline: cancellationDeadline.toISOString(),
       estimated_delivery: new Date(estimatedDelivery).toISOString().split('T')[0] // Format as YYYY-MM-DD
     };
     
-    console.log("Saving to Supabase with payload:", bookingPayload);
+    console.log("SAVE BOOKING DEBUG - Full payload:", JSON.stringify(bookingPayload, null, 2));
     
-    // Insert data into Supabase
+    // Insert data into Supabase with explicit error handling
     const { data, error } = await supabase
       .from('booking')
       .insert(bookingPayload)
@@ -48,17 +53,19 @@ export const saveBookingToSupabase = async (
       .maybeSingle();
       
     if (error) {
-      console.error("Error saving to Supabase:", error);
+      console.error("SUPABASE ERROR:", error.message);
+      console.error("ERROR DETAILS:", error.details);
+      console.error("ERROR HINT:", error.hint);
       return false;
     }
     
     // Clear cache after new booking
     clearCacheForUser(request.userId);
     
-    console.log("Successfully saved booking to Supabase with response:", data);
+    console.log("SAVE BOOKING SUCCESS - Response data:", data);
     return true;
   } catch (error) {
-    console.error("Supabase insertion error:", error);
+    console.error("CRITICAL ERROR in saveBookingToSupabase:", error);
     return false;
   }
 };
