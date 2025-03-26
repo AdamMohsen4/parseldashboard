@@ -50,6 +50,12 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     } else {
       estimatedDelivery.setDate(estimatedDelivery.getDate() + 5);
     }
+    
+    // If user selected a specific delivery date, use that instead
+    if (request.deliveryDate) {
+      estimatedDelivery.setTime(new Date(request.deliveryDate).getTime());
+    }
+    
     const estimatedDeliveryStr = estimatedDelivery.toISOString();
    
     // Set cancellation deadline (24h from now)
@@ -76,7 +82,12 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       shipment_id: shipmentId,
       customerType: request.customerType || 'private',
       businessName: request.businessName,
-      vatNumber: request.vatNumber
+      vatNumber: request.vatNumber,
+      poolingEnabled: request.poolingEnabled,
+      deliveryDate: request.deliveryDate,
+      paymentMethod: request.paymentMethod,
+      paymentDetails: request.paymentDetails,
+      termsAccepted: request.termsAccepted
     };
     
     // Save booking (in memory for this demo)

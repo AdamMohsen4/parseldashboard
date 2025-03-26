@@ -1,3 +1,4 @@
+
 // These are common fields in all types of forms for 3PL service requests
 export interface ThreePLRequestBase {
   // Company information
@@ -42,6 +43,9 @@ export interface ThreePLRequest extends ThreePLRequestBase {
   ecommerceStoreUrl?: string;
   ecommerceSkuCount?: string;
   ecommerceOrderVolume?: string;
+  
+  // Pooling option (for optimization)
+  poolingEnabled?: boolean;
 }
 
 // Response from submitting a 3PL service request

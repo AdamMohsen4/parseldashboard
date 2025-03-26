@@ -16,18 +16,33 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { BookingRequest } from '@/types/booking';
 
 interface PaymentFormProps {
   totalPrice: number;
   onPaymentComplete: () => void;
   onCancel: () => void;
-  onSubmit: (data: any) => void;
+  onSubmit: (paymentData: PaymentData) => void;
+  formData?: any; // All the collected form data from previous steps
+}
+
+export interface PaymentData {
+  paymentMethod: 'swish' | 'ebanking' | 'card';
+  cardNumber?: string;
+  expiryDate?: string;
+  cvv?: string;
+  cardholderName?: string;
+  swishNumber?: string;
+  bankName?: string;
+  termsAccepted: boolean;
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({ 
   totalPrice,
   onPaymentComplete,
-  onCancel}) => {
+  onCancel,
+  onSubmit
+}) => {
   const [paymentMethod, setPaymentMethod] = useState<'swish' | 'ebanking' | 'card'>('swish');
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
@@ -89,6 +104,20 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
     
     setIsProcessing(true);
+    
+    // Create payment data object
+    const paymentData: PaymentData = {
+      paymentMethod,
+      termsAccepted,
+      cardNumber: paymentMethod === 'card' ? cardNumber : undefined,
+      expiryDate: paymentMethod === 'card' ? expiryDate : undefined,
+      cardholderName: paymentMethod === 'card' ? cardholderName : undefined,
+      swishNumber: paymentMethod === 'swish' ? swishNumber : undefined,
+      bankName: paymentMethod === 'ebanking' ? bankName : undefined,
+    };
+    
+    // Send the payment data to the parent component
+    onSubmit(paymentData);
     
     // Simulate payment processing
     setTimeout(() => {

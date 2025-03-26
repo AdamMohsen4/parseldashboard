@@ -13,15 +13,14 @@ import BookingSteps from "@/components/booking/BookingSteps";
 import LocationSelector from "@/components/booking/LocationSelector";
 import DeliveryOptions from "@/components/booking/DeliveryOptions";
 import AddressDetails from "@/components/booking/AddressDetails";
-import { AddressDetails as AddressDetailsType } from "@/types/booking";
+import { AddressDetails as AddressDetailsType, BookingRequest } from "@/types/booking";
 import BookingSummary from "@/components/booking/BookingSummary";
-import PaymentForm from "@/components/booking/PaymentForm";
+import PaymentForm, { PaymentData } from "@/components/booking/PaymentForm";
 import PriceCalendarView from "@/components/priceCalendar/PriceCalendarView";
 import { generateMockPricingData, DateRange } from "@/utils/pricingUtils";
 import { addWeeks, startOfDay } from "date-fns";
 import LabelGenerator from "@/components/labels/LabelGenerator";
 import { trackShipment } from "@/services/shipmentService";
-import { get } from "http";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 type DeliveryOption = "fast" | "cheap" | null;
@@ -71,7 +70,8 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [pricingData, setPricingData] = useState([]);
   const [isCalendarLoading, setIsCalendarLoading] = useState(false);
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<Date | null>(null);
-  
+  const [paymentInfo, setPaymentInfo] = useState<PaymentData | null>(null);
+
   const today = startOfDay(new Date());
   const threeWeeksFromNow = addWeeks(today, 3);
   
@@ -195,7 +195,18 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         customerType: selectedCustomerType || "private",
         businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
         vatNumber: selectedCustomerType === "business" ? vatNumber : undefined,
-        pickupSlotId: "slot-1" // Default slot
+        pickupSlotId: "slot-1",
+        poolingEnabled: selectedDeliveryOption === 'cheap',
+        deliveryDate: selectedDeliveryDate ? selectedDeliveryDate.toISOString() : undefined,
+        paymentMethod: paymentInfo?.paymentMethod,
+        paymentDetails: {
+          cardNumber: paymentInfo?.cardNumber,
+          expiryDate: paymentInfo?.expiryDate,
+          cardholderName: paymentInfo?.cardholderName,
+          swishNumber: paymentInfo?.swishNumber,
+          bankName: paymentInfo?.bankName
+        },
+        termsAccepted: paymentInfo?.termsAccepted
       });
       
       if (result.success) {
@@ -352,6 +363,12 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const handleDeliveryDateSelect = (date: Date) => {
     setSelectedDeliveryDate(date);
     // toast.success(`Delivery date selected: ${date.toLocaleDateString()}`);
+  };
+
+  const handlePaymentSubmit = (data: PaymentData) => {
+    console.log("Payment data received:", data);
+    setPaymentInfo(data);
+    handleBookNow();
   };
 
   if (bookingConfirmed) {
@@ -563,33 +580,11 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                 <PaymentForm 
                   totalPrice={getCarrierPrice()}
                   onPaymentComplete={handleBookNow}
-                  onSubmit={handleSubmit} 
+                  onSubmit={handlePaymentSubmit} 
                   onCancel={handlePreviousStep}
                 />
-
               </div>
             )}
-          
-
-            {/* {currentStep === 5 && (
-              <div>
-                <BookingConfirmation bookingResult={undefined} carrier={{
-                  name: recipientName,
-                  eta: "3 days",
-                  price: getCarrierPrice()
-                }} canCancelBooking={false} labelLanguage={""} setLabelLanguage={function (language: string): void {
-                  labelLanguage
-                } } isGeneratingLabel={false} handleGenerateLabel={function (): void {
-                  LabelGenerator
-                } } handleCancelBooking={function (): void {
-                   cancelBooking
-                } } onBookAnother={function (): void {
-                  setBookingConfirmed
-                } }
-                />
-                
-              </div>
-            )} */}
           </form>
         </div>
       </div>

@@ -36,10 +36,15 @@ export const saveBookingToSupabase = async (
       customer_type: request.customerType || 'private',
       business_name: request.businessName,
       vat_number: request.vatNumber,
-      cancellation_deadline: cancellationDeadline.toISOString()
+      cancellation_deadline: cancellationDeadline.toISOString(),
+      pooling_enabled: request.poolingEnabled || false,
+      delivery_date: request.deliveryDate,
+      payment_method: request.paymentMethod,
+      payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
+      terms_accepted: request.termsAccepted || false,
+      estimated_delivery: estimatedDelivery
     });
     
-    // FIX: Changed from inserting an array to inserting a single object
     const { data, error } = await supabase
       .from('booking')
       .insert({
@@ -62,7 +67,13 @@ export const saveBookingToSupabase = async (
         customer_type: request.customerType || 'private',
         business_name: request.businessName,
         vat_number: request.vatNumber,
-        cancellation_deadline: cancellationDeadline.toISOString()
+        cancellation_deadline: cancellationDeadline.toISOString(),
+        pooling_enabled: request.poolingEnabled || false,
+        delivery_date: request.deliveryDate,
+        payment_method: request.paymentMethod,
+        payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
+        terms_accepted: request.termsAccepted || false,
+        estimated_delivery: estimatedDelivery
       })
       .select()
       .maybeSingle();
