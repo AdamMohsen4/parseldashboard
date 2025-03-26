@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { BookingRequest } from "@/types/booking";
 
@@ -16,7 +15,8 @@ export const saveBookingToSupabase = async (
   cancellationDeadline: Date
 ) => {
   try {
-    console.log("Saving booking to Supabase with payload:", {
+    // Create booking payload with detailed logging to track data
+    const bookingPayload = {
       user_id: request.userId,
       tracking_code: trackingCode,
       carrier_price: request.carrier.price,
@@ -24,8 +24,8 @@ export const saveBookingToSupabase = async (
       dimension_length: request.dimensions.length,
       dimension_width: request.dimensions.width,
       dimension_height: request.dimensions.height,
-      pickup_address: request.pickup,
-      delivery_address: request.delivery,
+      pickup_address: JSON.stringify(request.pickup), // Convert object to string for storage
+      delivery_address: JSON.stringify(request.delivery), // Convert object to string for storage
       delivery_speed: request.deliverySpeed,
       label_url: labelUrl,
       pickup_time: pickupTime,
@@ -35,44 +35,15 @@ export const saveBookingToSupabase = async (
       business_name: request.businessName,
       vat_number: request.vatNumber,
       cancellation_deadline: cancellationDeadline.toISOString(),
-      estimated_delivery: estimatedDelivery
-    });
+      estimated_delivery: new Date(estimatedDelivery).toISOString().split('T')[0] // Format as YYYY-MM-DD
+    };
     
-    // Convert the Date object to an ISO string for the cancellation_deadline
-    const cancellationDeadlineIso = cancellationDeadline.toISOString();
+    console.log("Saving to Supabase with payload:", bookingPayload);
     
-    // Parse the estimated delivery date string to ensure correct format
-    const estimatedDeliveryDate = new Date(estimatedDelivery).toISOString().split('T')[0];
-    
-    console.log("Formatted dates:", {
-      cancellationDeadlineIso,
-      estimatedDeliveryDate
-    });
-    
-    // Ensure we're matching the exact column names in the supabase table
+    // Insert data into Supabase
     const { data, error } = await supabase
       .from('booking')
-      .insert({
-        user_id: request.userId,
-        tracking_code: trackingCode,
-        carrier_price: request.carrier.price,
-        weight: request.weight,
-        dimension_length: request.dimensions.length,
-        dimension_width: request.dimensions.width,
-        dimension_height: request.dimensions.height,
-        pickup_address: JSON.stringify(request.pickup), // Convert object to string for storage
-        delivery_address: JSON.stringify(request.delivery), // Convert object to string for storage
-        delivery_speed: request.deliverySpeed,
-        label_url: labelUrl,
-        pickup_time: pickupTime,
-        total_price: totalPrice,
-        status: 'pending',
-        customer_type: request.customerType || 'private',
-        business_name: request.businessName,
-        vat_number: request.vatNumber,
-        cancellation_deadline: cancellationDeadlineIso,
-        estimated_delivery: estimatedDeliveryDate // Use the formatted date string
-      })
+      .insert(bookingPayload)
       .select()
       .maybeSingle();
       

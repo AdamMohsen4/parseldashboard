@@ -1,3 +1,4 @@
+
 import { generateShipmentId, generateTrackingCode, calculateTotalPrice } from './bookingUtils';
 import { BookingRequest, BookingResponse, AddressDetails } from '@/types/booking';
 import { toast } from 'sonner';
@@ -71,7 +72,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       recipient_address: typeof request.delivery === 'string' ? request.delivery : JSON.stringify(request.delivery),
       package_weight: request.weight,
       package_dimensions: `${request.dimensions.length}x${request.dimensions.width}x${request.dimensions.height}`,
-      carrier_name: request.carrier.name,
+      carrier_name: request.carrier.name || 'E-Parcel Nordic',
       total_price: totalPrice,
       cancellation_deadline: cancellationDeadline.toISOString(),
       can_be_cancelled: true,
