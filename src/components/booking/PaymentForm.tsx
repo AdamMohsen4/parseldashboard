@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,14 +15,12 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { BookingRequest } from '@/types/booking';
 
 interface PaymentFormProps {
   totalPrice: number;
   onPaymentComplete: () => void;
   onCancel: () => void;
   onSubmit: (paymentData: PaymentData) => void;
-  formData?: any; // All the collected form data from previous steps
 }
 
 export interface PaymentData {
@@ -365,6 +362,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               type="submit"
               disabled={isProcessing}
               className="bg-green-600 hover:bg-green-700 text-white min-w-[7rem]"
+              onClick={handleSubmit}
             >
               {isProcessing ? (
                 <div className="flex items-center gap-2">

@@ -1,12 +1,11 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
 import { bookShipment, cancelBooking } from "@/services/bookingService";
-import { Briefcase, Calendar, DollarSign, Download, Package, ShoppingCart, Truck, User, Zap } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { getBookingByTrackingCode } from "@/services/bookingDb";
 import { generateLabel } from "@/services/labelService";
 import BookingConfirmation from "@/components/booking/BookingConfirmation";
@@ -20,8 +19,8 @@ import PaymentForm, { PaymentData } from "@/components/booking/PaymentForm";
 import PriceCalendarView from "@/components/priceCalendar/PriceCalendarView";
 import { generateMockPricingData, DateRange } from "@/utils/pricingUtils";
 import { addWeeks, startOfDay } from "date-fns";
-import LabelGenerator from "@/components/labels/LabelGenerator";
-import { trackShipment } from "@/services/shipmentService";
+import { supabase } from "@/integrations/supabase/client";
+import { generateTrackingCode } from "@/services/bookingUtils";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 type DeliveryOption = "fast" | "cheap" | null;
@@ -32,7 +31,6 @@ interface ShipmentBookingPageProps {
 
 const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const { isSignedIn, user } = useUser();
-  const location = useLocation();
   const navigate = useNavigate();
   const [weight, setWeight] = useState("5");
   const [length, setLength] = useState("20");
@@ -382,8 +380,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     // toast.success(`Delivery date selected: ${date.toLocaleDateString()}`);
   };
 
-  // Removed the duplicate handlePaymentSubmit function that was here
-
   if (bookingConfirmed) {
     return (
       <div className="min-h-screen bg-background">
@@ -592,8 +588,59 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
               <div>
                 <PaymentForm 
                   totalPrice={getCarrierPrice()}
-                  onPaymentComplete={handleBookNow}
-                  onSubmit={handlePaymentSubmit} 
+                  onPaymentComplete={async () => {
+                    try {
+                      const bookingData = {
+                        user_id: user?.id,
+                        tracking_code: generateTrackingCode(),
+                        carrier_price: getCarrierPrice(),
+                        weight: selectedVolume,
+                        dimension_length: length,
+                        dimension_width: width,
+                        dimension_height: height,
+                        pickup_address: JSON.stringify({
+                          name: senderName,
+                          address: senderAddress,
+                          postalCode: pickupPostalCode,
+                          city: "Stockholm",
+                          country: pickupCountry,
+                          phone: senderPhone,
+                          email: senderEmail
+                        }),
+                        delivery_address: JSON.stringify({
+                          name: recipientName,
+                          address: recipientAddress,
+                          postalCode: deliveryPostalCode,
+                          city: "Helsinki",
+                          country: deliveryCountry,
+                          phone: recipientPhone,
+                          email: recipientEmail
+                        }),
+                        delivery_speed: selectedDeliveryOption === 'fast' ? 'express' : 'standard',
+                        pickup_time: new Date().toISOString(),
+                        total_price: getCarrierPrice(),
+                        status: 'pending',
+                        customer_type: selectedCustomerType || 'private',
+                        business_name: businessName || null,
+                        vat_number: vatNumber || null,
+                        cancellation_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+                      };
+
+                      const { error } = await supabase
+                        .from('booking')
+                        .insert(bookingData)
+                        .select()
+                        .single();
+
+                      if (error) throw error;
+                      
+                      handleBookNow();
+                    } catch (error) {
+                      console.error('Error saving to Supabase:', error);
+                      toast.error('Failed to save booking');
+                    }
+                  }}
+                  onSubmit={handlePaymentSubmit}
                   onCancel={handlePreviousStep}
                 />
               </div>

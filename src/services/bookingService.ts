@@ -1,47 +1,24 @@
-
 import { generateShipmentId, generateTrackingCode, calculateTotalPrice } from './bookingUtils';
-import { BookingRequest, BookingResponse, AddressDetails } from '@/types/booking';
-import { toast } from 'sonner';
+import { BookingRequest, BookingResponse } from '@/types/booking';
 import { saveBookingToSupabase } from './bookingDb';
-
-// Store bookings in memory (in a real app this would be a database call)
-const bookings: Record<string, any> = {};
 
 export const bookShipment = async (request: BookingRequest): Promise<BookingResponse> => {
   try {
-    console.log('Booking shipment - START with request:', JSON.stringify(request, null, 2));
-    
-    // Basic validation
-    if (!request.pickup || !request.delivery) {
+    if (!request.pickup || !request.delivery || !request.userId) {
       return {
         success: false,
-        message: 'Pickup and delivery addresses are required',
+        message: 'Required fields are missing',
       };
     }
     
-    if (!request.userId) {
-      return {
-        success: false,
-        message: 'User ID is required',
-      };
-    }
-    
-    // Generate shipment ID and tracking code
     const shipmentId = generateShipmentId();
     const trackingCode = generateTrackingCode();
-    
-    // Calculate total price
     const totalPrice = calculateTotalPrice(request.carrier.price, request.includeCompliance);
-    
-    // Simulate generation of a label URL
     const labelUrl = `https://api.shipping.com/labels/${trackingCode}`;
     
-    // Set pickup time (current time + 2 hours)
     const pickupTime = new Date();
     pickupTime.setHours(pickupTime.getHours() + 2);
-    const pickupTimeStr = pickupTime.toISOString();
     
-    // Set estimated delivery date (depends on delivery speed)
     const estimatedDelivery = new Date();
     if (request.deliverySpeed === 'express') {
       estimatedDelivery.setDate(estimatedDelivery.getDate() + 1);
@@ -51,46 +28,31 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       estimatedDelivery.setDate(estimatedDelivery.getDate() + 5);
     }
     
-    // If user selected a specific delivery date, use that instead
     if (request.deliveryDate) {
       estimatedDelivery.setTime(new Date(request.deliveryDate).getTime());
     }
     
-    const estimatedDeliveryStr = estimatedDelivery.toISOString();
-   
-    // Set cancellation deadline (24h from now)
     const cancellationDeadline = new Date();
     cancellationDeadline.setHours(cancellationDeadline.getHours() + 24);
     
-    console.log("BOOKING DEBUG - About to save to Supabase", {
-      userId: request.userId,
-      trackingCode,
-      estimatedDeliveryStr
-    });
-    
-    // Add additional call to save to Supabase - with enhanced error handling
     try {
       const savedToSupabase = await saveBookingToSupabase(
         request,
         trackingCode,
         labelUrl,
-        pickupTimeStr,
+        pickupTime.toISOString(),
         totalPrice,
-        estimatedDeliveryStr,
+        estimatedDelivery.toISOString(),
         cancellationDeadline
       );
       
       if (!savedToSupabase) {
-        console.error('Failed to save booking to Supabase, continuing with local storage only');
-      } else {
-        console.log('Successfully saved booking to Supabase!');
+        console.error('Failed to save booking to Supabase');
       }
-    } catch (supabaseError) {
-      console.error('Error saving to Supabase:', supabaseError);
-      // We'll still continue with the flow to avoid breaking the user experience
+    } catch (error) {
+      console.error('Error saving to Supabase:', error);
     }
     
-    // Create booking record for local storage
     const booking = {
       id: shipmentId,
       tracking_code: trackingCode,
@@ -118,20 +80,10 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       termsAccepted: request.termsAccepted
     };
     
-    // Save booking (in memory for this demo)
-    bookings[trackingCode] = booking;
-    
-    // For demonstration purposes, simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Store booking in localStorage (for demo purposes)
     const userBookings = JSON.parse(localStorage.getItem(`bookings_${request.userId}`) || '[]');
     userBookings.push(booking);
     localStorage.setItem(`bookings_${request.userId}`, JSON.stringify(userBookings));
     
-    console.log('Booking shipment - COMPLETE successfully for trackingCode:', trackingCode);
-    
-    // Return success response
     return {
       success: true,
       message: 'Shipment booked successfully',
@@ -152,33 +104,16 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
 
 export const cancelBooking = async (trackingCode: string, userId: string): Promise<boolean> => {
   try {
-    console.log('Cancelling booking:', trackingCode);
-    
-    // Check if booking exists and belongs to user
     const userBookings = JSON.parse(localStorage.getItem(`bookings_${userId}`) || '[]');
     const bookingIndex = userBookings.findIndex((b: any) => b.tracking_code === trackingCode);
     
-    if (bookingIndex === -1) {
-      console.error('Booking not found or does not belong to user');
+    if (bookingIndex === -1 || !userBookings[bookingIndex].can_be_cancelled) {
       return false;
     }
     
-    // Check if booking can be cancelled
-    const booking = userBookings[bookingIndex];
-    if (!booking.can_be_cancelled) {
-      console.error('Booking cannot be cancelled');
-      return false;
-    }
-    
-    // Update booking status
-    booking.status = 'cancelled';
-    booking.can_be_cancelled = false;
-    userBookings[bookingIndex] = booking;
-    
-    // Update local storage
+    userBookings[bookingIndex].status = 'cancelled';
+    userBookings[bookingIndex].can_be_cancelled = false;
     localStorage.setItem(`bookings_${userId}`, JSON.stringify(userBookings));
-    
-    // In a real app, this would update the database
     
     return true;
   } catch (error) {

@@ -13,70 +13,48 @@ export const saveBookingToSupabase = async (
   totalPrice: number,
   estimatedDelivery: string,
   cancellationDeadline: Date
-) => {
+): Promise<boolean> => {
   try {
-    console.log("Saving booking to Supabase with payload:", {
-      user_id: request.userId,
-      tracking_code: trackingCode,
-      carrier_name: request.carrier.name,
-      carrier_price: request.carrier.price,
-      weight: request.weight,
-      dimension_length: request.dimensions.length,
-      dimension_width: request.dimensions.width,
-      dimension_height: request.dimensions.height,
-      pickup_address: request.pickup,
-      delivery_address: request.delivery,
-      delivery_speed: request.deliverySpeed,
-      label_url: labelUrl,
-      pickup_time: pickupTime,
-      total_price: totalPrice,
-      status: 'pending',
-      customer_type: request.customerType || 'private',
-      business_name: request.businessName,
-      vat_number: request.vatNumber,
-      cancellation_deadline: cancellationDeadline.toISOString()
-    });
-    
-    // FIX: Changed from inserting an array to inserting a single object
     const { data, error } = await supabase
       .from('booking')
-      .insert({
-        user_id: request.userId,
-        tracking_code: trackingCode,
-        carrier_name: request.carrier.name,
-        carrier_price: request.carrier.price,
-        weight: request.weight,
-        dimension_length: request.dimensions.length,
-        dimension_width: request.dimensions.width,
-        dimension_height: request.dimensions.height,
-        pickup_address: JSON.stringify(request.pickup), // Convert object to string for storage
-        delivery_address: JSON.stringify(request.delivery), // Convert object to string for storage
-        delivery_speed: request.deliverySpeed,
-        include_compliance: request.includeCompliance,
-        label_url: labelUrl,
-        pickup_time: pickupTime,
-        total_price: totalPrice,
-        status: 'pending',
-        customer_type: request.customerType || 'private',
-        business_name: request.businessName,
-        vat_number: request.vatNumber,
-        cancellation_deadline: cancellationDeadline.toISOString()
-      })
-      .select()
-      .single();
+      .insert([
+        {
+          tracking_code: trackingCode,
+          user_id: request.userId,
+          status: 'pending',
+          sender_address: typeof request.pickup === 'string' ? request.pickup : JSON.stringify(request.pickup),
+          recipient_address: typeof request.delivery === 'string' ? request.delivery : JSON.stringify(request.delivery),
+          package_weight: request.weight,
+          package_dimensions: `${request.dimensions.length}x${request.dimensions.width}x${request.dimensions.height}`,
+          carrier_name: request.carrier.name || 'E-Parcel Nordic',
+          total_price: totalPrice,
+          cancellation_deadline: cancellationDeadline.toISOString(),
+          can_be_cancelled: true,
+          delivery_speed: request.deliverySpeed,
+          compliance_included: request.includeCompliance,
+          created_at: new Date().toISOString(),
+          customer_type: request.customerType || 'private',
+          business_name: request.businessName,
+          vat_number: request.vatNumber,
+          pooling_enabled: request.poolingEnabled,
+          delivery_date: request.deliveryDate,
+          payment_method: request.paymentMethod,
+          payment_details: request.paymentDetails,
+          terms_accepted: request.termsAccepted,
+          label_url: labelUrl,
+          pickup_time: pickupTime,
+          estimated_delivery: estimatedDelivery
+        }
+      ]);
 
     if (error) {
-      console.error("Error saving to Supabase:", error);
+      console.error('Error saving booking to Supabase:', error);
       return false;
     }
-    
-    // Clear cache after new booking
-    clearCacheForUser(request.userId);
-    
-    console.log("Successfully saved booking to Supabase with response:", data);
+
     return true;
   } catch (error) {
-    console.error("Supabase insertion error:", error);
+    console.error('Error in saveBookingToSupabase:', error);
     return false;
   }
 };
@@ -171,15 +149,6 @@ export const findBookingByOrderNumber = async (userId: string, orderNumber: stri
 
 export const getBookingByTrackingCode = async (trackingCode: string, userId: string) => {
   try {
-    const cacheKey = `booking-tracking-${userId}-${trackingCode}`;
-    
-    // Check cache first
-    const cachedData = bookingsCache.get(cacheKey);
-    if (cachedData && (Date.now() - cachedData.timestamp < CACHE_EXPIRY)) {
-      console.log("Returning booking from cache");
-      return cachedData.data;
-    }
-    
     const { data, error } = await supabase
       .from('booking')
       .select('*')
@@ -191,12 +160,6 @@ export const getBookingByTrackingCode = async (trackingCode: string, userId: str
       console.error("Error fetching booking by tracking code:", error);
       return null;
     }
-    
-    // Store in cache
-    bookingsCache.set(cacheKey, {
-      data: data,
-      timestamp: Date.now()
-    });
     
     return data;
   } catch (error) {
