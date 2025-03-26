@@ -41,7 +41,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [delivery, setDelivery] = useState("Helsinki, FI");
   const [deliveryPostalCode, setDeliveryPostalCode] = useState("00341");
   const [deliverySpeed, setDeliverySpeed] = useState("standard");
-  const [compliance, setCompliance] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
   const [bookingResult, setBookingResult] = useState<any>(null);
   const [selectedCustomerType, setSelectedCustomerType] = useState<CustomerType>(customerType || "private");
@@ -151,7 +150,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const handlePaymentSubmit = (data: PaymentData) => {
     console.log("Payment data received:", data);
     setPaymentInfo(data);
-    handleBookNow();
   };
 
   const handleBookNow = async () => {
@@ -163,6 +161,10 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     if (!isSignedIn || !user) {
       document.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger")?.click();
       return;
+    }
+
+    if (isBooking) {
+      return; // Prevent duplicate submissions
     }
 
     setIsBooking(true);
@@ -198,20 +200,12 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         pickup: pickupAddress,
         delivery: deliveryAddress,
         carrier: { name: carrier.name, price: carrier.price },
-        includeCompliance: compliance,
         userId: user.id,
         customerType: selectedCustomerType || "private",
         pickupSlotId: "slot-1",
         poolingEnabled: selectedDeliveryOption === 'cheap',
         deliveryDate: selectedDeliveryDate ? selectedDeliveryDate.toISOString() : undefined,
         paymentMethod: paymentInfo?.paymentMethod,
-        paymentDetails: {
-          cardNumber: paymentInfo?.cardNumber,
-          expiryDate: paymentInfo?.expiryDate,
-          cardholderName: paymentInfo?.cardholderName,
-          swishNumber: paymentInfo?.swishNumber,
-          bankName: paymentInfo?.bankName
-        },
         termsAccepted: paymentInfo?.termsAccepted
       };
       
@@ -582,60 +576,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
               <div>
                 <PaymentForm 
                   totalPrice={getCarrierPrice()}
-                  onPaymentComplete={async () => {
-                    try {
-                      const bookingData = {
-                        user_id: user?.id,
-                        tracking_code: generateTrackingCode(),
-                        carrier_price: getCarrierPrice(),
-                        weight: selectedVolume,
-                        dimension_length: length,
-                        dimension_width: width,
-                        dimension_height: height,
-                        pickup_address: JSON.stringify({
-                          name: senderName,
-                          address: senderAddress,
-                          postalCode: pickupPostalCode,
-                          city: "Stockholm",
-                          country: pickupCountry,
-                          phone: senderPhone,
-                          email: senderEmail
-                        }),
-                        delivery_address: JSON.stringify({
-                          name: recipientName,
-                          address: recipientAddress,
-                          postalCode: deliveryPostalCode,
-                          city: "Helsinki",
-                          country: deliveryCountry,
-                          phone: recipientPhone,
-                          email: recipientEmail
-                        }),
-                        pickup_time: new Date().toISOString(),
-                        total_price: getCarrierPrice(),
-                        status: 'pending',
-                        customer_type: selectedCustomerType || 'private',
-                        cancellation_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-                        pooling_enabled: selectedDeliveryOption === 'cheap' ? 'yes' : 'no',
-                        delivery_date: selectedDeliveryDate ? selectedDeliveryDate.toISOString() : null,
-                        payment_method: paymentInfo?.paymentMethod,
-                        payment_details: paymentInfo,
-                        terms_accepted: paymentInfo?.termsAccepted
-                      };
-
-                      const { error } = await supabase
-                        .from('booking')
-                        .insert(bookingData)
-                        .select()
-                        .single();
-
-                      if (error) throw error;
-                      
-                      handleBookNow();
-                    } catch (error) {
-                      console.error('Error saving to Supabase:', error);
-                      toast.error('Failed to save booking');
-                    }
-                  }}
+                  onPaymentComplete={handleBookNow}
                   onSubmit={handlePaymentSubmit}
                   onCancel={handlePreviousStep}
                 />

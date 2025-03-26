@@ -7,7 +7,6 @@ export interface BookingResponse {
   pickupTime?: string;
   totalPrice?: number;
   cancellationDeadline?: string;
-  canBeCancelled?: boolean;
 }
 
 export interface AddressDetails {
@@ -33,7 +32,6 @@ export interface BookingRequest {
     name: string;
     price: number;
   };
-  includeCompliance: boolean;
   userId: string;
   customerType?: string;
   pickupSlotId: string;

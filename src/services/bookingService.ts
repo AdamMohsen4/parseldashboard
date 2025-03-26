@@ -13,7 +13,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     
     const shipmentId = generateShipmentId();
     const trackingCode = generateTrackingCode();
-    const totalPrice = calculateTotalPrice(request.carrier.price, request.includeCompliance);
+    const totalPrice = calculateTotalPrice(request.carrier.price);
     const labelUrl = `https://api.shipping.com/labels/${trackingCode}`;
     
     const pickupTime = new Date();
@@ -22,46 +22,52 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const cancellationDeadline = new Date();
     cancellationDeadline.setHours(cancellationDeadline.getHours() + 24);
     
-    try {
-      const savedToSupabase = await saveBookingToSupabase(
-        request,
-        trackingCode,
-        labelUrl,
-        pickupTime.toISOString(),
-        totalPrice,
-        request.deliveryDate || new Date().toISOString(),
-        cancellationDeadline
-      );
-      
-      if (!savedToSupabase) {
-        console.error('Failed to save booking to Supabase');
-      }
-    } catch (error) {
-      console.error('Error saving to Supabase:', error);
+    // Save to Supabase first
+    const savedToSupabase = await saveBookingToSupabase(
+      request,
+      trackingCode,
+      labelUrl,
+      pickupTime.toISOString(),
+      totalPrice,
+      request.deliveryDate || new Date().toISOString(),
+      cancellationDeadline
+    );
+    
+    if (!savedToSupabase) {
+      return {
+        success: false,
+        message: 'Failed to save booking to database',
+      };
     }
     
+    // Only save to local storage if Supabase save was successful
     const booking = {
       id: shipmentId,
       tracking_code: trackingCode,
       user_id: request.userId,
       status: 'pending',
-      sender_address: typeof request.pickup === 'string' ? request.pickup : JSON.stringify(request.pickup),
-      recipient_address: typeof request.delivery === 'string' ? request.delivery : JSON.stringify(request.delivery),
-      package_weight: request.weight,
-      package_dimensions: `${request.dimensions.length}x${request.dimensions.width}x${request.dimensions.height}`,
+      pickup_address: typeof request.pickup === 'string' ? request.pickup : JSON.stringify(request.pickup),
+      delivery_address: typeof request.delivery === 'string' ? request.delivery : JSON.stringify(request.delivery),
+      weight: request.weight,
+      dimension_length: request.dimensions.length,
+      dimension_width: request.dimensions.width,
+      dimension_height: request.dimensions.height,
       carrier_name: request.carrier.name || 'E-Parcel Nordic',
+      carrier_price: request.carrier.price,
       total_price: totalPrice,
       cancellation_deadline: cancellationDeadline.toISOString(),
-      can_be_cancelled: true,
-      compliance_included: request.includeCompliance,
+      can_be_cancelled: 'yes',
       created_at: new Date().toISOString(),
-      shipment_id: shipmentId,
-      customerType: request.customerType || 'private',
-      poolingEnabled: request.poolingEnabled,
-      deliveryDate: request.deliveryDate,
-      paymentMethod: request.paymentMethod,
-      paymentDetails: request.paymentDetails,
-      termsAccepted: request.termsAccepted
+      customer_type: request.customerType || 'private',
+      pooling_enabled: request.poolingEnabled ? 'yes' : 'no',
+      delivery_date: request.deliveryDate ? new Date(request.deliveryDate).toISOString() : null,
+      payment_method: request.paymentMethod,
+      payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
+      terms_accepted: request.termsAccepted ? 'yes' : 'no',
+      label_url: labelUrl,
+      pickup_time: pickupTime.toISOString(),
+      estimated_delivery: request.deliveryDate || new Date().toISOString(),
+      delivery_speed: request.poolingEnabled ? 'economy' : 'express'
     };
     
     const userBookings = JSON.parse(localStorage.getItem(`bookings_${request.userId}`) || '[]');
@@ -75,7 +81,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       trackingCode,
       totalPrice,
       cancellationDeadline: cancellationDeadline.toISOString(),
-      canBeCancelled: true
     };
   } catch (error) {
     console.error('ERROR in bookShipment:', error);
@@ -91,9 +96,7 @@ export const cancelBooking = async (trackingCode: string, userId: string): Promi
     const userBookings = JSON.parse(localStorage.getItem(`bookings_${userId}`) || '[]');
     const bookingIndex = userBookings.findIndex((b: any) => b.tracking_code === trackingCode);
     
-    if (bookingIndex === -1 || !userBookings[bookingIndex].can_be_cancelled) {
-      return false;
-    }
+
     
     userBookings[bookingIndex].status = 'cancelled';
     userBookings[bookingIndex].can_be_cancelled = false;

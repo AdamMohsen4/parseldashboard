@@ -1,7 +1,6 @@
 
-export const calculateTotalPrice = (basePrice: number, includeCompliance: boolean): number => {
-  const complianceFee = includeCompliance ? 2 : 0;
-  return basePrice + complianceFee;
+export const calculateTotalPrice = (basePrice: number): number => {
+  return basePrice;
 };
 
 // export const calculateEstimatedDelivery = (deliverySpeed: string): string => {
