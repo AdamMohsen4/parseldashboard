@@ -1,13 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import NavBar from "@/components/layout/NavBar";
 import { useUser } from "@clerk/clerk-react";
 import { bookShipment, cancelBooking } from "@/services/bookingService";
-import GooglePlacesAutocomplete from "@/components/inputs/GooglePlacesAutocomplete";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Briefcase, Calendar, DollarSign, Download, Package, ShoppingCart, Truck, User, Zap } from "lucide-react";
 import { getBookingByTrackingCode } from "@/services/bookingDb";
 import { generateLabel } from "@/services/labelService";
@@ -16,15 +14,14 @@ import BookingSteps from "@/components/booking/BookingSteps";
 import LocationSelector from "@/components/booking/LocationSelector";
 import DeliveryOptions from "@/components/booking/DeliveryOptions";
 import AddressDetails from "@/components/booking/AddressDetails";
-import { AddressDetails as AddressDetailsType } from "@/types/booking";
+import { AddressDetails as AddressDetailsType, BookingRequest } from "@/types/booking";
 import BookingSummary from "@/components/booking/BookingSummary";
-import PaymentForm from "@/components/booking/PaymentForm";
+import PaymentForm, { PaymentData } from "@/components/booking/PaymentForm";
 import PriceCalendarView from "@/components/priceCalendar/PriceCalendarView";
 import { generateMockPricingData, DateRange } from "@/utils/pricingUtils";
 import { addWeeks, startOfDay } from "date-fns";
 import LabelGenerator from "@/components/labels/LabelGenerator";
 import { trackShipment } from "@/services/shipmentService";
-import { get } from "http";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 type DeliveryOption = "fast" | "cheap" | null;
@@ -74,7 +71,8 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [pricingData, setPricingData] = useState([]);
   const [isCalendarLoading, setIsCalendarLoading] = useState(false);
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<Date | null>(null);
-  
+  const [paymentInfo, setPaymentInfo] = useState<PaymentData | null>(null);
+
   const today = startOfDay(new Date());
   const threeWeeksFromNow = addWeeks(today, 3);
   
@@ -146,10 +144,16 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 
   const carrier = {
     id: 1,
-    name: "E-Parcel Nordic",
+    name: "",
     price: getCarrierPrice(),
-    eta: "3 days",
-    icon: "📦"
+    eta: "",
+    icon: ""
+  };
+
+  const handlePaymentSubmit = (data: PaymentData) => {
+    console.log("Payment data received:", data);
+    setPaymentInfo(data);
+    handleBookNow();
   };
 
   const handleBookNow = async () => {
@@ -166,6 +170,8 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     setIsBooking(true);
     
     try {
+      console.log("Starting booking process...");
+      
       const pickupAddress: AddressDetailsType = {
         name: senderName,
         address: senderAddress,
@@ -186,7 +192,9 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         email: recipientEmail
       };
       
-      const result = await bookShipment({
+      console.log("Prepared addresses:", { pickupAddress, deliveryAddress });
+      
+      const bookingRequest: BookingRequest = {
         weight,
         dimensions: { length, width, height },
         pickup: pickupAddress,
@@ -198,8 +206,25 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         customerType: selectedCustomerType || "private",
         businessName: selectedCustomerType === "business" || selectedCustomerType === "ecommerce" ? businessName : undefined,
         vatNumber: selectedCustomerType === "business" ? vatNumber : undefined,
-        pickupSlotId: "slot-1" // Default slot
-      });
+        pickupSlotId: "slot-1",
+        poolingEnabled: selectedDeliveryOption === 'cheap',
+        deliveryDate: selectedDeliveryDate ? selectedDeliveryDate.toISOString() : undefined,
+        paymentMethod: paymentInfo?.paymentMethod,
+        paymentDetails: {
+          cardNumber: paymentInfo?.cardNumber,
+          expiryDate: paymentInfo?.expiryDate,
+          cardholderName: paymentInfo?.cardholderName,
+          swishNumber: paymentInfo?.swishNumber,
+          bankName: paymentInfo?.bankName
+        },
+        termsAccepted: paymentInfo?.termsAccepted
+      };
+      
+      console.log("Prepared booking request:", bookingRequest);
+      
+      const result = await bookShipment(bookingRequest);
+      
+      console.log("Booking result:", result);
       
       if (result.success) {
         setBookingResult(result);
@@ -217,7 +242,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       }
     } catch (error) {
       console.error("Error in booking flow:", error);
-      toast.error("An unexpected error occurred.");
+      toast.error("An unexpected error occurred during booking.");
     } finally {
       setIsBooking(false);
     }
@@ -273,7 +298,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (currentStep < 4) {
+    if (currentStep < 3) {
       handleNextStep();
     } else {
       handleBookNow();
@@ -343,19 +368,21 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       setDeliverySpeed('express');
       setShowPriceCalendar(false);
       setSelectedDeliveryDate(null);
-      toast.success("Fast delivery selected - Your package will arrive in 1-2 business days");
+      // toast.success("Fast delivery selected - Your package will arrive in 1-2 business days");
     } else if (option === 'cheap') {
       setDeliverySpeed('economy');
       setShowPriceCalendar(true);
-      toast.success("Cheap delivery selected - Please choose a delivery date");
+      // toast.success("Cheap delivery selected - Please choose a delivery date");
       loadPriceCalendarData();
     }
   };
 
   const handleDeliveryDateSelect = (date: Date) => {
     setSelectedDeliveryDate(date);
-    toast.success(`Delivery date selected: ${date.toLocaleDateString()}`);
+    // toast.success(`Delivery date selected: ${date.toLocaleDateString()}`);
   };
+
+  // Removed the duplicate handlePaymentSubmit function that was here
 
   if (bookingConfirmed) {
     return (
@@ -566,32 +593,11 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                 <PaymentForm 
                   totalPrice={getCarrierPrice()}
                   onPaymentComplete={handleBookNow}
-                  
+                  onSubmit={handlePaymentSubmit} 
                   onCancel={handlePreviousStep}
                 />
-
               </div>
             )}
-
-            {/* {currentStep === 5 && (
-              <div>
-                <BookingConfirmation bookingResult={undefined} carrier={{
-                  name: recipientName,
-                  eta: "3 days",
-                  price: getCarrierPrice()
-                }} canCancelBooking={false} labelLanguage={""} setLabelLanguage={function (language: string): void {
-                  labelLanguage
-                } } isGeneratingLabel={false} handleGenerateLabel={function (): void {
-                  LabelGenerator
-                } } handleCancelBooking={function (): void {
-                   cancelBooking
-                } } onBookAnother={function (): void {
-                  setBookingConfirmed
-                } }
-                />
-                
-              </div>
-            )} */}
           </form>
         </div>
       </div>
