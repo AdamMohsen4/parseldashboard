@@ -5,11 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
   CreditCard, 
-  CheckCircle2, 
   AlertCircle, 
   Calendar, 
   LockKeyhole,
@@ -18,7 +16,6 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
 
 interface PaymentFormProps {
   totalPrice: number;

@@ -1,3 +1,4 @@
+
 from supabase_client import supabase
 import time
 import schedule
@@ -39,7 +40,7 @@ class Batch:
             self.current_volume += shipment.volume
             self.total_weight += shipment.weight
             if self.destination is None:
-                self.destination = shipment.destination  # Assign first shipment’s destination
+                self.destination = shipment.destination  # Assign first shipment's destination
             return True
         return False
 
