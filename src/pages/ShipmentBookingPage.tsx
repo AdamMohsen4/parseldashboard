@@ -149,6 +149,12 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     icon: ""
   };
 
+  const handlePaymentSubmit = (data: PaymentData) => {
+    console.log("Payment data received:", data);
+    setPaymentInfo(data);
+    handleBookNow();
+  };
+
   const handleBookNow = async () => {
     if (currentStep < 4) {
       handleNextStep();
@@ -163,6 +169,8 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     setIsBooking(true);
     
     try {
+      console.log("Starting booking process...");
+      
       const pickupAddress: AddressDetailsType = {
         name: senderName,
         address: senderAddress,
@@ -183,7 +191,9 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         email: recipientEmail
       };
       
-      const result = await bookShipment({
+      console.log("Prepared addresses:", { pickupAddress, deliveryAddress });
+      
+      const bookingRequest: BookingRequest = {
         weight,
         dimensions: { length, width, height },
         pickup: pickupAddress,
@@ -207,7 +217,13 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
           bankName: paymentInfo?.bankName
         },
         termsAccepted: paymentInfo?.termsAccepted
-      });
+      };
+      
+      console.log("Prepared booking request:", bookingRequest);
+      
+      const result = await bookShipment(bookingRequest);
+      
+      console.log("Booking result:", result);
       
       if (result.success) {
         setBookingResult(result);
@@ -225,7 +241,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
       }
     } catch (error) {
       console.error("Error in booking flow:", error);
-      toast.error("An unexpected error occurred.");
+      toast.error("An unexpected error occurred during booking.");
     } finally {
       setIsBooking(false);
     }
@@ -593,3 +609,4 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 };
 
 export default ShipmentBookingPage;
+

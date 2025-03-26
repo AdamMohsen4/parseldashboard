@@ -1,4 +1,3 @@
-
 import { generateShipmentId, generateTrackingCode, calculateTotalPrice } from './bookingUtils';
 import { BookingRequest, BookingResponse, AddressDetails } from '@/types/booking';
 import { toast } from 'sonner';
@@ -93,7 +92,17 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     // Save booking (in memory for this demo)
     bookings[trackingCode] = booking;
     
-    // Add additional call to save to Supabase
+    // Add additional call to save to Supabase - with verbose logging to debug issues
+    console.log("Preparing to save to Supabase with data:", {
+      request,
+      trackingCode,
+      labelUrl,
+      pickupTimeStr,
+      totalPrice,
+      estimatedDeliveryStr,
+      cancellationDeadline
+    });
+    
     const savedToSupabase = await saveBookingToSupabase(
       request,
       trackingCode,
@@ -107,6 +116,8 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     if (!savedToSupabase) {
       console.error('Failed to save booking to Supabase');
       // We'll still continue with the flow, but log the error
+    } else {
+      console.log('Successfully saved booking to Supabase');
     }
     
     // For demonstration purposes, simulate API call

@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { BookingRequest } from "@/types/booking";
 
@@ -19,7 +18,6 @@ export const saveBookingToSupabase = async (
     console.log("Saving booking to Supabase with payload:", {
       user_id: request.userId,
       tracking_code: trackingCode,
-      carrier_name: request.carrier.name,
       carrier_price: request.carrier.price,
       weight: request.weight,
       dimension_length: request.dimensions.length,
@@ -28,7 +26,6 @@ export const saveBookingToSupabase = async (
       pickup_address: request.pickup,
       delivery_address: request.delivery,
       delivery_speed: request.deliverySpeed,
-      include_compliance: request.includeCompliance,
       label_url: labelUrl,
       pickup_time: pickupTime,
       total_price: totalPrice,
@@ -37,20 +34,15 @@ export const saveBookingToSupabase = async (
       business_name: request.businessName,
       vat_number: request.vatNumber,
       cancellation_deadline: cancellationDeadline.toISOString(),
-      pooling_enabled: request.poolingEnabled || false,
-      delivery_date: request.deliveryDate,
-      payment_method: request.paymentMethod,
-      payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
-      terms_accepted: request.termsAccepted || false,
       estimated_delivery: estimatedDelivery
     });
     
+    // Ensure we're matching the exact column names in the supabase table
     const { data, error } = await supabase
       .from('booking')
       .insert({
         user_id: request.userId,
         tracking_code: trackingCode,
-        carrier_name: request.carrier.name,
         carrier_price: request.carrier.price,
         weight: request.weight,
         dimension_length: request.dimensions.length,
@@ -59,7 +51,6 @@ export const saveBookingToSupabase = async (
         pickup_address: JSON.stringify(request.pickup), // Convert object to string for storage
         delivery_address: JSON.stringify(request.delivery), // Convert object to string for storage
         delivery_speed: request.deliverySpeed,
-        include_compliance: request.includeCompliance,
         label_url: labelUrl,
         pickup_time: pickupTime,
         total_price: totalPrice,
@@ -68,12 +59,7 @@ export const saveBookingToSupabase = async (
         business_name: request.businessName,
         vat_number: request.vatNumber,
         cancellation_deadline: cancellationDeadline.toISOString(),
-        pooling_enabled: request.poolingEnabled || false,
-        delivery_date: request.deliveryDate,
-        payment_method: request.paymentMethod,
-        payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
-        terms_accepted: request.termsAccepted || false,
-        estimated_delivery: estimatedDelivery
+        estimated_delivery: new Date(estimatedDelivery)
       })
       .select()
       .maybeSingle();
