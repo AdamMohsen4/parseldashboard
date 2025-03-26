@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { BookingRequest } from "@/types/booking";
 
@@ -16,70 +15,53 @@ export const saveBookingToSupabase = async (
   cancellationDeadline: Date
 ) => {
   try {
-    console.log("Saving booking to Supabase with payload:", {
+    console.log('Starting Supabase save with data:', {
+      request,
+      trackingCode,
+      totalPrice,
+      estimatedDelivery
+    });
+
+    const bookingData = {
       user_id: request.userId,
       tracking_code: trackingCode,
-      carrier_name: request.carrier.name,
       carrier_price: request.carrier.price,
       weight: request.weight,
-      dimension_length: request.dimensions.length,
-      dimension_width: request.dimensions.width,
-      dimension_height: request.dimensions.height,
-      pickup_address: request.pickup,
-      delivery_address: request.delivery,
+      dimension_length: request.dimensions.length.toString(),
+      dimension_width: request.dimensions.width.toString(),
+      dimension_height: request.dimensions.height.toString(),
+      pickup_address: JSON.stringify(request.pickup),
+      delivery_address: JSON.stringify(request.delivery),
       delivery_speed: request.deliverySpeed,
-      include_compliance: request.includeCompliance,
       label_url: labelUrl,
       pickup_time: pickupTime,
       total_price: totalPrice,
       status: 'pending',
-      customer_type: request.customerType || 'private',
-      business_name: request.businessName,
-      vat_number: request.vatNumber,
-      cancellation_deadline: cancellationDeadline.toISOString()
-    });
-    
-    // FIX: Changed from inserting an array to inserting a single object
+      estimated_delivery: new Date(estimatedDelivery),
+      customer_type: request.customerType,
+      business_name: request.businessName || null,
+      vat_number: request.vatNumber || null,
+      cancellation_deadline: cancellationDeadline
+    };
+
+    console.log('Attempting to insert into Supabase:', bookingData);
+
     const { data, error } = await supabase
       .from('booking')
-      .insert({
-        user_id: request.userId,
-        tracking_code: trackingCode,
-        carrier_name: request.carrier.name,
-        carrier_price: request.carrier.price,
-        weight: request.weight,
-        dimension_length: request.dimensions.length,
-        dimension_width: request.dimensions.width,
-        dimension_height: request.dimensions.height,
-        pickup_address: JSON.stringify(request.pickup), // Convert object to string for storage
-        delivery_address: JSON.stringify(request.delivery), // Convert object to string for storage
-        delivery_speed: request.deliverySpeed,
-        include_compliance: request.includeCompliance,
-        label_url: labelUrl,
-        pickup_time: pickupTime,
-        total_price: totalPrice,
-        status: 'pending',
-        customer_type: request.customerType || 'private',
-        business_name: request.businessName,
-        vat_number: request.vatNumber,
-        cancellation_deadline: cancellationDeadline.toISOString()
-      })
+      .insert(bookingData)
       .select()
-      .maybeSingle();
-      
+      .single();
+
     if (error) {
-      console.error("Error saving to Supabase:", error);
-      return false;
+      console.error("Supabase insertion error:", error);
+      throw new Error(`Failed to save to Supabase: ${error.message}`);
     }
-    
-    // Clear cache after new booking
-    clearCacheForUser(request.userId);
-    
-    console.log("Successfully saved booking to Supabase with response:", data);
+
+    console.log("Successfully saved to Supabase:", data);
     return true;
   } catch (error) {
-    console.error("Supabase insertion error:", error);
-    return false;
+    console.error("Error saving to Supabase:", error);
+    throw error; // Re-throw to handle in calling function
   }
 };
 
