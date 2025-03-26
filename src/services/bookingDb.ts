@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { BookingRequest } from "@/types/booking";
 
@@ -37,6 +38,17 @@ export const saveBookingToSupabase = async (
       estimated_delivery: estimatedDelivery
     });
     
+    // Convert the Date object to an ISO string for the cancellation_deadline
+    const cancellationDeadlineIso = cancellationDeadline.toISOString();
+    
+    // Parse the estimated delivery date string to ensure correct format
+    const estimatedDeliveryDate = new Date(estimatedDelivery).toISOString().split('T')[0];
+    
+    console.log("Formatted dates:", {
+      cancellationDeadlineIso,
+      estimatedDeliveryDate
+    });
+    
     // Ensure we're matching the exact column names in the supabase table
     const { data, error } = await supabase
       .from('booking')
@@ -58,8 +70,8 @@ export const saveBookingToSupabase = async (
         customer_type: request.customerType || 'private',
         business_name: request.businessName,
         vat_number: request.vatNumber,
-        cancellation_deadline: cancellationDeadline.toISOString(),
-        estimated_delivery: new Date(estimatedDelivery)
+        cancellation_deadline: cancellationDeadlineIso,
+        estimated_delivery: estimatedDeliveryDate // Use the formatted date string
       })
       .select()
       .maybeSingle();

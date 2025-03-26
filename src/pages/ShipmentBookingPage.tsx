@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -381,11 +382,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     // toast.success(`Delivery date selected: ${date.toLocaleDateString()}`);
   };
 
-  const handlePaymentSubmit = (data: PaymentData) => {
-    console.log("Payment data received:", data);
-    setPaymentInfo(data);
-    handleBookNow();
-  };
+  // Removed the duplicate handlePaymentSubmit function that was here
 
   if (bookingConfirmed) {
     return (
@@ -609,4 +606,3 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
 };
 
 export default ShipmentBookingPage;
-
