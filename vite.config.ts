@@ -21,13 +21,13 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     chunkSizeWarningLimit: 1000,
-    minify: 'terser',
-    terserOptions: {
+    minify: mode === 'production' ? 'terser' : false,
+    terserOptions: mode === 'production' ? {
       compress: {
-        drop_console: mode === 'production',
+        drop_console: true,
         drop_debugger: true,
       },
-    },
+    } : undefined,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -36,5 +36,8 @@ export default defineConfig(({ mode }) => ({
         },
       },
     },
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom'],
   },
 }));
