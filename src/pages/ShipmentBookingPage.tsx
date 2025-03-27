@@ -78,6 +78,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     pricingData,
     isCalendarLoading,
     selectedDeliveryDate,
+    setSelectedDeliveryDate,
     dateRange,
     handleDeliveryDateSelect
   } = usePriceCalendar();
@@ -240,17 +241,18 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
         <div className="container mx-auto px-4 py-8">
           <BookingConfirmation 
             bookingResult={bookingResult}
-            carrier={carrier}
+            carrier={{
+              name: bookingResult?.carrier_name || "E-Parcel",
+              eta: "2-4 business days",
+              price: bookingResult?.carrier_price || 9.90
+            }}
             canCancelBooking={canCancelBooking}
             labelLanguage={labelLanguage}
             setLabelLanguage={setLabelLanguage}
             isGeneratingLabel={isGeneratingLabel}
             handleGenerateLabel={handleGenerateLabel}
             handleCancelBooking={handleCancelBooking}
-            onBookAnother={() => {
-              resetBooking();
-              navigate('/shipment');
-            }}
+            onBookAnother={resetBooking}
           />
         </div>
       </div>
