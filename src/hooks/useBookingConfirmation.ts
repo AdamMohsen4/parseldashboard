@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from "@clerk/clerk-react";
 import { toast } from "sonner";
@@ -121,7 +120,8 @@ export const useBookingConfirmation = () => {
     setBookingConfirmed(false);
     setBookingResult(null);
     localStorage.removeItem('lastBooking');
-    navigate('/shipment');
+    
+    window.location.href = '/shipment';
   };
 
   return {

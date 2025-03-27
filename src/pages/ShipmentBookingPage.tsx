@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -28,7 +27,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const { isSignedIn, user } = useUser();
   const navigate = useNavigate();
   
-  // Form state
   const [weight, setWeight] = useState("5");
   const [length, setLength] = useState("20");
   const [width, setWidth] = useState("15");
@@ -45,7 +43,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [selectedVolume, setSelectedVolume] = useState("m");
   const [paymentInfo, setPaymentInfo] = useState<PaymentData | null>(null);
   
-  // Address details state
   const [senderName, setSenderName] = useState("");
   const [senderEmail, setSenderEmail] = useState("");
   const [senderPhone, setSenderPhone] = useState("");
@@ -55,7 +52,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [recipientPhone, setRecipientPhone] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
 
-  // Custom hooks
   const {
     bookingResult,
     bookingConfirmed,
