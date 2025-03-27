@@ -17,7 +17,7 @@ const ShipmentItem: React.FC<ShipmentItemProps> = ({ shipment }) => {
         <div>
           <div className="flex items-center gap-2">
             <h3 className="font-medium">
-              {"1"} → {"2"}
+              {shipment.trackingCode}
             </h3>
             <ShipmentStatus status={shipment.status} />
           </div>

@@ -39,13 +39,8 @@ const BookingSteps: React.FC<BookingStepsProps> = ({ currentStep }) => {
           </div>
           <span className={`text-sm ${currentStep >= 4 ? 'font-medium' : 'text-muted-foreground'}`}>Payment</span>
         
-          <div className="flex-1 flex items-center gap-4">
-          <div className="flex-1 h-px bg-border"></div>
-        </div>
-        <div className={`flex h-8 w-8 items-center justify-center rounded-full ${currentStep >= 5? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-            <span className="text-xs font-bold">4</span>
-          </div>
-          <span className={`text-sm ${currentStep >= 5 ? 'font-medium' : 'text-muted-foreground'}`}>Booking Completed</span>
+         
+       
 
     </div>
   );
