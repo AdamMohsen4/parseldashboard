@@ -5,9 +5,11 @@ import { toast } from "sonner";
 import { getBookingByTrackingCode } from "@/services/bookingDb";
 import { cancelBooking, bookShipment } from "@/services/bookingService";
 import { BookingRequest } from "@/types/booking";
+import { useNavigate } from "react-router-dom";
 
 export const useBookingConfirmation = () => {
   const { user } = useUser();
+  const navigate = useNavigate();
   const [bookingResult, setBookingResult] = useState<any>(null);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [canCancelBooking, setCanCancelBooking] = useState(false);
@@ -119,6 +121,7 @@ export const useBookingConfirmation = () => {
     setBookingConfirmed(false);
     setBookingResult(null);
     localStorage.removeItem('lastBooking');
+    navigate('/shipment');
   };
 
   return {
