@@ -191,10 +191,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const handleDeliveryOptionSelect = (option: DeliveryOption) => {
     setSelectedDeliveryOption(option);
     
-    if (option === 'fast') {
-      setShowPriceCalendar(false);
-      setSelectedDeliveryDate(null);
-    } else if (option === 'cheap') {
+    if (option === 'cheap') {
       setShowPriceCalendar(true);
     }
   };
