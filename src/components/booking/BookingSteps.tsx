@@ -1,6 +1,9 @@
 
 import React from 'react';
 
+// Define step labels as a constant to avoid recreating on each render
+const STEP_LABELS = ['Overview', 'Package Details', 'Address', 'Payment'];
+
 interface BookingStepsProps {
   currentStep: number;
 }
@@ -20,9 +23,7 @@ const BookingSteps: React.FC<BookingStepsProps> = ({ currentStep }) => {
             <span className={`text-sm mt-1 ${
               currentStep >= step ? 'font-medium' : 'text-muted-foreground'
             }`}>
-              {step === 1 ? 'Overview' : 
-               step === 2 ? 'Package Details' : 
-               step === 3 ? 'Address' : 'Payment'}
+              {STEP_LABELS[step-1]}
             </span>
           </div>
         </React.Fragment>
@@ -31,4 +32,5 @@ const BookingSteps: React.FC<BookingStepsProps> = ({ currentStep }) => {
   );
 };
 
-export default BookingSteps;
+// Use memo to prevent unnecessary re-renders
+export default React.memo(BookingSteps);
