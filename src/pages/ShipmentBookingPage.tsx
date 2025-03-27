@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -40,7 +41,6 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [pickupPostalCode, setPickupPostalCode] = useState("112 23");
   const [delivery, setDelivery] = useState("Helsinki, FI");
   const [deliveryPostalCode, setDeliveryPostalCode] = useState("00341");
-  const [deliverySpeed, setDeliverySpeed] = useState("standard");
   const [isBooking, setIsBooking] = useState(false);
   const [bookingResult, setBookingResult] = useState<any>(null);
   const [selectedCustomerType, setSelectedCustomerType] = useState<CustomerType>(customerType || "private");
@@ -354,11 +354,9 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     setSelectedDeliveryOption(option);
     
     if (option === 'fast') {
-      setDeliverySpeed('express');
       setShowPriceCalendar(false);
       setSelectedDeliveryDate(null);
     } else if (option === 'cheap') {
-      setDeliverySpeed('economy');
       setShowPriceCalendar(true);
       loadPriceCalendarData();
     }

@@ -1,3 +1,4 @@
+
 import { generateShipmentId, generateTrackingCode, calculateTotalPrice } from './bookingUtils';
 import { BookingRequest, BookingResponse } from '@/types/booking';
 import { saveBookingToSupabase } from './bookingDb';
@@ -29,7 +30,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       labelUrl,
       pickupTime.toISOString(),
       totalPrice,
-      request.deliveryDate || new Date().toISOString(),
       cancellationDeadline
     );
     
@@ -65,9 +65,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
       terms_accepted: request.termsAccepted ? 'yes' : 'no',
       label_url: labelUrl,
-      pickup_time: pickupTime.toISOString(),
-      estimated_delivery: request.deliveryDate || new Date().toISOString(),
-      delivery_speed: request.poolingEnabled ? 'economy' : 'express'
+      pickup_time: pickupTime.toISOString()
     };
     
     const userBookings = JSON.parse(localStorage.getItem(`bookings_${request.userId}`) || '[]');
@@ -95,8 +93,6 @@ export const cancelBooking = async (trackingCode: string, userId: string): Promi
   try {
     const userBookings = JSON.parse(localStorage.getItem(`bookings_${userId}`) || '[]');
     const bookingIndex = userBookings.findIndex((b: any) => b.tracking_code === trackingCode);
-    
-
     
     userBookings[bookingIndex].status = 'cancelled';
     userBookings[bookingIndex].can_be_cancelled = false;

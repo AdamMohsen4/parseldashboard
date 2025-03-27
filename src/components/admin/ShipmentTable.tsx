@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Table,
@@ -63,7 +64,6 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            
             <TableRow>
               <TableHead>Tracking Code</TableHead>
               <TableHead>User ID</TableHead>
@@ -73,7 +73,6 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
               <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
-            
           </TableHeader>
           
           <TableBody>
@@ -81,7 +80,6 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
               <TableRow key={shipment.id}>
                 <TableCell className="font-medium">{shipment.tracking_code || "N/A"}</TableCell>
                 <TableCell>
-                  
                   {shipment.user_id ? shipment.user_id.substring(0, 8) + "..." : "N/A"}
                 </TableCell>
                 <TableCell>{shipment.pickup_address || "N/A"}</TableCell>
@@ -94,9 +92,6 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-
-              
-
                     <Button 
                       size="sm" 
                       variant="outline"
@@ -195,10 +190,6 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
                       <p className="text-sm text-muted-foreground">Created At</p>
                       <p>{formatDate(selectedShipment.created_at)}</p>
                     </div>
-                    {/* <div>
-                      <p className="text-sm text-muted-foreground">Carrier</p>
-                      <p>{selectedShipment.carrier_name || "E-Parsel Nordic"}</p>
-                    </div> */}
                     <div>
                       <p className="text-sm text-muted-foreground">Customer Type</p>
                       <p className="capitalize">{selectedShipment.customer_type || "Private"}</p>
@@ -212,14 +203,6 @@ const ShipmentTable: React.FC<ShipmentTableProps> = ({
                     <div>
                       <p className="text-sm text-muted-foreground">Pickup Time</p>
                       <p>{selectedShipment.pickup_time || "N/A"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Estimated Delivery</p>
-                      <p>{selectedShipment.estimated_delivery ? new Date(selectedShipment.estimated_delivery).toLocaleDateString() : "N/A"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Delivery Speed</p>
-                      <p className="capitalize">{selectedShipment.delivery_speed || "Standard"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Cancellation Deadline</p>
