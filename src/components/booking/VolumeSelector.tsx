@@ -34,7 +34,7 @@ const VolumeSelector: React.FC<VolumeSelectorProps> = ({ onVolumeSelect }) => {
           <CardHeader className="text-center">
             <Package className="w-12 h-12 mx-auto mb-4 text-blue-600" />
             <h2 className="text-xl font-semibold">Low Volume</h2>
-            <p className="text-sm text-gray-500">Perfect for individual shipments</p>
+            <p className="text-sm text-gray-500">For Individual shipments</p>
           </CardHeader>
           <CardContent className="space-y-4">
             <ul className="space-y-2 text-sm">
@@ -44,11 +44,11 @@ const VolumeSelector: React.FC<VolumeSelectorProps> = ({ onVolumeSelect }) => {
               </li>
               <li className="flex items-center">
                 <span className="mr-2">✓</span>
-                Standard shipping rates
+                Competitive rates
               </li>
               <li className="flex items-center">
                 <span className="mr-2">✓</span>
-                Flexible pickup options
+                Easy booking process
               </li>
             </ul>
             <Button 
@@ -66,7 +66,7 @@ const VolumeSelector: React.FC<VolumeSelectorProps> = ({ onVolumeSelect }) => {
           <CardHeader className="text-center">
             <Truck className="w-12 h-12 mx-auto mb-4 text-green-600" />
             <h2 className="text-xl font-semibold">High Volume</h2>
-            <p className="text-sm text-gray-500">For businesses with regular shipments</p>
+            <p className="text-sm text-gray-500">For Businesses</p>
           </CardHeader>
           <CardContent className="space-y-4">
             <ul className="space-y-2 text-sm">
@@ -80,7 +80,7 @@ const VolumeSelector: React.FC<VolumeSelectorProps> = ({ onVolumeSelect }) => {
               </li>
               <li className="flex items-center">
                 <span className="mr-2">✓</span>
-                Dedicated support
+                Easy upload of shipment data
               </li>
             </ul>
             <Button 
