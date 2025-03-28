@@ -23,6 +23,7 @@ const SupportPage = lazy(() => import("./pages/SupportPage"));
 // const IntegrationPage = lazy(() => import("./pages/IntegrationPage"));
 const TransportationPartnersPage = lazy(() => import("./pages/TransportationPartnersPage"));
 const ShipmentsPage = lazy(() => import("./pages/ShipmentsPage"));
+const HighVolumeBookingPage = lazy(() => import("./pages/HighVolumeBookingPage"));
 // const WarehousePage = lazy(() => import("./pages/WarehousePage").then(module => ({ default: module })));
 
 // Loading fallback component
@@ -77,6 +78,11 @@ const App = () => (
               <Route path="/shipment/ecommerce" element={
                 <AuthWrapper requireAuth>
                   <ShipmentBookingPage customerType="ecommerce" />
+                </AuthWrapper>
+              } />
+              <Route path="/shipment/high-volume" element={
+                <AuthWrapper requireAuth>
+                  <HighVolumeBookingPage />
                 </AuthWrapper>
               } />
               {/* <Route path="/3pl" element={
