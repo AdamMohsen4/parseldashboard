@@ -1,4 +1,3 @@
-
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { ClerkProvider } from "@clerk/clerk-react";
@@ -6,7 +5,7 @@ import App from "./App";
 import "./index.css";
 import "./i18n";
 
-const PUBLISHABLE_KEY = "pk_test_YXJ0aXN0aWMtdGVycmllci03Ni5jbGVyay5hY2NvdW50cy5kZXYk";
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 if (!PUBLISHABLE_KEY) {
   throw new Error("Missing Clerk Publishable Key");

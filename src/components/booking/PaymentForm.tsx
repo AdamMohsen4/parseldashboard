@@ -197,7 +197,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           </div>
         </div>
           
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           {paymentMethod === 'swish' && (
             <div className="space-y-4">
               <div className="space-y-2">
@@ -323,7 +323,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             </div>
           )}
           
-          <div className="mt-6 flex items-start gap-2">
+          <div className="flex items-center space-x-2">
             <Checkbox 
               id="terms" 
               checked={termsAccepted}
@@ -359,7 +359,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             </Button>
             
             <Button 
-              type="submit"
+              type="button"
               disabled={isProcessing}
               className="bg-green-600 hover:bg-green-700 text-white min-w-[7rem]"
               onClick={handleSubmit}
@@ -377,7 +377,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               )}
             </Button>
           </div>
-        </form>
+        </div>
       </div>
     </Card>
   );

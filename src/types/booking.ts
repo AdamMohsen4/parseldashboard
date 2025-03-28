@@ -17,6 +17,7 @@ export interface AddressDetails {
   country: string;
   phone: string;
   email: string;
+  vatNumber?: string;
 }
 
 export interface BookingRequest {

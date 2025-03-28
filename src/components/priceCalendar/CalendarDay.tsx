@@ -1,4 +1,3 @@
-
 import React from "react";
 import { isSameMonth, isWithinInterval, format, isSameDay } from "date-fns";
 import { PricingDay, DateRange, getPricingForDay, formatPrice } from "@/utils/pricingUtils";
