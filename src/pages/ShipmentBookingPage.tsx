@@ -21,6 +21,8 @@ import { generateMockPricingData, DateRange } from "@/utils/pricingUtils";
 import { addWeeks, startOfDay } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { generateTrackingCode } from "@/services/bookingUtils";
+import VolumeSelector from "@/components/booking/VolumeSelector";
+import ShipmentVolume from "@/components/booking/ShipmentVolume";
 
 type CustomerType = "business" | "private" | "ecommerce" | null;
 type DeliveryOption = "fast" | "cheap" | null;
@@ -61,7 +63,8 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   const [recipientEmail, setRecipientEmail] = useState("");
   const [recipientPhone, setRecipientPhone] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
-  const [selectedVolume, setSelectedVolume] = useState("m");
+  const [selectedVolume, setSelectedVolume] = useState<'high' | 'low' | null>(null);
+  const [packageVolume, setPackageVolume] = useState<'xxs' | 's' | 'm' | 'l' | 'xl' | 'xxl'>('m');
   const [selectedDeliveryOption, setSelectedDeliveryOption] = useState<DeliveryOption>(null);
   const [showPriceCalendar, setShowPriceCalendar] = useState(false);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -128,7 +131,7 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
   };
 
   const getCarrierPrice = () => {
-    switch (selectedVolume) {
+    switch (packageVolume) {
       case 'xxs': return 5.90;
       case 's': return 7.90;
       case 'm': return 9.90;
@@ -368,6 +371,10 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     setSelectedDeliveryDate(date);
   };
 
+  const handleVolumeSelect = (volume: 'high' | 'low') => {
+    setSelectedVolume(volume);
+  };
+
   if (bookingConfirmed) {
     return (
       <div className="min-h-screen bg-background">
@@ -394,39 +401,62 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <NavBar />
+  if (!selectedVolume) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <NavBar />
+        <VolumeSelector onVolumeSelect={handleVolumeSelect} />
+      </div>
+    );
+  }
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-5xl mx-auto">
-          <BookingSteps currentStep={currentStep} />
-          
-          <form onSubmit={handleSubmit}>
-            {currentStep === 1 && (
-              <div>
-                <LocationSelector
-                  pickupCountry={pickupCountry}
-                  setPickupCountry={setPickupCountry}
-                  pickupPostalCode={pickupPostalCode}
-                  setPickupPostalCode={setPickupPostalCode}
-                  deliveryCountry={deliveryCountry}
-                  setDeliveryCountry={setDeliveryCountry}
-                  deliveryPostalCode={deliveryPostalCode}
-                  setDeliveryPostalCode={setDeliveryPostalCode}
-                  onSwapLocations={handleSwapLocations}
-                />
-                
-                <div className="mt-8 border rounded-lg shadow-sm">
-                  <div className="bg-slate-700 text-white p-3 font-semibold">
-                    Select Delivery Option
-                  </div>
-                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button
-                    onClick={() => handleDeliveryOptionSelect('fast')}
-                    type="button"
-                    className={`h-20 text-left p-4 rounded-lg border transition-all duration-200 
-                      ${selectedDeliveryOption === 'fast' ? ' text-white' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+  if (selectedVolume === 'high') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <NavBar />
+        <div className="max-w-4xl mx-auto p-4">
+          <h1 className="text-2xl font-bold text-center mb-8">High Volume Booking</h1>
+          <p className="text-center text-gray-600">This feature is coming soon. Please contact our sales team for high volume shipping solutions.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <NavBar />
+      <div className="max-w-4xl mx-auto p-4">
+        <BookingSteps currentStep={currentStep} />
+        
+        <form onSubmit={handleSubmit} className="mt-8">
+          {currentStep === 1 && (
+            <div>
+              <LocationSelector
+                pickup={pickup}
+                setPickup={setPickup}
+                delivery={delivery}
+                setDelivery={setDelivery}
+                pickupPostalCode={pickupPostalCode}
+                setPickupPostalCode={setPickupPostalCode}
+                deliveryPostalCode={deliveryPostalCode}
+                setDeliveryPostalCode={setDeliveryPostalCode}
+                pickupCountry={pickupCountry}
+                setPickupCountry={setPickupCountry}
+                deliveryCountry={deliveryCountry}
+                setDeliveryCountry={setDeliveryCountry}
+                onSwap={handleSwapLocations}
+              />
+              
+              <div className="mt-8 border rounded-lg shadow-sm">
+                <div className="bg-slate-700 text-white p-3 font-semibold">
+                  Select Delivery Option
+                </div>
+                <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Button
+                  onClick={() => handleDeliveryOptionSelect('fast')}
+                  type="button"
+                  className={`h-20 text-left p-4 rounded-lg border transition-all duration-200 
+                    ${selectedDeliveryOption === 'fast' ? ' text-white' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
                   >
                     <div className="flex flex-col items-start space-y-1">
                       <span className="font-medium text-base">Fast Delivery</span>
@@ -434,11 +464,11 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     </div>
                   </Button>
 
-                  <Button
-                    onClick={() => handleDeliveryOptionSelect('cheap')}
-                    type="button"
-                    className={`h-20 text-left p-4 rounded-lg border transition-all duration-200 
-                      ${selectedDeliveryOption === 'cheap' ? 'text-white' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                <Button
+                  onClick={() => handleDeliveryOptionSelect('cheap')}
+                  type="button"
+                  className={`h-20 text-left p-4 rounded-lg border transition-all duration-200 
+                    ${selectedDeliveryOption === 'cheap' ? 'text-white' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
                   >
                     <div className="flex flex-col items-start space-y-1">
                       <span className="font-medium text-base">Cheap Delivery</span>
@@ -446,144 +476,143 @@ const ShipmentBookingPage = ({ customerType }: ShipmentBookingPageProps) => {
                     </div>
                   </Button>
                 </div>
-                  
-                  {showPriceCalendar && (
-                    <div className="px-6 pb-6">
-                      <div className="mt-4 mb-2 flex items-center">
-                        <Calendar className="h-5 w-5 mr-2 text-blue-500" />
-                        <h3 className="font-medium">Select delivery date to get the best price</h3>
-                      </div>
-                      <div className="border rounded-lg shadow-sm bg-white">
-                        <PriceCalendarView
-                          currentMonth={currentMonth}
-                          setCurrentMonth={setCurrentMonth}
-                          pricingData={pricingData}
-                          isLoading={isCalendarLoading}
-                          dateRange={dateRange}
-                          onDateSelect={handleDeliveryDateSelect}
-                          selectedDate={selectedDeliveryDate}
-                        />
-                      </div>
-                      {selectedDeliveryDate && (
-                        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                          <p className="text-blue-800">
-                            <span className="font-medium">Delivery date selected: </span> 
-                            {selectedDeliveryDate.toLocaleDateString()}
-                          </p>
-                        </div>
-                      )}
+                
+                {showPriceCalendar && (
+                  <div className="px-6 pb-6">
+                    <div className="mt-4 mb-2 flex items-center">
+                      <Calendar className="h-5 w-5 mr-2 text-blue-500" />
+                      <h3 className="font-medium">Select delivery date to get the best price</h3>
                     </div>
-                  )}
-                </div>
-                
-                <div className="flex justify-end mt-6">
-                  <Button 
-                    type="button" 
-                    onClick={handleNextStep}
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                    disabled={selectedDeliveryOption === 'cheap' && !selectedDeliveryDate}
-                  >
-                    Continue
-                  </Button>
-                </div>
+                    <div className="border rounded-lg shadow-sm bg-white">
+                      <PriceCalendarView
+                        currentMonth={currentMonth}
+                        setCurrentMonth={setCurrentMonth}
+                        pricingData={pricingData}
+                        isLoading={isCalendarLoading}
+                        dateRange={dateRange}
+                        onDateSelect={handleDeliveryDateSelect}
+                        selectedDate={selectedDeliveryDate}
+                      />
+                    </div>
+                    {selectedDeliveryDate && (
+                      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                        <p className="text-blue-800">
+                          <span className="font-medium">Delivery date selected: </span> 
+                          {selectedDeliveryDate.toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            )}
+              
+              <div className="flex justify-end mt-6">
+                <Button 
+                  type="button" 
+                  onClick={handleNextStep}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  disabled={selectedDeliveryOption === 'cheap' && !selectedDeliveryDate}
+                >
+                  Continue
+                </Button>
+              </div>
+            </div>
+          )}
 
-            {currentStep === 2 && (
-              <div>
-                <DeliveryOptions
-                  selectedVolume={selectedVolume}
-                  setSelectedVolume={setSelectedVolume}
-                />
+          {currentStep === 2 && (
+            <div>
+              <ShipmentVolume
+                selectedVolume={packageVolume}
+                onVolumeSelect={setPackageVolume}
+              />
 
-                <div className="flex justify-between gap-4 mt-6">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={handlePreviousStep}
-                  >
-                    Previous
-                  </Button>
-                  
-                  <Button 
-                    type="button" 
-                    onClick={handleNextStep}
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    Continue
-                  </Button>
-                </div>
-              </div>
-            )}
-            
-            {currentStep === 3 && (
-              <div>
-                <AddressDetails
-                  senderName={senderName}
-                  setSenderName={setSenderName}
-                  senderEmail={senderEmail}
-                  setSenderEmail={setSenderEmail}
-                  senderPhone={senderPhone}
-                  setSenderPhone={setSenderPhone}
-                  senderAddress={senderAddress}
-                  setSenderAddress={setSenderAddress}
-                  recipientName={recipientName}
-                  setRecipientName={setRecipientName}
-                  recipientEmail={recipientEmail}
-                  setRecipientEmail={setRecipientEmail}
-                  recipientPhone={recipientPhone}
-                  setRecipientPhone={setRecipientPhone}
-                  recipientAddress={recipientAddress}
-                  setRecipientAddress={setRecipientAddress}
-                  pickupCountry={pickupCountry}
-                  pickupPostalCode={pickupPostalCode}
-                  deliveryCountry={deliveryCountry}
-                  deliveryPostalCode={deliveryPostalCode}
-                />
+              <div className="flex justify-between gap-4 mt-6">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handlePreviousStep}
+                >
+                  Previous
+                </Button>
                 
-                <BookingSummary
-                  senderName={senderName}
-                  senderAddress={senderAddress}
-                  pickupPostalCode={pickupPostalCode}
-                  pickupCountry={pickupCountry}
-                  recipientName={recipientName}
-                  recipientAddress={recipientAddress}
-                  deliveryPostalCode={deliveryPostalCode}
-                  deliveryCountry={deliveryCountry}
-                />
-                
-                <div className="flex justify-between gap-4 mt-6">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={handlePreviousStep}
-                  >
-                    Previous
-                  </Button>
-                  
-                  <Button
-                    type="button"
-                    onClick={handleNextStep}
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    Continue to Payment
-                  </Button>
-                </div>
+                <Button 
+                  type="button" 
+                  onClick={handleNextStep}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Continue
+                </Button>
               </div>
-            )}
+            </div>
+          )}
+          
+          {currentStep === 3 && (
+            <div>
+              <AddressDetails
+                senderName={senderName}
+                setSenderName={setSenderName}
+                senderEmail={senderEmail}
+                setSenderEmail={setSenderEmail}
+                senderPhone={senderPhone}
+                setSenderPhone={setSenderPhone}
+                senderAddress={senderAddress}
+                setSenderAddress={setSenderAddress}
+                recipientName={recipientName}
+                setRecipientName={setRecipientName}
+                recipientEmail={recipientEmail}
+                setRecipientEmail={setRecipientEmail}
+                recipientPhone={recipientPhone}
+                setRecipientPhone={setRecipientPhone}
+                recipientAddress={recipientAddress}
+                setRecipientAddress={setRecipientAddress}
+                pickupCountry={pickupCountry}
+                pickupPostalCode={pickupPostalCode}
+                deliveryCountry={deliveryCountry}
+                deliveryPostalCode={deliveryPostalCode}
+              />
+              
+              <BookingSummary
+                senderName={senderName}
+                senderAddress={senderAddress}
+                pickupPostalCode={pickupPostalCode}
+                pickupCountry={pickupCountry}
+                recipientName={recipientName}
+                recipientAddress={recipientAddress}
+                deliveryPostalCode={deliveryPostalCode}
+                deliveryCountry={deliveryCountry}
+              />
+              
+              <div className="flex justify-between gap-4 mt-6">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handlePreviousStep}
+                >
+                  Previous
+                </Button>
+                
+                <Button
+                  type="button"
+                  onClick={handleNextStep}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Continue to Payment
+                </Button>
+              </div>
+            </div>
+          )}
 
-            {currentStep === 4 && (
-              <div>
-                <PaymentForm 
-                  totalPrice={getCarrierPrice()}
-                  onPaymentComplete={handleBookNow}
-                  onSubmit={handlePaymentSubmit}
-                  onCancel={handlePreviousStep}
-                />
-              </div>
-            )}
-          </form>
-        </div>
+          {currentStep === 4 && (
+            <div>
+              <PaymentForm 
+                totalPrice={getCarrierPrice()}
+                onPaymentComplete={handleBookNow}
+                onSubmit={handlePaymentSubmit}
+                onCancel={handlePreviousStep}
+              />
+            </div>
+          )}
+        </form>
       </div>
     </div>
   );
