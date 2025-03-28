@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { BookingRequest } from "@/types/booking";
 
@@ -11,11 +12,21 @@ export const saveBookingToSupabase = async (
   labelUrl: string,
   pickupTime: string,
   totalPrice: number,
-  estimatedDelivery: string,
   cancellationDeadline: Date
 ): Promise<boolean> => {
   try {
+<<<<<<< HEAD
     const { error } = await supabase
+=======
+    console.log("Saving booking to Supabase with data:", {
+      trackingCode,
+      userId: request.userId,
+      weightValue: request.weight,
+      carrierPrice: request.carrier.price
+    });
+
+    const { data, error } = await supabase
+>>>>>>> f8bbc6f5f1a499f699ffbdae29ee2a5d5c07e420
       .from('booking')
       .insert([
         {
@@ -41,9 +52,7 @@ export const saveBookingToSupabase = async (
           payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
           terms_accepted: request.termsAccepted ? 'yes' : 'no',
           label_url: labelUrl,
-          pickup_time: pickupTime,
-          estimated_delivery: estimatedDelivery,
-          delivery_speed: request.poolingEnabled ? 'economy' : 'express'
+          pickup_time: pickupTime
         }
       ]);
 
@@ -52,6 +61,7 @@ export const saveBookingToSupabase = async (
       return false;
     }
 
+    console.log('Booking saved successfully to Supabase');
     return true;
   } catch (error) {
     console.error('Error in saveBookingToSupabase:', error);
