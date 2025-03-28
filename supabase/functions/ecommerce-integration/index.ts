@@ -96,6 +96,11 @@ serve(async (req) => {
       // Generate shipping label URL (mock for now)
       const labelUrl = `https://e-parsel.com/labels/${trackingCode}.pdf`;
       
+      // Calculate delivery date (3 days from now)
+      const deliveryDate = new Date();
+      deliveryDate.setDate(deliveryDate.getDate() + 3);
+      const estimatedDelivery = deliveryDate.toISOString().split("T")[0];
+      
       // Calculate price
       const basePrice = 8; // E-commerce rate
       const compliancePrice = requestData.includeCompliance ? 2 : 0;
@@ -115,11 +120,13 @@ serve(async (req) => {
           dimension_height: requestData.dimensions.height,
           pickup_address: requestData.pickup,
           delivery_address: requestData.delivery,
+          delivery_speed: "standard",
           include_compliance: requestData.includeCompliance || false,
           label_url: labelUrl,
           pickup_time: new Date().toISOString(),
           total_price: totalPrice,
           status: "pending",
+          estimated_delivery: estimatedDelivery,
           customer_type: "ecommerce",
           business_name: requestData.orderNumber // Store order number in business_name
         });
@@ -145,6 +152,7 @@ serve(async (req) => {
           trackingCode,
           shipmentId,
           labelUrl,
+          estimatedDelivery,
           totalPrice
         }),
         {

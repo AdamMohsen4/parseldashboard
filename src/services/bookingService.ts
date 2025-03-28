@@ -1,4 +1,3 @@
-
 import { generateShipmentId, generateTrackingCode, calculateTotalPrice } from './bookingUtils';
 import { BookingRequest, BookingResponse } from '@/types/booking';
 import { saveBookingToSupabase } from './bookingDb';
@@ -29,6 +28,7 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       labelUrl,
       pickupTime.toISOString(),
       totalPrice,
+      request.deliveryDate || new Date().toISOString(),
       cancellationDeadline
     );
     
@@ -39,41 +39,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
       };
     }
     
-<<<<<<< HEAD
-=======
-    // Only save to local storage if Supabase save was successful
-    const booking = {
-      id: shipmentId,
-      tracking_code: trackingCode,
-      user_id: request.userId,
-      status: 'pending',
-      pickup_address: typeof request.pickup === 'string' ? request.pickup : JSON.stringify(request.pickup),
-      delivery_address: typeof request.delivery === 'string' ? request.delivery : JSON.stringify(request.delivery),
-      weight: request.weight,
-      dimension_length: request.dimensions.length,
-      dimension_width: request.dimensions.width,
-      dimension_height: request.dimensions.height,
-      carrier_name: request.carrier.name || 'E-Parcel Nordic',
-      carrier_price: request.carrier.price,
-      total_price: totalPrice,
-      cancellation_deadline: cancellationDeadline.toISOString(),
-      can_be_cancelled: 'yes',
-      created_at: new Date().toISOString(),
-      customer_type: request.customerType || 'private',
-      pooling_enabled: request.poolingEnabled ? 'yes' : 'no',
-      delivery_date: request.deliveryDate ? new Date(request.deliveryDate).toISOString() : null,
-      payment_method: request.paymentMethod,
-      payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
-      terms_accepted: request.termsAccepted ? 'yes' : 'no',
-      label_url: labelUrl,
-      pickup_time: pickupTime.toISOString()
-    };
-    
-    const userBookings = JSON.parse(localStorage.getItem(`bookings_${request.userId}`) || '[]');
-    userBookings.push(booking);
-    localStorage.setItem(`bookings_${request.userId}`, JSON.stringify(userBookings));
-    
->>>>>>> f8bbc6f5f1a499f699ffbdae29ee2a5d5c07e420
     return {
       success: true,
       message: 'Shipment booked successfully',
@@ -95,6 +60,8 @@ export const cancelBooking = async (trackingCode: string, userId: string): Promi
   try {
     const userBookings = JSON.parse(localStorage.getItem(`bookings_${userId}`) || '[]');
     const bookingIndex = userBookings.findIndex((b: any) => b.tracking_code === trackingCode);
+    
+
     
     userBookings[bookingIndex].status = 'cancelled';
     userBookings[bookingIndex].can_be_cancelled = false;
