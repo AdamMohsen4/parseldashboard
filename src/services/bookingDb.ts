@@ -15,7 +15,7 @@ export const saveBookingToSupabase = async (
   cancellationDeadline: Date
 ): Promise<boolean> => {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('booking')
       .insert([
         {

@@ -22,7 +22,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
     const cancellationDeadline = new Date();
     cancellationDeadline.setHours(cancellationDeadline.getHours() + 24);
     
-    // Save to Supabase first
     const savedToSupabase = await saveBookingToSupabase(
       request,
       trackingCode,
@@ -39,40 +38,6 @@ export const bookShipment = async (request: BookingRequest): Promise<BookingResp
         message: 'Failed to save booking to database',
       };
     }
-    
-    // Only save to local storage if Supabase save was successful
-    const booking = {
-      id: shipmentId,
-      tracking_code: trackingCode,
-      user_id: request.userId,
-      status: 'pending',
-      pickup_address: typeof request.pickup === 'string' ? request.pickup : JSON.stringify(request.pickup),
-      delivery_address: typeof request.delivery === 'string' ? request.delivery : JSON.stringify(request.delivery),
-      weight: request.weight,
-      dimension_length: request.dimensions.length,
-      dimension_width: request.dimensions.width,
-      dimension_height: request.dimensions.height,
-      carrier_name: request.carrier.name || 'E-Parcel Nordic',
-      carrier_price: request.carrier.price,
-      total_price: totalPrice,
-      cancellation_deadline: cancellationDeadline.toISOString(),
-      can_be_cancelled: 'yes',
-      created_at: new Date().toISOString(),
-      customer_type: request.customerType || 'private',
-      pooling_enabled: request.poolingEnabled ? 'yes' : 'no',
-      delivery_date: request.deliveryDate ? new Date(request.deliveryDate).toISOString() : null,
-      payment_method: request.paymentMethod,
-      payment_details: request.paymentDetails ? JSON.stringify(request.paymentDetails) : null,
-      terms_accepted: request.termsAccepted ? 'yes' : 'no',
-      label_url: labelUrl,
-      pickup_time: pickupTime.toISOString(),
-      estimated_delivery: request.deliveryDate || new Date().toISOString(),
-      delivery_speed: request.poolingEnabled ? 'economy' : 'express'
-    };
-    
-    const userBookings = JSON.parse(localStorage.getItem(`bookings_${request.userId}`) || '[]');
-    userBookings.push(booking);
-    localStorage.setItem(`bookings_${request.userId}`, JSON.stringify(userBookings));
     
     return {
       success: true,

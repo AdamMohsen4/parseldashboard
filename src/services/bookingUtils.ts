@@ -1,4 +1,3 @@
-
 export const calculateTotalPrice = (basePrice: number): number => {
   return basePrice;
 };
