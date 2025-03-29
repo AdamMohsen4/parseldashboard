@@ -123,6 +123,74 @@ export const resources = {
         total: 'Total:',
         confirmBooking: 'Confirm Booking',
         signInToBook: 'Sign In to Book',
+        volumeSelector: {
+          title: 'Choose Your Shipping Volume',
+          lowVolume: {
+            title: 'Low Volume',
+            subtitle: 'For Individual shipments',
+            features: {
+              individual: 'Individual package booking',
+              rates: 'Competitive rates',
+              process: 'Easy booking process'
+            },
+            button: 'Continue to Booking'
+          },
+          highVolume: {
+            title: 'High Volume',
+            subtitle: 'For Businesses',
+            features: {
+              bulk: 'Bulk shipping solutions',
+              rates: 'Competitive rates',
+              upload: 'Easy upload of shipment data'
+            },
+            button: 'Start High Volume Booking'
+          }
+        },
+        highVolume: {
+          title: 'High Volume Shipment Booking',
+          businessInfo: {
+            title: 'Business Information',
+            description: 'Please provide your business details for the high volume shipment',
+            name: 'Business Name',
+            vatNumber: 'VAT Number',
+            address: 'Address',
+            city: 'City',
+            postalCode: 'Postal Code',
+            country: 'Country',
+            contactPerson: 'Contact Person',
+            email: 'Email',
+            phone: 'Phone'
+          },
+          uploadData: {
+            title: 'Upload Shipment Data',
+            description: 'Upload a CSV or Excel file containing your shipment data',
+            fileLabel: 'Shipment Data File',
+            uploadButton: 'Upload CSV or Excel file',
+            clearButton: 'Clear',
+            validationErrors: 'Validation Errors',
+            preview: 'Preview',
+            shipments: 'shipments'
+          },
+          review: {
+            title: 'Review Your Shipment',
+            description: 'Please review your business information and shipment data before submitting',
+            businessInfo: 'Business Information',
+            shipmentSummary: 'Shipment Summary',
+            totalPackages: 'Total Packages',
+            totalWeight: 'Total Weight',
+            estimatedCost: 'Estimated Cost',
+            submitButton: 'Submit Shipment',
+            processing: 'Processing...'
+          },
+          importantInfo: {
+            title: 'Important Information',
+            description: 'For high volume shipments, please provide your business details and upload a CSV or Excel file containing your shipment data. The file should include columns for recipient name, address, city, postal code, country, and package details.'
+          },
+          navigation: {
+            next: 'Next',
+            back: 'Back'
+          }
+        }
       },
       compliance: {
         title: 'Compliance Package',
@@ -370,6 +438,74 @@ export const resources = {
         total: 'Totalt:',
         confirmBooking: 'Bekräfta Bokning',
         signInToBook: 'Logga In för att Boka',
+        volumeSelector: {
+          title: 'Välj Din Fraktvolym',
+          lowVolume: {
+            title: 'Låg Volym',
+            subtitle: 'För enskilda försändelser',
+            features: {
+              individual: 'Enskild paketbokning',
+              rates: 'Konkurrenskraftiga priser',
+              process: 'Enkel bokningsprocess'
+            },
+            button: 'Fortsätt till Bokning'
+          },
+          highVolume: {
+            title: 'Hög Volym',
+            subtitle: 'För företag',
+            features: {
+              bulk: 'Partifraktlösningar',
+              rates: 'Konkurrenskraftiga priser',
+              upload: 'Enkel uppladdning av försändelsedata'
+            },
+            button: 'Starta Högvolymsbokning'
+          }
+        },
+        highVolume: {
+          title: 'Bokning av Stora Volymer',
+          businessInfo: {
+            title: 'Företagsinformation',
+            description: 'Vänligen ange dina företagsuppgifter för den stora volymen',
+            name: 'Företagsnamn',
+            vatNumber: 'Momsnummer',
+            address: 'Adress',
+            city: 'Stad',
+            postalCode: 'Postnummer',
+            country: 'Land',
+            contactPerson: 'Kontaktperson',
+            email: 'E-post',
+            phone: 'Telefon'
+          },
+          uploadData: {
+            title: 'Ladda Upp Försändelsedata',
+            description: 'Ladda upp en CSV- eller Excel-fil med dina försändelsedata',
+            fileLabel: 'Försändelsedatafil',
+            uploadButton: 'Ladda upp CSV eller Excel-fil',
+            clearButton: 'Rensa',
+            validationErrors: 'Valideringsfel',
+            preview: 'Förhandsvisning',
+            shipments: 'försändelser'
+          },
+          review: {
+            title: 'Granska Din Försändelse',
+            description: 'Vänligen granska din företagsinformation och försändelsedata innan du skickar',
+            businessInfo: 'Företagsinformation',
+            shipmentSummary: 'Försändelsesammanfattning',
+            totalPackages: 'Totalt Antal Paket',
+            totalWeight: 'Total Vikt',
+            estimatedCost: 'Uppskattad Kostnad',
+            submitButton: 'Skicka Försändelse',
+            processing: 'Bearbetar...'
+          },
+          importantInfo: {
+            title: 'Viktig Information',
+            description: 'För stora volymer, vänligen ange dina företagsuppgifter och ladda upp en CSV- eller Excel-fil med dina försändelsedata. Filen bör innehålla kolumner för mottagarens namn, adress, stad, postnummer, land och paketdetaljer.'
+          },
+          navigation: {
+            next: 'Nästa',
+            back: 'Tillbaka'
+          }
+        }
       },
       compliance: {
         title: 'Efterlevnadspaket',
@@ -617,6 +753,74 @@ export const resources = {
         total: 'Yhteensä:',
         confirmBooking: 'Vahvista Varaus',
         signInToBook: 'Kirjaudu Sisään Varataksesi',
+        volumeSelector: {
+          title: 'Valitse Lähetysvolyymi',
+          lowVolume: {
+            title: 'Pieni Volyymi',
+            subtitle: 'Yksittäisille lähetyksille',
+            features: {
+              individual: 'Yksittäisten pakettien varaaminen',
+              rates: 'Kilpailukykyiset hinnat',
+              process: 'Helppo varaamisprosessi'
+            },
+            button: 'Jatka Varaamiseen'
+          },
+          highVolume: {
+            title: 'Suuri Volyymi',
+            subtitle: 'Yrityksille',
+            features: {
+              bulk: 'Erätoimitusten ratkaisut',
+              rates: 'Kilpailukykyiset hinnat',
+              upload: 'Helppo lähetystietojen lataus'
+            },
+            button: 'Aloita Suurten Volyymien Varaaminen'
+          }
+        },
+        highVolume: {
+          title: 'Suurten Volyymien Lähetysten Varaaminen',
+          businessInfo: {
+            title: 'Yrityksen Tiedot',
+            description: 'Anna yrityksesi tiedot suurten volyymien lähetykselle',
+            name: 'Yrityksen Nimi',
+            vatNumber: 'ALV-numero',
+            address: 'Osoite',
+            city: 'Kaupunki',
+            postalCode: 'Postinumero',
+            country: 'Maa',
+            contactPerson: 'Yhteyshenkilö',
+            email: 'Sähköposti',
+            phone: 'Puhelin'
+          },
+          uploadData: {
+            title: 'Lähetystietojen Lataus',
+            description: 'Lataa CSV- tai Excel-tiedosto, joka sisältää lähetystietosi',
+            fileLabel: 'Lähetystietotiedosto',
+            uploadButton: 'Lataa CSV tai Excel',
+            clearButton: 'Tyhjennä',
+            validationErrors: 'Validoinnin Virheet',
+            preview: 'Esikatselu',
+            shipments: 'lähetystä'
+          },
+          review: {
+            title: 'Tarkista Lähetyksesi',
+            description: 'Tarkista yrityksesi tiedot ja lähetystiedot ennen lähettämistä',
+            businessInfo: 'Yrityksen Tiedot',
+            shipmentSummary: 'Lähetysten Yhteenveto',
+            totalPackages: 'Pakettien Kokonaismäärä',
+            totalWeight: 'Kokonaispaino',
+            estimatedCost: 'Arvioitu Kustannus',
+            submitButton: 'Lähetä Lähetys',
+            processing: 'Käsitellään...'
+          },
+          importantInfo: {
+            title: 'Tärkeää Tietoa',
+            description: 'Suurten volyymien lähetyksille, anna yrityksesi tiedot ja lataa CSV- tai Excel-tiedosto, joka sisältää lähetystietosi. Tiedoston tulee sisältää sarakkeet vastaanottajan nimelle, osoitteelle, kaupungille, postinumerolle, maalle ja paketin tiedoille.'
+          },
+          navigation: {
+            next: 'Seuraava',
+            back: 'Takaisin'
+          }
+        }
       },
       compliance: {
         title: 'Vaatimustenmukaisuuspaketti',

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Package, Truck, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 type VolumeType = 'high' | 'low';
 
@@ -12,6 +13,7 @@ interface VolumeSelectorProps {
 
 const VolumeSelector: React.FC<VolumeSelectorProps> = ({ onVolumeSelect }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleLowVolume = () => {
     onVolumeSelect('low');
@@ -26,36 +28,36 @@ const VolumeSelector: React.FC<VolumeSelectorProps> = ({ onVolumeSelect }) => {
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      <h1 className="text-2xl font-bold text-center mb-8">Choose Your Shipping Volume</h1>
+      <h1 className="text-2xl font-bold text-center mb-8">{t('booking.volumeSelector.title')}</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Low Volume Card */}
         <Card className="hover:shadow-lg transition-shadow cursor-pointer">
           <CardHeader className="text-center">
             <Package className="w-12 h-12 mx-auto mb-4 text-blue-600" />
-            <h2 className="text-xl font-semibold">Low Volume</h2>
-            <p className="text-sm text-gray-500">For Individual shipments</p>
+            <h2 className="text-xl font-semibold">{t('booking.volumeSelector.lowVolume.title')}</h2>
+            <p className="text-sm text-gray-500">{t('booking.volumeSelector.lowVolume.subtitle')}</p>
           </CardHeader>
           <CardContent className="space-y-4">
             <ul className="space-y-2 text-sm">
               <li className="flex items-center">
                 <span className="mr-2">✓</span>
-                Individual package booking
+                {t('booking.volumeSelector.lowVolume.features.individual')}
               </li>
               <li className="flex items-center">
                 <span className="mr-2">✓</span>
-                Competitive rates
+                {t('booking.volumeSelector.lowVolume.features.rates')}
               </li>
               <li className="flex items-center">
                 <span className="mr-2">✓</span>
-                Easy booking process
+                {t('booking.volumeSelector.lowVolume.features.process')}
               </li>
             </ul>
             <Button 
               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               onClick={handleLowVolume}
             >
-              Continue to Booking
+              {t('booking.volumeSelector.lowVolume.button')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </CardContent>
@@ -65,29 +67,29 @@ const VolumeSelector: React.FC<VolumeSelectorProps> = ({ onVolumeSelect }) => {
         <Card className="hover:shadow-lg transition-shadow cursor-pointer">
           <CardHeader className="text-center">
             <Truck className="w-12 h-12 mx-auto mb-4 text-green-600" />
-            <h2 className="text-xl font-semibold">High Volume</h2>
-            <p className="text-sm text-gray-500">For Businesses</p>
+            <h2 className="text-xl font-semibold">{t('booking.volumeSelector.highVolume.title')}</h2>
+            <p className="text-sm text-gray-500">{t('booking.volumeSelector.highVolume.subtitle')}</p>
           </CardHeader>
           <CardContent className="space-y-4">
             <ul className="space-y-2 text-sm">
               <li className="flex items-center">
                 <span className="mr-2">✓</span>
-                Bulk shipping solutions
+                {t('booking.volumeSelector.highVolume.features.bulk')}
               </li>
               <li className="flex items-center">
                 <span className="mr-2">✓</span>
-                Competitive rates
+                {t('booking.volumeSelector.highVolume.features.rates')}
               </li>
               <li className="flex items-center">
                 <span className="mr-2">✓</span>
-                Easy upload of shipment data
+                {t('booking.volumeSelector.highVolume.features.upload')}
               </li>
             </ul>
             <Button 
               className="w-full bg-green-600 hover:bg-green-700 text-white"
               onClick={handleHighVolume}
             >
-              Start High Volume Booking
+              {t('booking.volumeSelector.highVolume.button')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </CardContent>

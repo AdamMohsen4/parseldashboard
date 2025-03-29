@@ -186,15 +186,15 @@ const HighVolumeBookingPage = () => {
   const renderBusinessInfoStep = () => (
     <Card>
       <CardHeader>
-        <CardTitle>Business Information</CardTitle>
-        <CardDescription>Please provide your business details for the high volume shipment</CardDescription>
+        <CardTitle>{t('booking.highVolume.businessInfo.title')}</CardTitle>
+        <CardDescription>{t('booking.highVolume.businessInfo.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(businessInfo).map(([key, value]) => (
               <div key={key} className="space-y-2">
-                <Label htmlFor={key}>{key.replace(/([A-Z])/g, ' $1').trim()}</Label>
+                <Label htmlFor={key}>{t(`booking.highVolume.businessInfo.${key}`)}</Label>
                 <Input
                   id={key}
                   name={key}
@@ -208,7 +208,7 @@ const HighVolumeBookingPage = () => {
           </div>
           <div className="flex justify-end">
             <Button type="button" onClick={handleNext}>
-              Next <ArrowRight className="ml-2 h-4 w-4" />
+              {t('booking.highVolume.navigation.next')} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </form>
@@ -219,13 +219,13 @@ const HighVolumeBookingPage = () => {
   const renderUploadDataStep = () => (
     <Card>
       <CardHeader>
-        <CardTitle>Upload Shipment Data</CardTitle>
-        <CardDescription>Upload a CSV or Excel file containing your shipment data</CardDescription>
+        <CardTitle>{t('booking.highVolume.uploadData.title')}</CardTitle>
+        <CardDescription>{t('booking.highVolume.uploadData.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
           <div className="space-y-4">
-            <Label>Shipment Data File</Label>
+            <Label>{t('booking.highVolume.uploadData.fileLabel')}</Label>
             <div className="flex items-center gap-4">
               <Input
                 type="file"
@@ -240,7 +240,7 @@ const HighVolumeBookingPage = () => {
                 className="flex items-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-accent"
               >
                 <Upload className="h-4 w-4" />
-                {file ? file.name : 'Upload CSV or Excel file'}
+                {file ? file.name : t('booking.highVolume.uploadData.uploadButton')}
               </Label>
               {file && (
                 <Button
@@ -253,7 +253,7 @@ const HighVolumeBookingPage = () => {
                     setValidationErrors([]);
                   }}
                 >
-                  Clear
+                  {t('booking.highVolume.uploadData.clearButton')}
                 </Button>
               )}
             </div>
@@ -262,7 +262,7 @@ const HighVolumeBookingPage = () => {
           {validationErrors.length > 0 && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Validation Errors</AlertTitle>
+              <AlertTitle>{t('booking.highVolume.uploadData.validationErrors')}</AlertTitle>
               <AlertDescription>
                 <ul className="list-disc pl-4">
                   {validationErrors.map((error, index) => (
@@ -275,7 +275,7 @@ const HighVolumeBookingPage = () => {
 
           {shipments.length > 0 && (
             <div className="space-y-4">
-              <h3 className="font-medium">Preview ({shipments.length} shipments)</h3>
+              <h3 className="font-medium">{t('booking.highVolume.uploadData.preview')} ({shipments.length} {t('booking.highVolume.uploadData.shipments')})</h3>
               <div className="border rounded-md">
                 <Table>
                   <TableHeader>
@@ -301,14 +301,14 @@ const HighVolumeBookingPage = () => {
 
           <div className="flex justify-between">
             <Button type="button" variant="outline" onClick={handleBack}>
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back
+              <ArrowLeft className="mr-2 h-4 w-4" /> {t('booking.highVolume.navigation.back')}
             </Button>
             <Button 
               type="button" 
               onClick={handleNext}
               disabled={shipments.length === 0 || validationErrors.length > 0}
             >
-              Next <ArrowRight className="ml-2 h-4 w-4" />
+              {t('booking.highVolume.navigation.next')} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -319,17 +319,17 @@ const HighVolumeBookingPage = () => {
   const renderReviewStep = () => (
     <Card>
       <CardHeader>
-        <CardTitle>Review Your Shipment</CardTitle>
-        <CardDescription>Please review your business information and shipment data before submitting</CardDescription>
+        <CardTitle>{t('booking.highVolume.review.title')}</CardTitle>
+        <CardDescription>{t('booking.highVolume.review.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
           <div className="space-y-4">
-            <h3 className="font-medium">Business Information</h3>
+            <h3 className="font-medium">{t('booking.highVolume.review.businessInfo')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Object.entries(businessInfo).map(([key, value]) => (
                 <div key={key}>
-                  <Label>{key.replace(/([A-Z])/g, ' $1').trim()}</Label>
+                  <Label>{t(`booking.highVolume.businessInfo.${key}`)}</Label>
                   <p>{value}</p>
                 </div>
               ))}
@@ -337,20 +337,20 @@ const HighVolumeBookingPage = () => {
           </div>
 
           <div className="space-y-4">
-            <h3 className="font-medium">Shipment Summary</h3>
+            <h3 className="font-medium">{t('booking.highVolume.review.shipmentSummary')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 border rounded-md">
-                <Label>Total Packages</Label>
+                <Label>{t('booking.highVolume.review.totalPackages')}</Label>
                 <p className="text-2xl font-bold">{shipments.length}</p>
               </div>
               <div className="p-4 border rounded-md">
-                <Label>Total Weight</Label>
+                <Label>{t('booking.highVolume.review.totalWeight')}</Label>
                 <p className="text-2xl font-bold">
                   {shipments.reduce((sum, s) => sum + s.packageWeight, 0).toFixed(2)} kg
                 </p>
               </div>
               <div className="p-4 border rounded-md">
-                <Label>Estimated Cost</Label>
+                <Label>{t('booking.highVolume.review.estimatedCost')}</Label>
                 <p className="text-2xl font-bold">€{(shipments.length * 10).toFixed(2)}</p>
               </div>
             </div>
@@ -358,14 +358,14 @@ const HighVolumeBookingPage = () => {
 
           <div className="flex justify-between">
             <Button type="button" variant="outline" onClick={handleBack}>
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back
+              <ArrowLeft className="mr-2 h-4 w-4" /> {t('booking.highVolume.navigation.back')}
             </Button>
             <Button 
               type="button" 
               onClick={handleSubmit}
               disabled={isProcessing}
             >
-              {isProcessing ? 'Processing...' : 'Submit Shipment'}
+              {isProcessing ? t('booking.highVolume.review.processing') : t('booking.highVolume.review.submitButton')}
             </Button>
           </div>
         </div>
@@ -378,13 +378,13 @@ const HighVolumeBookingPage = () => {
       <NavBar />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6">High Volume Shipment Booking</h1>
+          <h1 className="text-3xl font-bold mb-6">{t('booking.highVolume.title')}</h1>
           
           <Alert className="mb-8">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Important Information</AlertTitle>
+            <AlertTitle>{t('booking.highVolume.importantInfo.title')}</AlertTitle>
             <AlertDescription>
-              For high volume shipments, please provide your business details and upload a CSV or Excel file containing your shipment data. The file should include columns for recipient name, address, city, postal code, country, and package details.
+              {t('booking.highVolume.importantInfo.description')}
             </AlertDescription>
           </Alert>
 
