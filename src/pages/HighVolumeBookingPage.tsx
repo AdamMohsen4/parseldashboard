@@ -4,12 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Upload, FileSpreadsheet, FileText, AlertCircle, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Upload, AlertCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
 import NavBar from "@/components/layout/NavBar";
 import { processCSVFile, processExcelFile, validateShipmentData } from '@/utils/fileProcessing';
-import { ShipmentData, HighVolumeShipment } from '@/types/shipment';
+import { ShipmentData } from '@/types/shipment';
+import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@clerk/clerk-react";
 import {
   Table,
   TableBody,
@@ -33,73 +35,69 @@ interface BusinessInfo {
 
 type Step = 'business-info' | 'upload-data' | 'review';
 
+const initialBusinessInfo: BusinessInfo = {
+  name: '',
+  vatNumber: '',
+  address: '',
+  city: '',
+  postalCode: '',
+  country: '',
+  contactPerson: '',
+  email: '',
+  phone: '',
+};
+
 const HighVolumeBookingPage = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const { user } = useUser();
   const [currentStep, setCurrentStep] = useState<Step>('business-info');
-  const [businessInfo, setBusinessInfo] = useState<BusinessInfo>({
-    name: '',
-    vatNumber: '',
-    address: '',
-    city: '',
-    postalCode: '',
-    country: '',
-    contactPerson: '',
-    email: '',
-    phone: '',
-  });
+  const [businessInfo, setBusinessInfo] = useState<BusinessInfo>(initialBusinessInfo);
   const [file, setFile] = useState<File | null>(null);
   const [shipments, setShipments] = useState<ShipmentData[]>([]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setBusinessInfo(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setBusinessInfo(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      try {
-        setIsProcessing(true);
-        setFile(selectedFile);
-        
-        let processedShipments: ShipmentData[];
-        if (selectedFile.type === 'text/csv') {
-          processedShipments = await processCSVFile(selectedFile);
-        } else {
-          processedShipments = await processExcelFile(selectedFile);
-        }
+    if (!selectedFile) return;
 
-        const validation = validateShipmentData(processedShipments);
-        if (!validation.valid) {
-          setValidationErrors(validation.errors);
-          toast({
-            title: "Validation Errors",
-            description: "Please fix the errors in your file before proceeding.",
-            variant: "destructive",
-          });
-        } else {
-          setValidationErrors([]);
-          setShipments(processedShipments);
-          toast({
-            title: "File Processed",
-            description: `Successfully processed ${processedShipments.length} shipments.`,
-          });
-        }
-      } catch (error) {
+    try {
+      setIsProcessing(true);
+      setFile(selectedFile);
+      
+      const processedShipments = selectedFile.type === 'text/csv' 
+        ? await processCSVFile(selectedFile)
+        : await processExcelFile(selectedFile);
+
+      const validation = validateShipmentData(processedShipments);
+      if (!validation.valid) {
+        setValidationErrors(validation.errors);
         toast({
-          title: "Error Processing File",
-          description: error instanceof Error ? error.message : "An error occurred while processing the file.",
+          title: "Validation Errors",
+          description: "Please fix the errors in your file before proceeding.",
           variant: "destructive",
         });
-      } finally {
-        setIsProcessing(false);
+      } else {
+        setValidationErrors([]);
+        setShipments(processedShipments);
+        toast({
+          title: "File Processed",
+          description: `Successfully processed ${processedShipments.length} shipments.`,
+        });
       }
+    } catch (error) {
+      toast({
+        title: "Error Processing File",
+        description: error instanceof Error ? error.message : "An error occurred while processing the file.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -112,59 +110,72 @@ const HighVolumeBookingPage = () => {
   };
 
   const handleBack = () => {
-    if (currentStep === 'upload-data') {
-      setCurrentStep('business-info');
-    } else if (currentStep === 'review') {
-      setCurrentStep('upload-data');
-    }
+    setCurrentStep(currentStep === 'review' ? 'upload-data' : 'business-info');
   };
+
+  const generateTrackingCode = () => 
+    `EP${Date.now().toString().slice(-8)}${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
 
     try {
-      const highVolumeShipment: HighVolumeShipment = {
-        businessInfo,
-        shipments,
-        totalPackages: shipments.length,
-        totalWeight: shipments.reduce((sum, s) => sum + s.packageWeight, 0),
-        estimatedCost: shipments.length * 10, // Example calculation
-      };
+      const { data: businessData, error: businessError } = await supabase
+        .from('high_volume_businesses')
+        .insert({
+          name: businessInfo.name,
+          vat_number: businessInfo.vatNumber,
+          address: businessInfo.address,
+          city: businessInfo.city,
+          postal_code: businessInfo.postalCode,
+          country: businessInfo.country,
+          contact_person: businessInfo.contactPerson,
+          email: businessInfo.email,
+          phone: businessInfo.phone
+        })
+        .select()
+        .single();
 
-      // Here you would typically:
-      // 1. Send the data to your backend
-      // 2. Process the shipments
-      // 3. Generate shipping labels
-      // 4. Send confirmation emails
+      if (businessError) throw new Error(`Failed to save business information: ${businessError.message}`);
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const shipmentRecords = shipments.map(shipment => ({
+        business_id: businessData.id,
+        tracking_code: generateTrackingCode(),
+        recipient_name: shipment.recipientName,
+        recipient_address: shipment.recipientAddress,
+        recipient_city: shipment.recipientCity,
+        recipient_postal_code: shipment.recipientPostalCode,
+        recipient_country: shipment.recipientCountry,
+        package_weight: shipment.packageWeight,
+        package_length: shipment.packageLength,
+        package_width: shipment.packageWidth,
+        package_height: shipment.packageHeight,
+        special_instructions: shipment.specialInstructions || null,
+        status: 'pending'
+      }));
+
+      const { error: shipmentsError } = await supabase
+        .from('high_volume_shipments')
+        .insert(shipmentRecords);
+
+      if (shipmentsError) throw new Error(`Failed to save shipments: ${shipmentsError.message}`);
 
       toast({
         title: "Success!",
-        description: "Your high volume shipment request has been submitted.",
+        description: `Successfully created ${shipments.length} shipments for ${businessInfo.name}`,
       });
 
       // Reset form
-      setBusinessInfo({
-        name: '',
-        vatNumber: '',
-        address: '',
-        city: '',
-        postalCode: '',
-        country: '',
-        contactPerson: '',
-        email: '',
-        phone: '',
-      });
+      setBusinessInfo(initialBusinessInfo);
       setFile(null);
       setShipments([]);
       setCurrentStep('business-info');
     } catch (error) {
+      console.error('Error submitting high volume shipment:', error);
       toast({
         title: "Error",
-        description: "There was an error processing your request. Please try again.",
+        description: error instanceof Error ? error.message : "There was an error processing your request. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -176,115 +187,25 @@ const HighVolumeBookingPage = () => {
     <Card>
       <CardHeader>
         <CardTitle>Business Information</CardTitle>
-        <CardDescription>
-          Please provide your business details for the high volume shipment
-        </CardDescription>
+        <CardDescription>Please provide your business details for the high volume shipment</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Business Name</Label>
-              <Input
-                id="name"
-                name="name"
-                value={businessInfo.name}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="vatNumber">VAT Number</Label>
-              <Input
-                id="vatNumber"
-                name="vatNumber"
-                value={businessInfo.vatNumber}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
+            {Object.entries(businessInfo).map(([key, value]) => (
+              <div key={key} className="space-y-2">
+                <Label htmlFor={key}>{key.replace(/([A-Z])/g, ' $1').trim()}</Label>
+                <Input
+                  id={key}
+                  name={key}
+                  value={value}
+                  onChange={handleInputChange}
+                  required
+                  type={key === 'email' ? 'email' : key === 'phone' ? 'tel' : 'text'}
+                />
+              </div>
+            ))}
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="address">Business Address</Label>
-            <Input
-              id="address"
-              name="address"
-              value={businessInfo.address}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="city">City</Label>
-              <Input
-                id="city"
-                name="city"
-                value={businessInfo.city}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="postalCode">Postal Code</Label>
-              <Input
-                id="postalCode"
-                name="postalCode"
-                value={businessInfo.postalCode}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="country">Country</Label>
-              <Input
-                id="country"
-                name="country"
-                value={businessInfo.country}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="contactPerson">Contact Person</Label>
-              <Input
-                id="contactPerson"
-                name="contactPerson"
-                value={businessInfo.contactPerson}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={businessInfo.email}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
-            <Input
-              id="phone"
-              name="phone"
-              type="tel"
-              value={businessInfo.phone}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-
           <div className="flex justify-end">
             <Button type="button" onClick={handleNext}>
               Next <ArrowRight className="ml-2 h-4 w-4" />
@@ -299,9 +220,7 @@ const HighVolumeBookingPage = () => {
     <Card>
       <CardHeader>
         <CardTitle>Upload Shipment Data</CardTitle>
-        <CardDescription>
-          Upload a CSV or Excel file containing your shipment data
-        </CardDescription>
+        <CardDescription>Upload a CSV or Excel file containing your shipment data</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
@@ -338,9 +257,6 @@ const HighVolumeBookingPage = () => {
                 </Button>
               )}
             </div>
-            <p className="text-sm text-muted-foreground">
-              Supported formats: CSV, Excel (.xlsx, .xls)
-            </p>
           </div>
 
           {validationErrors.length > 0 && (
@@ -404,51 +320,19 @@ const HighVolumeBookingPage = () => {
     <Card>
       <CardHeader>
         <CardTitle>Review Your Shipment</CardTitle>
-        <CardDescription>
-          Please review your business information and shipment data before submitting
-        </CardDescription>
+        <CardDescription>Please review your business information and shipment data before submitting</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
           <div className="space-y-4">
             <h3 className="font-medium">Business Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label>Business Name</Label>
-                <p>{businessInfo.name}</p>
-              </div>
-              <div>
-                <Label>VAT Number</Label>
-                <p>{businessInfo.vatNumber}</p>
-              </div>
-              <div>
-                <Label>Address</Label>
-                <p>{businessInfo.address}</p>
-              </div>
-              <div>
-                <Label>City</Label>
-                <p>{businessInfo.city}</p>
-              </div>
-              <div>
-                <Label>Postal Code</Label>
-                <p>{businessInfo.postalCode}</p>
-              </div>
-              <div>
-                <Label>Country</Label>
-                <p>{businessInfo.country}</p>
-              </div>
-              <div>
-                <Label>Contact Person</Label>
-                <p>{businessInfo.contactPerson}</p>
-              </div>
-              <div>
-                <Label>Email</Label>
-                <p>{businessInfo.email}</p>
-              </div>
-              <div>
-                <Label>Phone</Label>
-                <p>{businessInfo.phone}</p>
-              </div>
+              {Object.entries(businessInfo).map(([key, value]) => (
+                <div key={key}>
+                  <Label>{key.replace(/([A-Z])/g, ' $1').trim()}</Label>
+                  <p>{value}</p>
+                </div>
+              ))}
             </div>
           </div>
 
