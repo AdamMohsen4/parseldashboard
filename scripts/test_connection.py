@@ -18,8 +18,11 @@ def test_connection():
             print("❌ Error: Missing credentials in .env file")
             return False
             
-        # Create Supabase client
-        supabase: Client = create_client(supabase_url, supabase_key)
+        # Create Supabase client with correct initialization for v1.2.0
+        supabase: Client = create_client(
+            supabase_url=supabase_url,
+            supabase_key=supabase_key
+        )
         
         # Try to fetch a single business
         response = supabase.table('high_volume_businesses').select('*').limit(1).execute()
